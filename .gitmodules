@@ -7,3 +7,6 @@
 [submodule "forkoff-websocket"]
 	path = forkoff-websocket
 	url = ./forkoff-websocket/
+[submodule "forkoff-client"]
+	path = forkoff-client
+	url = ./forkoff-client/
