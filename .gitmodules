@@ -1,0 +1,9 @@
+[submodule "forkoff-api"]
+	path = forkoff-api
+	url = ./forkoff-api
+[submodule "forkoff-gameserver"]
+	path = forkoff-gameserver
+	url = ./forkoff-gameserver/
+[submodule "forkoff-websocket"]
+	path = forkoff-websocket
+	url = ./forkoff-websocket/
