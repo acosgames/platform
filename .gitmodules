@@ -10,3 +10,6 @@
 [submodule "forkoff-client"]
 	path = forkoff-client
 	url = ./forkoff-client/
+[submodule "forkoff-shared"]
+	path = forkoff-shared
+	url = ./forkoff-shared/
