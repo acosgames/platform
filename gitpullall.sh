@@ -30,4 +30,5 @@ cd ..
 echo "=========================================================="
 echo ">>>> PULL forkoff-platform"
 git pull origin master
+git submodule update --remote
 echo "=========================================================="
