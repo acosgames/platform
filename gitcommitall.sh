@@ -15,39 +15,39 @@ echo ">>>> COMMIT forkoff-api"
 cd forkoff-api
 git add .
 git commit -m "$1"
-git push origin master
+git push origin $BRANCH
 cd ..
 echo "=========================================================="
 echo ">>>> COMMIT forkoff-client"
 cd forkoff-client
 git add .
 git commit -m "$1"
-git push origin master
+git push origin $BRANCH
 cd ..
 echo "=========================================================="
 echo ">>>> COMMIT forkoff-gameserver"
 cd forkoff-gameserver
 git add .
 git commit -m "$1"
-git push origin master
+git push origin $BRANCH
 cd ..
 echo "=========================================================="
 echo ">>>> COMMIT forkoff-shared"
 cd forkoff-shared
 git add .
 git commit -m "$1"
-git push origin master
+git push origin $BRANCH
 cd ..
 echo "=========================================================="
 echo ">>>> COMMIT forkoff-websocket"
 cd forkoff-websocket
 git add .
 git commit -m "$1"
-git push origin master
+git push origin $BRANCH
 cd ..
 echo "=========================================================="
 echo ">>>> COMMIT forkoff-platform"
 git add .
 git commit -m "$1"
-git push origin master
+git push origin $BRANCH
 echo "=========================================================="
