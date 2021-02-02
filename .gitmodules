@@ -12,4 +12,4 @@
 	url = git@github.com:forkoff-io/forkoff-client.git
 [submodule "forkoff-shared"]
 	path = forkoff-shared
-	url = git@github.com:forkoff-io/forkoff-shared.git
+	url = ../forkoff-shared.git
