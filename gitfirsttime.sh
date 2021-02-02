@@ -4,5 +4,8 @@
 
 echo "=========================================================="
 echo ">>>> SUBMODULE INIT"
-git submodule update --init --recursive --remote
+git submodule update --recursive --remote --init
+echo "=========================================================="
+echo ">>>> SUBMODULE INIT"
+git submodule foreach --recursive git checkout master
 echo "=========================================================="
