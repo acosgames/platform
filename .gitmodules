@@ -1,15 +1,15 @@
 [submodule "forkoff-api"]
 	path = forkoff-api
-	url = ../forkoff-api
+	url = git@github.com:forkoff-io/forkoff-api
 [submodule "forkoff-gameserver"]
 	path = forkoff-gameserver
-	url = ../forkoff-gameserver/
+	url = git@github.com:forkoff-io/forkoff-gameserver/
 [submodule "forkoff-websocket"]
 	path = forkoff-websocket
-	url = ../forkoff-websocket/
+	url = git@github.com:forkoff-io/forkoff-websocket/
 [submodule "forkoff-client"]
 	path = forkoff-client
-	url = ../forkoff-client/
+	url = git@github.com:forkoff-io/forkoff-client/
 [submodule "forkoff-shared"]
 	path = forkoff-shared
-	url = ../forkoff-shared/
+	url = git@github.com:forkoff-io/forkoff-shared/
