@@ -1,0 +1,25 @@
+{
+  "name": "forkoff-platform",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently npm:dev-api npm:dev-client",
+    "dev-api": "cd forkoff-api && npm start",
+    "dev-client": "cd forkoff-client && npm start",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/forkoff-io/forkoff-platform.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/forkoff-io/forkoff-platform/issues"
+  },
+  "homepage": "https://github.com/forkoff-io/forkoff-platform#readme",
+  "dependencies": {
+    "concurrently": "^5.3.0"
+  }
+}
