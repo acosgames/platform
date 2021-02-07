@@ -1,3 +1,4 @@
+#!/bin/sh
 # Optional branch for 1st argument
 # Last argument is always the commit message
 

@@ -9,46 +9,40 @@ if [ $# -lt 2 ]; then
 fi
 
 echo "============================="
-echo ">>>> COMMIT TO: "$BRANCH
+echo ">>>> COMMIT LOCAL TO: "$BRANCH
 echo ">>>> Message: "$MESSAGE
 echo "============================="
-echo ">>>> COMMIT forkoff-api"
+echo ">>>> COMMIT LOCAL forkoff-api"
 cd forkoff-api
 git add .
 git commit -m "$1"
-git push origin $BRANCH
 cd ..
 echo "=========================================================="
-echo ">>>> COMMIT forkoff-client"
+echo ">>>> COMMIT LOCAL forkoff-client"
 cd forkoff-client
 git add .
 git commit -m "$1"
-git push origin $BRANCH
 cd ..
 echo "=========================================================="
-echo ">>>> COMMIT forkoff-gameserver"
+echo ">>>> COMMIT LOCAL forkoff-gameserver"
 cd forkoff-gameserver
 git add .
 git commit -m "$1"
-git push origin $BRANCH
 cd ..
 echo "=========================================================="
-echo ">>>> COMMIT forkoff-shared"
+echo ">>>> COMMIT LOCAL forkoff-shared"
 cd forkoff-shared
 git add .
 git commit -m "$1"
-git push origin $BRANCH
 cd ..
 echo "=========================================================="
-echo ">>>> COMMIT forkoff-websocket"
+echo ">>>> COMMIT LOCAL forkoff-websocket"
 cd forkoff-websocket
 git add .
 git commit -m "$1"
-git push origin $BRANCH
 cd ..
 echo "=========================================================="
-echo ">>>> COMMIT forkoff-platform"
+echo ">>>> COMMIT LOCAL forkoff-platform"
 git add .
 git commit -m "$1"
-git push origin $BRANCH
 echo "=========================================================="
