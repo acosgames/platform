@@ -23,4 +23,14 @@
 	url = ../forkoff-shared.git
 	update = merge 
 	branch = master
+[submodule "tictactoe-client"]
+	path = templates/tictactoe-client
+	url = git@github.com:fivesecondgames/tictactoe-client.git
+	update = merge 
+	branch = master
+[submodule "tictactoe-server"]
+	path = templates/tictactoe-client
+	url = git@github.com:fivesecondgames/tictactoe-client.git
+	update = merge 
+	branch = master
 	
