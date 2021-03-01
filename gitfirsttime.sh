@@ -9,7 +9,4 @@ git submodule update --recursive --remote --init
 echo "=========================================================="
 echo ">>>> SUBMODULE INIT"
 git submodule foreach --recursive git checkout master
-
-cd ./templates
-git submodule foreach --recursive git checkout main
 echo "=========================================================="

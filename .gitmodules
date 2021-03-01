@@ -27,10 +27,10 @@
 	path = templates/tictactoe-client
 	url = git@github.com:fivesecondgames/tictactoe-client.git
 	update = merge 
-	branch = main
+	branch = master
 [submodule "tictactoe-server"]
 	path = templates/tictactoe-server
 	url = git@github.com:fivesecondgames/tictactoe-server.git
 	update = merge 
-	branch = main
+	branch = master
 	
