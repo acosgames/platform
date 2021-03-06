@@ -4,32 +4,32 @@
 
 
 echo "=========================================================="
-echo ">>>> STATUS forkoff-api"
-cd forkoff-api
+echo ">>>> STATUS fsg-api"
+cd fsg-api
 git status
 cd ..
 echo "=========================================================="
-echo ">>>> STATUS forkoff-client"
-cd forkoff-client
+echo ">>>> STATUS fsg-client"
+cd fsg-client
 git status
 cd ..
 echo "=========================================================="
-echo ">>>> STATUS forkoff-gameserver"
-cd forkoff-gameserver
+echo ">>>> STATUS fsg-gameserver"
+cd fsg-gameserver
 git status
 cd ..
 echo "=========================================================="
-echo ">>>> STATUS forkoff-shared"
-cd forkoff-shared
+echo ">>>> STATUS fsg-shared"
+cd fsg-shared
 git status
 cd ..
 echo "=========================================================="
-echo ">>>> STATUS forkoff-websocket"
-cd forkoff-websocket
+echo ">>>> STATUS fsg-websocket"
+cd fsg-websocket
 git status
 cd ..
 echo "=========================================================="
-echo ">>>> STATUS forkoff-platform"
+echo ">>>> STATUS fsg-platform"
 git status
 echo "=========================================================="
 

@@ -1,36 +1,41 @@
-[submodule "forkoff-api"]
-	path = forkoff-api
-	url = git@github.com:forkoff-io/forkoff-api.git
+[submodule "fsg-api"]
+	path = fsg-api
+	url = git@github.com:5SG/fsg-api.git
 	update = merge 
-	branch = master
-[submodule "forkoff-gameserver"]
-	path = forkoff-gameserver
-	url = git@github.com:forkoff-io/forkoff-gameserver.git
+	branch = main
+[submodule "fsg-gameserver"]
+	path = fsg-gameserver
+	url = git@github.com:5SG/fsg-gameserver.git
 	update = merge 
-	branch = master
-[submodule "forkoff-websocket"]
-	path = forkoff-websocket
-	url = git@github.com:forkoff-io/forkoff-websocket.git
+	branch = main
+[submodule "fsg-websocket"]
+	path = fsg-websocket
+	url = git@github.com:5SG/fsg-websocket.git
 	update = merge 
-	branch = master
-[submodule "forkoff-client"]
-	path = forkoff-client
-	url = git@github.com:forkoff-io/forkoff-client.git
+	branch = main
+[submodule "fsg-client"]
+	path = fsg-client
+	url = git@github.com:5SG/fsg-client.git
 	update = merge 
-	branch = master
-[submodule "forkoff-shared"]
-	path = forkoff-shared
-	url = ../forkoff-shared.git
+	branch = main
+[submodule "fsg-shared"]
+	path = fsg-shared
+	url = ../fsg-shared.git
 	update = merge 
-	branch = master
+	branch = main
 [submodule "tictactoe-client"]
 	path = templates/tictactoe-client
 	url = git@github.com:fivesecondgames/tictactoe-client.git
 	update = merge 
-	branch = master
+	branch = main
 [submodule "tictactoe-server"]
 	path = templates/tictactoe-server
 	url = git@github.com:fivesecondgames/tictactoe-server.git
 	update = merge 
-	branch = master
+	branch = main
+[submodule "fsg-gitworker"]
+	path = fsg-gitworker
+	url = git@github.com:5SG/fsg-gitworker.git
+	update = merge 
+	branch = main
 	

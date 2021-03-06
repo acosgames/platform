@@ -8,5 +8,5 @@ echo ">>>> SUBMODULE INIT"
 git submodule update --recursive --remote --init
 echo "=========================================================="
 echo ">>>> SUBMODULE INIT"
-git submodule foreach --recursive git checkout master
+git submodule foreach --recursive git checkout main
 echo "=========================================================="

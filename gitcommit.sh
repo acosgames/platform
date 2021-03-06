@@ -1,10 +1,10 @@
 #!/bin/sh
 # Optional branch for 1st argument
 # Last argument is always the commit message
-BRANCH=${1:-master}
+BRANCH=${1:-main}
 MESSAGE=${2:-"new updates"}
 if [ $# -lt 2 ]; then
-        BRANCH=master
+        BRANCH=main
         MESSAGE=${1:-"new updates"}
 fi
 
@@ -12,42 +12,42 @@ echo "============================="
 echo ">>>> COMMIT TO: "$BRANCH
 echo ">>>> Message: "$MESSAGE
 echo "============================="
-echo ">>>> COMMIT forkoff-api"
-cd forkoff-api
+echo ">>>> COMMIT fsg-api"
+cd fsg-api
 git add .
 git commit -m "$1"
 git push origin $BRANCH
 cd ..
 echo "=========================================================="
-echo ">>>> COMMIT forkoff-client"
-cd forkoff-client
+echo ">>>> COMMIT fsg-client"
+cd fsg-client
 git add .
 git commit -m "$1"
 git push origin $BRANCH
 cd ..
 echo "=========================================================="
-echo ">>>> COMMIT forkoff-gameserver"
-cd forkoff-gameserver
+echo ">>>> COMMIT fsg-gameserver"
+cd fsg-gameserver
 git add .
 git commit -m "$1"
 git push origin $BRANCH
 cd ..
 echo "=========================================================="
-echo ">>>> COMMIT forkoff-shared"
-cd forkoff-shared
+echo ">>>> COMMIT fsg-shared"
+cd fsg-shared
 git add .
 git commit -m "$1"
 git push origin $BRANCH
 cd ..
 echo "=========================================================="
-echo ">>>> COMMIT forkoff-websocket"
-cd forkoff-websocket
+echo ">>>> COMMIT fsg-websocket"
+cd fsg-websocket
 git add .
 git commit -m "$1"
 git push origin $BRANCH
 cd ..
 echo "=========================================================="
-echo ">>>> COMMIT forkoff-platform"
+echo ">>>> COMMIT fsg-platform"
 git add .
 git commit -m "$1"
 git push origin $BRANCH

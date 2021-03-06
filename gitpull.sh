@@ -4,32 +4,32 @@
 
 
 echo "=========================================================="
-echo ">>>> PULL forkoff-api"
-cd forkoff-api
-git pull origin master
+echo ">>>> PULL fsg-api"
+cd fsg-api
+git pull origin main
 cd ..
 echo "=========================================================="
-echo ">>>> PULL forkoff-client"
-cd forkoff-client
-git pull origin master
+echo ">>>> PULL fsg-client"
+cd fsg-client
+git pull origin main
 cd ..
 echo "=========================================================="
-echo ">>>> PULL forkoff-gameserver"
-cd forkoff-gameserver
-git pull origin master
+echo ">>>> PULL fsg-gameserver"
+cd fsg-gameserver
+git pull origin main
 cd ..
 echo "=========================================================="
-echo ">>>> PULL forkoff-shared"
-cd forkoff-shared
-git pull origin master
+echo ">>>> PULL fsg-shared"
+cd fsg-shared
+git pull origin main
 cd ..
 echo "=========================================================="
-echo ">>>> PULL forkoff-websocket"
-cd forkoff-websocket
-git pull origin master
+echo ">>>> PULL fsg-websocket"
+cd fsg-websocket
+git pull origin main
 cd ..
 echo "=========================================================="
-echo ">>>> PULL forkoff-platform"
-git pull origin master
+echo ">>>> PULL fsg-platform"
+git pull origin main
 git submodule update --remote
 echo "=========================================================="
