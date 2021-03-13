@@ -47,6 +47,13 @@ git commit -m "$1"
 git push origin $BRANCH
 cd ..
 echo "=========================================================="
+echo ">>>> COMMIT fsg-gitworker"
+cd fsg-gitworker
+git add .
+git commit -m "$1"
+git push origin $BRANCH
+cd ..
+echo "=========================================================="
 echo ">>>> COMMIT fsg-platform"
 git add .
 git commit -m "$1"
