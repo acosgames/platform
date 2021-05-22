@@ -23,9 +23,9 @@
 	url = ../fsg-shared.git
 	update = merge 
 	branch = main
-[submodule "tictactoe-client"]
+[submodule "tictactoe"]
 	path = templates/tictactoe-client
-	url = git@github.com:fivesecondgames/tictactoe-client.git
+	url = git@github.com:fivesecondgames/tictactoe.git
 	update = merge 
 	branch = main
 [submodule "tictactoe-server"]

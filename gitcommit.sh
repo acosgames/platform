@@ -59,3 +59,10 @@ git add .
 git commit -m "$1"
 git push origin $BRANCH
 echo "=========================================================="
+echo ">>>> COMMIT templates/tictactoe"
+cd templates/tictactoe
+git add .
+git commit -m "$1"
+git push origin $BRANCH
+cd ..
+echo "=========================================================="

@@ -33,14 +33,8 @@ echo ">>>> STATUS fsg-platform"
 git status
 echo "=========================================================="
 
-echo ">>>> STATUS templates/tictactoe-client"
-cd templates/tictactoe-client
-git status
-cd ../..
-echo "=========================================================="
-
-echo ">>>> STATUS templates/tictactoe-server"
-cd templates/tictactoe-server
+echo ">>>> STATUS templates/tictactoe"
+cd templates/tictactoe
 git status
 cd ../..
 echo "=========================================================="
