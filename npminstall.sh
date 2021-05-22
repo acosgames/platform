@@ -1,7 +1,4 @@
 #!/bin/sh
-# Optional branch for 1st argument
-# Last argument is always the commit message
-
 
 echo "=========================================================="
 echo ">>>> NPM INSTALL fsg-api"
@@ -31,4 +28,9 @@ cd ..
 echo "=========================================================="
 echo ">>>> NPM INSTALL fsg-platform"
 npm install
+echo "=========================================================="
+echo ">>>> NPM INSTALL templates/tictactoe"
+cd templates/tictactoe
+npm install
+cd ..
 echo "=========================================================="
