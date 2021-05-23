@@ -32,7 +32,6 @@ echo "=========================================================="
 echo ">>>> STATUS fsg-platform"
 git status
 echo "=========================================================="
-
 echo ">>>> STATUS templates/tictactoe"
 cd templates/tictactoe
 git status
