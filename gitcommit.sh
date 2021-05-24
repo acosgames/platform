@@ -59,7 +59,7 @@ cd templates/tictactoe
 git add .
 git commit -m "$1"
 git push origin $BRANCH
-cd ..
+cd ../..
 echo "=========================================================="
 echo ">>>> COMMIT fsg-platform"
 git add .
