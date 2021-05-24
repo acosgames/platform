@@ -26,11 +26,11 @@ cd fsg-websocket
 npm install
 cd ..
 echo "=========================================================="
-echo ">>>> NPM INSTALL fsg-platform"
-npm install
-echo "=========================================================="
 echo ">>>> NPM INSTALL templates/tictactoe"
 cd templates/tictactoe
 npm install
-cd ..
+cd ../..
+echo "=========================================================="
+echo ">>>> NPM INSTALL fsg-platform"
+npm install
 echo "=========================================================="

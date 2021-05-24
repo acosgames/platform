@@ -32,7 +32,7 @@ echo "=========================================================="
 echo ">>>> PULL templates/tictactoe"
 cd templates/tictactoe
 git pull origin main
-cd ..
+cd ../..
 echo "=========================================================="
 echo ">>>> PULL fsg-platform"
 git pull origin main

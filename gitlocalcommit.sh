@@ -46,7 +46,7 @@ echo ">>>> COMMIT templates/tictactoe"
 cd templates/tictactoe
 git add .
 git commit -m "$1"
-cd ..
+cd ../..
 echo "=========================================================="
 echo ">>>> COMMIT LOCAL fsg-platform"
 git add .
