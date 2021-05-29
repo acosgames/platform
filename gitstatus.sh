@@ -29,6 +29,11 @@ cd fsg-websocket
 git status
 cd ..
 echo "=========================================================="
+echo ">>>> STATUS fsg-gitworker"
+cd fsg-gitworker
+git status
+cd ..
+echo "=========================================================="
 echo ">>>> STATUS templates/tictactoe"
 cd templates/tictactoe
 git status

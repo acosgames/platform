@@ -29,6 +29,11 @@ cd fsg-websocket
 git pull origin main
 cd ..
 echo "=========================================================="
+echo ">>>> PULL fsg-gitworker"
+cd fsg-gitworker
+git pull origin main
+cd ..
+echo "=========================================================="
 echo ">>>> PULL templates/tictactoe"
 cd templates/tictactoe
 git pull origin main

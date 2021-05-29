@@ -24,6 +24,12 @@ echo "=========================================================="
 echo ">>>> NPM INSTALL fsg-websocket"
 cd fsg-websocket
 npm install
+npm run installws
+cd ..
+echo "=========================================================="
+echo ">>>> NPM INSTALL fsg-gitworker"
+cd fsg-gitworker
+npm install
 cd ..
 echo "=========================================================="
 echo ">>>> NPM INSTALL templates/tictactoe"
