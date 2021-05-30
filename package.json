@@ -4,13 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "concurrently npm:dev-api npm:dev-client npm:dev-gitwebhook",
-    "dev-servers": "concurrently npm:dev-node npm:dev-gameserver",
+    "start": "./node_modules/.bin/concurrently npm:dev-api npm:dev-client npm:dev-gitwebhook",
+    "dev-servers": "./node_modules/.bin/concurrently npm:dev-node npm:dev-gameserver",
     "dev-api": "cd fsg-api && npm start",
     "dev-client": "cd fsg-client && npm start",
     "dev-gitwebhook": "cd fsg-gitworker && npm run dev-gitwebhook",
     "dev-wscluster": "cd fsg-websocket && npm run dev-wscluster",
-    "dev-node": "cd fsg-websocket && npm run dev-node",
+    "dev-node": "cd fsg-websocket && npm run dev",
     "dev-gameserver": "cd fsg-gameserver && npm run dev",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
