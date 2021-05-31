@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "./node_modules/.bin/concurrently npm:dev-api npm:dev-client npm:dev-gitwebhook",
+    "start": "./node_modules/.bin/concurrently npm:dev-api npm:dev-client",
     "dev-servers": "./node_modules/.bin/concurrently npm:dev-node npm:dev-gameserver",
     "dev-api": "cd fsg-api && npm start",
     "dev-client": "cd fsg-client && npm start",
