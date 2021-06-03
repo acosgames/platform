@@ -14,7 +14,6 @@
             "script": "./index.js",
             "watch": ["src", "index.js", "../fsg-shared"],
             "node_args": ["--inspect=10003"],
-            "watch_delay": 100,
             "ignore_watch": ["node_modules"],
             "source_map_support": true
     
@@ -25,7 +24,6 @@
             "script": "./index.js",
             "watch": ["src", "index.js", "../fsg-shared"],
             "node_args": ["--inspect=10004"],
-            "watch_delay": 100,
             "ignore_watch": ["node_modules"]
         }
     ]
