@@ -4,27 +4,36 @@
             "name": "fsg-api",
             "cwd": "./fsg-api",
             "script": "./index.js",
-            "watch": ["src", "index.js", "../fsg-shared"],
+            "watch": ["src/**", "index.js"],
             "node_args": ["--inspect=10001"],
-            "ignore_watch": ["node_modules", "public", "sessions"]
+            "ignore_watch": ["public", "sessions"],
+            "watch_options": {
+                "followSymlinks": true
+            }
         },
         {
             "name": "fsg-gameserver",
             "cwd": "./fsg-gameserver",
             "script": "./index.js",
-            "watch": ["src", "index.js", "../fsg-shared"],
+            "watch": ["src/**", "index.js"],
             "node_args": ["--inspect=10003"],
-            "ignore_watch": ["node_modules"],
-            "source_map_support": true
+            "ignore_watch": [],
+            "source_map_support": true,
+            "watch_options": {
+                "followSymlinks": true
+            }
     
         },
         {
             "name": "fsg-websocket",
             "cwd": "./fsg-websocket",
             "script": "./index.js",
-            "watch": ["src", "index.js", "../fsg-shared"],
+            "watch": ["src/**", "index.js"],
             "node_args": ["--inspect=10004"],
-            "ignore_watch": ["node_modules"]
+            "ignore_watch": [],
+            "watch_options": {
+                "followSymlinks": true
+            }
         }
     ]
 }
