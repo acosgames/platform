@@ -1,0 +1,36 @@
+{
+    "apps": [
+        {
+            "name": "fsg-api",
+            "cwd": "./fsg-api",
+            "script": "./index.js",
+            "watch": ["src/**", "index.js"],
+            "ignore_watch": ["public", "sessions"],
+            "watch_options": {
+                "followSymlinks": true
+            }
+        },
+        {
+            "name": "fsg-gameserver",
+            "cwd": "./fsg-gameserver",
+            "script": "./index.js",
+            "watch": ["src/**", "index.js"],
+            "ignore_watch": [],
+            "source_map_support": true,
+            "watch_options": {
+                "followSymlinks": true
+            }
+    
+        },
+        {
+            "name": "fsg-websocket",
+            "cwd": "./fsg-websocket",
+            "script": "./index.js",
+            "watch": ["src/**", "index.js"],
+            "ignore_watch": [],
+            "watch_options": {
+                "followSymlinks": true
+            }
+        }
+    ]
+}
