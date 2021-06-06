@@ -33,3 +33,8 @@
 	url = git@github.com:fivesecondgames/tictactoe.git
 	update = merge 
 	branch = main
+[submodule "templates/poptrivia"]
+	path = templates/poptrivia
+	url = git@github.com:fivesecondgames/poptrivia.git
+	update = merge 
+	branch = main

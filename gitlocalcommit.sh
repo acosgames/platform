@@ -54,6 +54,12 @@ git add .
 git commit -m "$1"
 cd ../..
 echo "=========================================================="
+echo ">>>> COMMIT templates/poptrivia"
+cd templates/poptrivia
+git add .
+git commit -m "$1"
+cd ../..
+echo "=========================================================="
 echo ">>>> COMMIT LOCAL fsg-platform"
 git add .
 git commit -m "$1"

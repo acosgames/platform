@@ -37,6 +37,11 @@ cd templates/tictactoe
 npm install
 cd ../..
 echo "=========================================================="
+echo ">>>> NPM INSTALL templates/poptrivia"
+cd templates/poptrivia
+npm install
+cd ../..
+echo "=========================================================="
 echo ">>>> NPM INSTALL fsg-platform"
 npm install
 echo "=========================================================="
