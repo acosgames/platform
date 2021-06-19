@@ -60,6 +60,12 @@ git add .
 git commit -m "$1"
 cd ../..
 echo "=========================================================="
+echo ">>>> COMMIT templates/rockpaperscissors"
+cd templates/rockpaperscissors
+git add .
+git commit -m "$1"
+cd ../..
+echo "=========================================================="
 echo ">>>> COMMIT LOCAL fsg-platform"
 git add .
 git commit -m "$1"

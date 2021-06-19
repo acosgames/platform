@@ -68,6 +68,13 @@ git commit -m "$1"
 git push origin $BRANCH
 cd ../..
 echo "=========================================================="
+echo ">>>> COMMIT templates/rockpaperscissors"
+cd templates/rockpaperscissors
+git add .
+git commit -m "$1"
+git push origin $BRANCH
+cd ../..
+echo "=========================================================="
 echo ">>>> COMMIT fsg-platform"
 git add .
 git commit -m "$1"
