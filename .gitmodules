@@ -43,3 +43,8 @@
 	url = git@github.com:fivesecondgames/rockpaperscissors.git
 	update = merge 
 	branch = main
+[submodule "templates/fivesecondgames"]
+	path = templates/fivesecondgames
+	url = git@github.com:fivesecondgames/fivesecondgames.git
+	update = merge 
+	branch = main

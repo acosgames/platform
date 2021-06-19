@@ -49,6 +49,11 @@ cd templates/rockpaperscissors
 git status
 cd ../..
 echo "=========================================================="
+echo ">>>> STATUS templates/fivesecondgames"
+cd templates/fivesecondgames
+git status
+cd ../..
+echo "=========================================================="
 echo ">>>> STATUS fsg-platform"
 git status
 echo "=========================================================="

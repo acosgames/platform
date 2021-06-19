@@ -42,6 +42,16 @@ cd templates/poptrivia
 npm install
 cd ../..
 echo "=========================================================="
+echo ">>>> NPM INSTALL templates/rockpaperscissors"
+cd templates/rockpaperscissors
+npm install
+cd ../..
+echo "=========================================================="
+echo ">>>> NPM INSTALL templates/fivesecondgames"
+cd templates/fivesecondgames
+npm install
+cd ../..
+echo "=========================================================="
 echo ">>>> NPM INSTALL fsg-platform"
 npm install
 echo "=========================================================="

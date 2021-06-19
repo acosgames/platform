@@ -49,6 +49,11 @@ cd templates/rockpaperscissors
 git pull origin main
 cd ../..
 echo "=========================================================="
+echo ">>>> PULL templates/fivesecondgames"
+cd templates/fivesecondgames
+git pull origin main
+cd ../..
+echo "=========================================================="
 echo ">>>> PULL fsg-platform"
 git pull origin main
 git submodule update --remote
