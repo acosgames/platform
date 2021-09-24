@@ -30,6 +30,12 @@ git add .
 git commit -m "$1"
 cd ..
 echo "=========================================================="
+echo ">>>> COMMIT LOCAL fsg-matchmaker"
+cd fsg-matchmaker
+git add .
+git commit -m "$1"
+cd ..
+echo "=========================================================="
 echo ">>>> COMMIT LOCAL fsg-shared"
 cd fsg-shared
 git add .

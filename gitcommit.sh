@@ -33,6 +33,13 @@ git commit -m "$1"
 git push origin $BRANCH
 cd ..
 echo "=========================================================="
+echo ">>>> COMMIT fsg-matchmaker"
+cd fsg-matchmaker
+git add .
+git commit -m "$1"
+git push origin $BRANCH
+cd ..
+echo "=========================================================="
 echo ">>>> COMMIT fsg-shared"
 cd fsg-shared
 git add .

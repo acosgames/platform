@@ -31,6 +31,16 @@
             "watch_options": {
                 "followSymlinks": true
             }
+        },
+        {
+            "name": "fsg-matchmaker",
+            "cwd": "./fsg-matchmaker",
+            "script": "./index.js",
+            "watch": ["src/**", "index.js"],
+            "ignore_watch": [],
+            "watch_options": {
+                "followSymlinks": true
+            }
         }
     ]
 }

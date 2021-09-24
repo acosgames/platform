@@ -13,6 +13,11 @@
 	url = git@github.com:5SG/fsg-websocket.git
 	update = merge 
 	branch = main
+[submodule "fsg-matchmaker"]
+	path = fsg-matchmaker
+	url = git@github.com:5SG/fsg-matchmaker.git
+	update = merge 
+	branch = main
 [submodule "fsg-client"]
 	path = fsg-client
 	url = git@github.com:5SG/fsg-client.git

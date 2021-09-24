@@ -19,6 +19,11 @@ cd fsg-gameserver
 git status
 cd ..
 echo "=========================================================="
+echo ">>>> STATUS fsg-matchmaker"
+cd fsg-gameserver
+git status
+cd ..
+echo "=========================================================="
 echo ">>>> STATUS fsg-shared"
 cd fsg-shared
 git status

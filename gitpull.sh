@@ -19,6 +19,11 @@ cd fsg-gameserver
 git pull origin main
 cd ..
 echo "=========================================================="
+echo ">>>> PULL fsg-matchmaker"
+cd fsg-matchmaker
+git pull origin main
+cd ..
+echo "=========================================================="
 echo ">>>> PULL fsg-shared"
 cd fsg-shared
 git pull origin main

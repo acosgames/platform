@@ -16,6 +16,11 @@ cd fsg-gameserver
 npm install
 cd ..
 echo "=========================================================="
+echo ">>>> NPM INSTALL fsg-matchmaker"
+cd fsg-matchmaker
+npm install
+cd ..
+echo "=========================================================="
 echo ">>>> NPM INSTALL fsg-shared"
 cd fsg-shared
 npm install
