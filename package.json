@@ -16,6 +16,7 @@
     "dev-wscluster": "cd fsg-websocket && npm run dev-wscluster",
     "dev-node": "cd fsg-websocket && npm run dev",
     "dev-gameserver": "cd fsg-gameserver && npm run dev",
+    "dev-matchmaker": "cd fsg-matchmaker && npm run dev",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
