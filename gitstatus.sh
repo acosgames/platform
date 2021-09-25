@@ -20,7 +20,7 @@ git status
 cd ..
 echo "=========================================================="
 echo ">>>> STATUS fsg-matchmaker"
-cd fsg-gameserver
+cd fsg-matchmaker
 git status
 cd ..
 echo "=========================================================="
