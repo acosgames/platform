@@ -4,47 +4,34 @@
             "name": "fsg-api",
             "cwd": "./fsg-api",
             "script": "./index.js",
-            "watch": ["src/**", "index.js", "../fsg-shared/**"],
+            "watch": ["src/**", "index.js", "node_modules/fsg-shared/**"],
             "node_args": ["--inspect=10001"],
-            "ignore_watch": ["public", "sessions"],
-            "watch_options": {
-                "followSymlinks": true
-            }
+            "ignore_watch": ["public", "sessions"]
         },
         {
             "name": "fsg-gameserver",
             "cwd": "./fsg-gameserver",
             "script": "./index.js",
-            "watch": ["src/**", "index.js", "../fsg-shared/**"],
+            "watch": ["src/**", "index.js", "node_modules/fsg-shared/**"],
             "node_args": ["--inspect=10003"],
             "ignore_watch": ["serverScripts/**"],
-            "source_map_support": true,
-            "watch_options": {
-                "followSymlinks": true
-            }
-    
+            "source_map_support": true
         },
         {
             "name": "fsg-websocket",
             "cwd": "./fsg-websocket",
             "script": "./index.js",
-            "watch": ["src/**", "index.js", "../fsg-shared/**"],
+            "watch": ["src/**", "index.js", "node_modules/fsg-shared/**"],
             "node_args": ["--inspect=10004"],
-            "ignore_watch": [],
-            "watch_options": {
-                "followSymlinks": true
-            }
+            "ignore_watch": []
         },
         {
             "name": "fsg-matchmaker",
             "cwd": "./fsg-matchmaker",
             "script": "./index.js",
-            "watch": ["src/**", "index.js", "../fsg-shared/**"],
-            "node_args": ["--inspect=10004"],
-            "ignore_watch": [],
-            "watch_options": {
-                "followSymlinks": true
-            }
+            "watch": ["src/**", "index.js", "node_modules/fsg-shared/**"],
+            "node_args": ["--inspect=10005"],
+            "ignore_watch": []
         }
     ]
 }
