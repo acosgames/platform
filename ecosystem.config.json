@@ -4,6 +4,8 @@
             "name": "fsg-api",
             "cwd": "./fsg-api",
             "script": "./index.js",
+            "instances": "1",
+            "exec_mode": "cluster",
             "watch": ["src/**", "index.js", "node_modules/fsg-shared/**"],
             "node_args": ["--inspect=10001"],
             "ignore_watch": ["public", "sessions"]
@@ -12,15 +14,18 @@
             "name": "fsg-gameserver",
             "cwd": "./fsg-gameserver",
             "script": "./index.js",
+            "instances": "1",
+            "exec_mode": "cluster",
             "watch": ["src/**", "index.js", "node_modules/fsg-shared/**"],
             "node_args": ["--inspect=10003"],
-            "ignore_watch": ["serverScripts/**"],
-            "source_map_support": true
+            "ignore_watch": ["serverScripts/**"]
         },
         {
             "name": "fsg-websocket",
             "cwd": "./fsg-websocket",
             "script": "./index.js",
+            "instances": "1",
+            "exec_mode": "cluster",
             "watch": ["src/**", "index.js", "node_modules/fsg-shared/**"],
             "node_args": ["--inspect=10004"],
             "ignore_watch": []
@@ -29,6 +34,8 @@
             "name": "fsg-matchmaker",
             "cwd": "./fsg-matchmaker",
             "script": "./index.js",
+            "instances": "1",
+            "exec_mode": "cluster",
             "watch": ["src/**", "index.js", "node_modules/fsg-shared/**"],
             "node_args": ["--inspect=10005"],
             "ignore_watch": []

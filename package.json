@@ -6,7 +6,7 @@
   "scripts": {
     "start": "./node_modules/.bin/concurrently npm:dev-client npm:dev",
     "dev": "pm2 start ecosystem.config.json --watch --no-daemon",
-    "prod": "pm2 start ecosystem.config.prod.json",
+    "prod": "pm2 start ecosystem.config.prod.json --watch --no-daemon",
     "stop": "pm2 stop ecosystem.config.json",
     "kill": "pm2 kill",
     "logs": "pm2 logs",
