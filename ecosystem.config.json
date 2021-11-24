@@ -6,9 +6,18 @@
             "script": "./index.js",
             "instances": "1",
             "exec_mode": "cluster",
-            "watch": ["src/**", "index.js", "node_modules/fsg-shared/**"],
-            "node_args": ["--inspect=10001"],
-            "ignore_watch": ["public", "sessions"]
+            "watch": [
+                "src/**",
+                "index.js",
+                "node_modules/fsg-shared/**"
+            ],
+            "node_args": [
+                "--inspect=10001"
+            ],
+            "ignore_watch": [
+                "public",
+                "sessions"
+            ]
         },
         {
             "name": "fsg-gameserver",
@@ -16,9 +25,19 @@
             "script": "./index.js",
             "instances": "1",
             "exec_mode": "cluster",
-            "watch": ["src/**", "index.js", "node_modules/fsg-shared/**"],
-            "node_args": ["--inspect=10003"],
-            "ignore_watch": ["serverScripts/**"]
+            "watch": [
+                "saved/**",
+                "serverScripts/**",
+                "src/**",
+                "index.js",
+                "node_modules/fsg-shared/**"
+            ],
+            "node_args": [
+                "--inspect=10003"
+            ],
+            "ignore_watch": [
+                "serverScripts/**"
+            ]
         },
         {
             "name": "fsg-websocket",
@@ -26,8 +45,14 @@
             "script": "./index.js",
             "instances": "1",
             "exec_mode": "cluster",
-            "watch": ["src/**", "index.js", "node_modules/fsg-shared/**"],
-            "node_args": ["--inspect=10004"],
+            "watch": [
+                "src/**",
+                "index.js",
+                "node_modules/fsg-shared/**"
+            ],
+            "node_args": [
+                "--inspect=10004"
+            ],
             "ignore_watch": []
         },
         {
@@ -36,8 +61,14 @@
             "script": "./index.js",
             "instances": "1",
             "exec_mode": "cluster",
-            "watch": ["src/**", "index.js", "node_modules/fsg-shared/**"],
-            "node_args": ["--inspect=10005"],
+            "watch": [
+                "src/**",
+                "index.js",
+                "node_modules/fsg-shared/**"
+            ],
+            "node_args": [
+                "--inspect=10005"
+            ],
             "ignore_watch": []
         }
     ]
