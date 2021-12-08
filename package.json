@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "./node_modules/.bin/concurrently npm:dev-client npm:dev",
-    "dev": "pm2 start ecosystem.config.json --watch --no-daemon",
-    "prod": "pm2 start ecosystem.config.prod.json --watch --no-daemon",
+    "dev": "pm2 start ecosystem.config.json --watch",
+    "prod": "pm2 start ecosystem.config.prod.json --watch",
     "stop": "pm2 stop ecosystem.config.json",
     "kill": "pm2 kill",
     "logs": "pm2 logs",
@@ -32,7 +32,10 @@
     "url": "https://github.com/5SG/fsg-platform/issues"
   },
   "homepage": "https://github.com/5SG/fsg-platform#readme",
-  "dependencies": {},
+  "dependencies": {
+    "react-markdown": "^7.1.1",
+    "remark-gfm": "^3.0.1"
+  },
   "devDependencies": {
     "concurrently": "^5.3.0",
     "nodemon": "^2.0.7"
