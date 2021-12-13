@@ -57,6 +57,18 @@
             "watch_options": {
                 "followSymlinks": true
             }
+        },
+        {
+            "name": "fsg-gitworker",
+            "cwd": "./fsg-gitworker",
+            "script": "./gitwebhook.js",
+            "watch": [
+                "gitwebhook.js"
+            ],
+            "ignore_watch": [],
+            "watch_options": {
+                "followSymlinks": true
+            }
         }
     ]
 }

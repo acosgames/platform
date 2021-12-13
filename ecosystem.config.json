@@ -70,6 +70,20 @@
                 "--inspect=10005"
             ],
             "ignore_watch": []
+        },
+        {
+            "name": "fsg-gitworker",
+            "cwd": "./fsg-gitworker",
+            "script": "./gitwebhook.js",
+            "instances": "1",
+            "exec_mode": "cluster",
+            "watch": [
+                "*.js"
+            ],
+            "node_args": [
+                "--inspect=10006"
+            ],
+            "ignore_watch": []
         }
     ]
 }
