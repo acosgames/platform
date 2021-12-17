@@ -4,14 +4,19 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "./node_modules/.bin/concurrently npm:dev-client npm:dev",
-    "dev": "pm2 start ecosystem.config.json --watch",
-    "prod": "pm2 start ecosystem.config.prod.json --watch",
+    "start": "./node_modules/.bin/run-p server client",
+    "client": "npm start --prefix fsg-client",
+    "client:dev": "npm start --prefix fsg-client",
+    "server": "pm2 start ecosystem.config.json --watch --no-daemon",
+    "server:dev": "pm2 start ecosystem.config.json --watch",
+    "server:prod": "pm2 start ecosystem.config.prod.json --watch",
+    "kill": "taskkill //im node.exe //F",
     "stop": "pm2 stop ecosystem.config.json",
-    "kill": "pm2 kill",
+    
     "logs": "pm2 logs",
     "list": "pm2 list",
     "monit": "pm2 monit",
+    
     "dev-servers": "./node_modules/.bin/concurrently npm:dev-node npm:dev-gameserver",
     "dev-api": "cd fsg-api && npm start",
     "dev-client": "cd fsg-client && npm start",
@@ -32,10 +37,9 @@
     "url": "https://github.com/5SG/fsg-platform/issues"
   },
   "homepage": "https://github.com/5SG/fsg-platform#readme",
-  "dependencies": {
-  },
   "devDependencies": {
     "concurrently": "^5.3.0",
-    "nodemon": "^2.0.7"
+    "nodemon": "^2.0.7",
+    "npm-run-all": "^4.1.5"
   }
 }
