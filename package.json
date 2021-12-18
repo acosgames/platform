@@ -7,7 +7,7 @@
     "start": "./node_modules/.bin/run-p server client",
     "client": "npm start --prefix fsg-client",
     "client:dev": "npm start --prefix fsg-client",
-    "server": "pm2 start ecosystem.config.json --watch --no-daemon",
+    "server": "export NODE_OPTIONS=\"--max-old-space-size=8192\" && pm2 start ecosystem.config.json --watch --no-daemon",
     "server:dev": "pm2 start ecosystem.config.json --watch",
     "server:prod": "pm2 start ecosystem.config.prod.json --watch",
     "kill": "taskkill //im node.exe //F",
