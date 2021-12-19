@@ -4,71 +4,91 @@
             "name": "fsg-api",
             "cwd": "./fsg-api",
             "script": "./index.js",
+            "vizion": false,
             "watch": [
                 "src/**",
                 "index.js"
             ],
             "ignore_watch": [
                 "public",
-                "sessions"
+                "sessions",
+                "node_modules"
             ],
             "watch_options": {
                 "followSymlinks": true
-            }
+            },
+            "node_args": [
+                "--max_old_space_size=1000"
+              ]
         },
         {
             "name": "fsg-gameserver",
             "cwd": "./fsg-gameserver",
             "script": "./index.js",
+            "vizion": false,
             "watch": [
                 "saved/**",
-                "serverScripts/**",
                 "src/**",
                 "index.js"
             ],
-            "ignore_watch": [],
+            "ignore_watch": ["serverScripts","node_modules"],
             "source_map_support": true,
             "watch_options": {
                 "followSymlinks": true
-            }
+            },
+            "node_args": [
+                "--max_old_space_size=2000"
+              ]
         },
         {
             "name": "fsg-websocket",
             "cwd": "./fsg-websocket",
             "script": "./index.js",
+            "vizion": false,
             "watch": [
                 "src/**",
                 "index.js"
             ],
-            "ignore_watch": [],
+            "ignore_watch": ["node_modules"],
             "watch_options": {
                 "followSymlinks": true
-            }
+            },
+            "node_args": [
+                "--max_old_space_size=2000"
+              ]
         },
         {
             "name": "fsg-matchmaker",
             "cwd": "./fsg-matchmaker",
             "script": "./index.js",
+            "vizion": false,
             "watch": [
                 "src/**",
                 "index.js"
             ],
-            "ignore_watch": [],
+            "ignore_watch": ["node_modules"],
             "watch_options": {
                 "followSymlinks": true
-            }
+            },
+            "node_args": [
+                "--max_old_space_size=500"
+              ]
         },
         {
             "name": "fsg-gitworker",
             "cwd": "./fsg-gitworker",
             "script": "./gitwebhook.js",
+            "vizion": false,
             "watch": [
                 "gitwebhook.js"
             ],
-            "ignore_watch": [],
+            "ignore_watch": ["node_modules"],
             "watch_options": {
                 "followSymlinks": true
-            }
+            },
+            "node_args": [
+                "--max_old_space_size=200"
+              ]
         }
     ]
 }

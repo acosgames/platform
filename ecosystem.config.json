@@ -4,6 +4,7 @@
             "name": "fsg-api",
             "cwd": "./fsg-api",
             "script": "./index.js",
+            "vizion": false,
             "instances": "1",
             "exec_mode": "cluster",
             "watch": [
@@ -23,6 +24,7 @@
             "name": "fsg-gameserver",
             "cwd": "./fsg-gameserver",
             "script": "./index.js",
+            "vizion": false,
             "instances": "1",
             "exec_mode": "cluster",
             "watch": [
@@ -43,6 +45,7 @@
             "name": "fsg-websocket",
             "cwd": "./fsg-websocket",
             "script": "./index.js",
+            "vizion": false,
             "instances": "1",
             "exec_mode": "cluster",
             "watch": [
@@ -59,6 +62,7 @@
             "name": "fsg-matchmaker",
             "cwd": "./fsg-matchmaker",
             "script": "./index.js",
+            "vizion": false,
             "instances": "1",
             "exec_mode": "cluster",
             "watch": [
@@ -75,6 +79,7 @@
             "name": "fsg-gitworker",
             "cwd": "./fsg-gitworker",
             "script": "./gitwebhook.js",
+            "vizion": false,
             "instances": "1",
             "exec_mode": "cluster",
             "watch": [
