@@ -17,7 +17,8 @@
             ],
             "ignore_watch": [
                 "public",
-                "sessions"
+                "sessions",
+                "node_modules/fsg-shared/node_modules/**"
             ]
         },
         {
@@ -38,7 +39,8 @@
                 "--inspect=10003"
             ],
             "ignore_watch": [
-                "serverScripts/**"
+                "serverScripts/**",
+                "node_modules/fsg-shared/node_modules/**"
             ]
         },
         {
@@ -56,7 +58,7 @@
             "node_args": [
                 "--inspect=10004"
             ],
-            "ignore_watch": []
+            "ignore_watch": ["node_modules/fsg-shared/node_modules/**"]
         },
         {
             "name": "fsg-matchmaker",
@@ -73,7 +75,7 @@
             "node_args": [
                 "--inspect=10005"
             ],
-            "ignore_watch": []
+            "ignore_watch": ["node_modules/fsg-shared/node_modules/**"]
         },
         {
             "name": "fsg-gitworker",
@@ -88,7 +90,7 @@
             "node_args": [
                 "--inspect=10006"
             ],
-            "ignore_watch": []
+            "ignore_watch": ["node_modules/fsg-shared/node_modules/**"]
         }
     ]
 }
