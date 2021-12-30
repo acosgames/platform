@@ -1,12 +1,12 @@
 {
-  "name": "fsg-platform",
+  "name": "platform",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "start": "./node_modules/.bin/run-p server client",
-    "client": "npm start --prefix fsg-client",
-    "client:dev": "npm start --prefix fsg-client",
+    "client": "npm start --prefix client",
+    "client:dev": "npm start --prefix client",
     "server": "export NODE_OPTIONS=\"--max-old-space-size=8192\" && pm2 start ecosystem.config.json --watch --no-daemon",
     "server:dev": "pm2 start ecosystem.config.json --watch",
     "server:prod": "pm2 start ecosystem.config.prod.json --watch --no-daemon",
@@ -18,25 +18,25 @@
     "monit": "pm2 monit",
     
     "dev-servers": "./node_modules/.bin/concurrently npm:dev-node npm:dev-gameserver",
-    "dev-api": "cd fsg-api && npm start",
-    "dev-client": "cd fsg-client && npm start",
-    "dev-gitwebhook": "cd fsg-gitworker && npm run dev-gitwebhook",
-    "dev-wscluster": "cd fsg-websocket && npm run dev-wscluster",
-    "dev-node": "cd fsg-websocket && npm run dev",
-    "dev-gameserver": "cd fsg-gameserver && npm run dev",
-    "dev-matchmaker": "cd fsg-matchmaker && npm run dev",
+    "dev-api": "cd api && npm start",
+    "dev-client": "cd client && npm start",
+    "dev-gitwebhook": "cd gitworker && npm run dev-gitwebhook",
+    "dev-wscluster": "cd websocket && npm run dev-wscluster",
+    "dev-node": "cd websocket && npm run dev",
+    "dev-gameserver": "cd gameserver && npm run dev",
+    "dev-matchmaker": "cd matchmaker && npm run dev",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/5SG/fsg-platform.git"
+    "url": "git+https://github.com/5SG/platform.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/5SG/fsg-platform/issues"
+    "url": "https://github.com/5SG/platform/issues"
   },
-  "homepage": "https://github.com/5SG/fsg-platform#readme",
+  "homepage": "https://github.com/5SG/platform#readme",
   "devDependencies": {
     "concurrently": "^5.3.0",
     "nodemon": "^2.0.7",

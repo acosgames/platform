@@ -11,7 +11,7 @@
         //     "skipFiles": [
         //         "<node_internals>/**"
         //     ],
-        //     "program": "${workspaceFolder}\\templates\\tictactoe\\fivesecondgames\\webpack\\server\\dev.config.js"
+        //     "program": "${workspaceFolder}\\templates\\tictactoe\\acosgames\\webpack\\server\\dev.config.js"
         // },
 
         // {

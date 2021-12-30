@@ -4,38 +4,38 @@
 
 
 echo "=========================================================="
-echo ">>>> STATUS fsg-api"
-cd fsg-api
+echo ">>>> STATUS api"
+cd api
 git status
 cd ..
 echo "=========================================================="
-echo ">>>> STATUS fsg-client"
-cd fsg-client
+echo ">>>> STATUS client"
+cd client
 git status
 cd ..
 echo "=========================================================="
-echo ">>>> STATUS fsg-gameserver"
-cd fsg-gameserver
+echo ">>>> STATUS gameserver"
+cd gameserver
 git status
 cd ..
 echo "=========================================================="
-echo ">>>> STATUS fsg-matchmaker"
-cd fsg-matchmaker
+echo ">>>> STATUS matchmaker"
+cd matchmaker
 git status
 cd ..
 echo "=========================================================="
-echo ">>>> STATUS fsg-shared"
-cd fsg-shared
+echo ">>>> STATUS shared"
+cd shared
 git status
 cd ..
 echo "=========================================================="
-echo ">>>> STATUS fsg-websocket"
-cd fsg-websocket
+echo ">>>> STATUS websocket"
+cd websocket
 git status
 cd ..
 echo "=========================================================="
-echo ">>>> STATUS fsg-gitworker"
-cd fsg-gitworker
+echo ">>>> STATUS gitworker"
+cd gitworker
 git status
 cd ..
 echo "=========================================================="
@@ -54,11 +54,11 @@ cd templates/rockpaperscissors
 git status
 cd ../..
 echo "=========================================================="
-echo ">>>> STATUS templates/fivesecondgames"
-cd templates/fivesecondgames
+echo ">>>> STATUS templates/acosgames"
+cd templates/acosgames
 git status
 cd ../..
 echo "=========================================================="
-echo ">>>> STATUS fsg-platform"
+echo ">>>> STATUS platform"
 git status
 echo "=========================================================="

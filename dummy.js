@@ -1,11 +1,11 @@
-// const { genFullShortId } = require('./fsg-shared/util/idgen');
+// const { genFullShortId } = require('./shared/util/idgen');
 
 // for(var i=0; i<5; i++) {
 //     console.log(genFullShortId(5));
 // }
 
 
-const redis = require('./fsg-shared/services/redis');
+const redis = require('./shared/services/redis');
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));

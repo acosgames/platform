@@ -1,36 +1,36 @@
-[submodule "fsg-api"]
-	path = fsg-api
-	url = git@github.com:5SG/fsg-api.git
+[submodule "api"]
+	path = api
+	url = git@github.com:acosg/api.git
 	update = merge 
 	branch = main
-[submodule "fsg-gameserver"]
-	path = fsg-gameserver
-	url = git@github.com:5SG/fsg-gameserver.git
+[submodule "gameserver"]
+	path = gameserver
+	url = git@github.com:acosg/gameserver.git
 	update = merge 
 	branch = main
-[submodule "fsg-websocket"]
-	path = fsg-websocket
-	url = git@github.com:5SG/fsg-websocket.git
+[submodule "websocket"]
+	path = websocket
+	url = git@github.com:acosg/websocket.git
 	update = merge 
 	branch = main
-[submodule "fsg-matchmaker"]
-	path = fsg-matchmaker
-	url = git@github.com:5SG/fsg-matchmaker.git
+[submodule "matchmaker"]
+	path = matchmaker
+	url = git@github.com:acosg/matchmaker.git
 	update = merge 
 	branch = main
-[submodule "fsg-client"]
-	path = fsg-client
-	url = git@github.com:5SG/fsg-client.git
+[submodule "client"]
+	path = client
+	url = git@github.com:acosg/client.git
 	update = merge 
 	branch = main
-[submodule "fsg-shared"]
-	path = fsg-shared
-	url = ../fsg-shared.git
+[submodule "shared"]
+	path = shared
+	url = ../shared.git
 	update = merge 
 	branch = main
-[submodule "fsg-gitworker"]
-	path = fsg-gitworker
-	url = git@github.com:5SG/fsg-gitworker.git
+[submodule "gitworker"]
+	path = gitworker
+	url = git@github.com:acosg/gitworker.git
 	update = merge 
 	branch = main
 [submodule "templates/tictactoe"]
@@ -48,8 +48,8 @@
 	url = git@github.com:fivesecondgames/rockpaperscissors.git
 	update = merge 
 	branch = main
-[submodule "templates/fivesecondgames"]
-	path = templates/fivesecondgames
-	url = git@github.com:fivesecondgames/fivesecondgames.git
+[submodule "templates/acosgames"]
+	path = templates/acosgames
+	url = git@github.com:acosgames/acosgames.git
 	update = merge 
 	branch = main

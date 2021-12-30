@@ -3,54 +3,54 @@ npm install -g yarn
 npm install -g pm2
 
 echo "=========================================================="
-echo ">>>> NPM INSTALL fsg-shared"
-cd fsg-shared
+echo ">>>> NPM INSTALL shared"
+cd shared
 npm install
 npm audit fix
 npm link
 cd ..
 echo "=========================================================="
-echo ">>>> NPM INSTALL fsg-api"
-cd fsg-api
+echo ">>>> NPM INSTALL api"
+cd api
 npm install
 npm audit fix
-npm link fsg-shared
+npm link shared
 cd ..
 echo "=========================================================="
-echo ">>>> NPM INSTALL fsg-client"
-cd fsg-client
+echo ">>>> NPM INSTALL client"
+cd client
 npm install
 npm audit fix
-npm link fsg-shared
+npm link shared
 cd ..
 echo "=========================================================="
-echo ">>>> NPM INSTALL fsg-gameserver"
-cd fsg-gameserver
+echo ">>>> NPM INSTALL gameserver"
+cd gameserver
 npm install
 npm audit fix
-npm link fsg-shared
+npm link shared
 cd ..
 echo "=========================================================="
-echo ">>>> NPM INSTALL fsg-matchmaker"
-cd fsg-matchmaker
+echo ">>>> NPM INSTALL matchmaker"
+cd matchmaker
 npm install
 npm audit fix
-npm link fsg-shared
+npm link shared
 cd ..
 echo "=========================================================="
-echo ">>>> NPM INSTALL fsg-websocket"
-cd fsg-websocket
+echo ">>>> NPM INSTALL websocket"
+cd websocket
 npm install
 npm audit fix
-npm link fsg-shared
+npm link shared
 npm run installws
 cd ..
 echo "=========================================================="
-echo ">>>> NPM INSTALL fsg-gitworker"
-cd fsg-gitworker
+echo ">>>> NPM INSTALL gitworker"
+cd gitworker
 npm install
 npm audit fix
-npm link fsg-shared
+npm link shared
 cd ..
 echo "=========================================================="
 echo ">>>> NPM INSTALL templates/tictactoe"
@@ -71,13 +71,13 @@ npm install
 npm audit fix
 cd ../..
 echo "=========================================================="
-echo ">>>> NPM INSTALL templates/fivesecondgames"
-cd templates/fivesecondgames
+echo ">>>> NPM INSTALL templates/acosgames"
+cd templates/acosgames
 npm install
 npm audit fix
 cd ../..
 echo "=========================================================="
-echo ">>>> NPM INSTALL fsg-platform"
+echo ">>>> NPM INSTALL platform"
 npm install
 npm audit fix
 echo "=========================================================="

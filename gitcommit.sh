@@ -12,50 +12,50 @@ echo "============================="
 echo ">>>> COMMIT TO: "$BRANCH
 echo ">>>> Message: "$MESSAGE
 echo "============================="
-echo ">>>> COMMIT fsg-api"
-cd fsg-api
+echo ">>>> COMMIT api"
+cd api
 git add .
 git commit -m "$1"
 git push origin $BRANCH
 cd ..
 echo "=========================================================="
-echo ">>>> COMMIT fsg-client"
-cd fsg-client
+echo ">>>> COMMIT client"
+cd client
 git add .
 git commit -m "$1"
 git push origin $BRANCH
 cd ..
 echo "=========================================================="
-echo ">>>> COMMIT fsg-gameserver"
-cd fsg-gameserver
+echo ">>>> COMMIT gameserver"
+cd gameserver
 git add .
 git commit -m "$1"
 git push origin $BRANCH
 cd ..
 echo "=========================================================="
-echo ">>>> COMMIT fsg-matchmaker"
-cd fsg-matchmaker
+echo ">>>> COMMIT matchmaker"
+cd matchmaker
 git add .
 git commit -m "$1"
 git push origin $BRANCH
 cd ..
 echo "=========================================================="
-echo ">>>> COMMIT fsg-shared"
-cd fsg-shared
+echo ">>>> COMMIT shared"
+cd shared
 git add .
 git commit -m "$1"
 git push origin $BRANCH
 cd ..
 echo "=========================================================="
-echo ">>>> COMMIT fsg-websocket"
-cd fsg-websocket
+echo ">>>> COMMIT websocket"
+cd websocket
 git add .
 git commit -m "$1"
 git push origin $BRANCH
 cd ..
 echo "=========================================================="
-echo ">>>> COMMIT fsg-gitworker"
-cd fsg-gitworker
+echo ">>>> COMMIT gitworker"
+cd gitworker
 git add .
 git commit -m "$1"
 git push origin $BRANCH
@@ -82,14 +82,14 @@ git commit -m "$1"
 git push origin $BRANCH
 cd ../..
 echo "=========================================================="
-echo ">>>> COMMIT templates/fivesecondgames"
-cd templates/fivesecondgames
+echo ">>>> COMMIT templates/acosgames"
+cd templates/acosgames
 git add .
 git commit -m "$1"
 git push origin $BRANCH
 cd ../..
 echo "=========================================================="
-echo ">>>> COMMIT fsg-platform"
+echo ">>>> COMMIT platform"
 git add .
 git commit -m "$1"
 git push origin $BRANCH

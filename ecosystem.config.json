@@ -1,8 +1,8 @@
 {
     "apps": [
         {
-            "name": "fsg-api",
-            "cwd": "./fsg-api",
+            "name": "api",
+            "cwd": "./api",
             "script": "./index.js",
             "vizion": false,
             "instances": "1",
@@ -10,7 +10,7 @@
             "watch": [
                 "src/**",
                 "index.js",
-                "node_modules/fsg-shared/**"
+                "node_modules/shared/**"
             ],
             "node_args": [
                 "--inspect=10001"
@@ -18,12 +18,12 @@
             "ignore_watch": [
                 "public",
                 "sessions",
-                "node_modules/fsg-shared/node_modules/**"
+                "node_modules/shared/node_modules/**"
             ]
         },
         {
-            "name": "fsg-gameserver",
-            "cwd": "./fsg-gameserver",
+            "name": "gameserver",
+            "cwd": "./gameserver",
             "script": "./index.js",
             "vizion": false,
             "instances": "1",
@@ -33,19 +33,19 @@
                 "serverScripts/**",
                 "src/**",
                 "index.js",
-                "node_modules/fsg-shared/**"
+                "node_modules/shared/**"
             ],
             "node_args": [
                 "--inspect=10003"
             ],
             "ignore_watch": [
                 "serverScripts/**",
-                "node_modules/fsg-shared/node_modules/**"
+                "node_modules/shared/node_modules/**"
             ]
         },
         {
-            "name": "fsg-websocket",
-            "cwd": "./fsg-websocket",
+            "name": "websocket",
+            "cwd": "./websocket",
             "script": "./index.js",
             "vizion": false,
             "instances": "1",
@@ -53,16 +53,16 @@
             "watch": [
                 "src/**",
                 "index.js",
-                "node_modules/fsg-shared/**"
+                "node_modules/shared/**"
             ],
             "node_args": [
                 "--inspect=10004"
             ],
-            "ignore_watch": ["node_modules/fsg-shared/node_modules/**"]
+            "ignore_watch": ["node_modules/shared/node_modules/**"]
         },
         {
-            "name": "fsg-matchmaker",
-            "cwd": "./fsg-matchmaker",
+            "name": "matchmaker",
+            "cwd": "./matchmaker",
             "script": "./index.js",
             "vizion": false,
             "instances": "1",
@@ -70,16 +70,16 @@
             "watch": [
                 "src/**",
                 "index.js",
-                "node_modules/fsg-shared/**"
+                "node_modules/shared/**"
             ],
             "node_args": [
                 "--inspect=10005"
             ],
-            "ignore_watch": ["node_modules/fsg-shared/node_modules/**"]
+            "ignore_watch": ["node_modules/shared/node_modules/**"]
         },
         {
-            "name": "fsg-gitworker",
-            "cwd": "./fsg-gitworker",
+            "name": "gitworker",
+            "cwd": "./gitworker",
             "script": "./gitwebhook.js",
             "vizion": false,
             "instances": "1",
@@ -90,7 +90,7 @@
             "node_args": [
                 "--inspect=10006"
             ],
-            "ignore_watch": ["node_modules/fsg-shared/node_modules/**"]
+            "ignore_watch": ["node_modules/shared/node_modules/**"]
         }
     ]
 }

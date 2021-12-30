@@ -1,8 +1,8 @@
 {
     "apps": [
         {
-            "name": "fsg-api",
-            "cwd": "./fsg-api",
+            "name": "api",
+            "cwd": "./api",
             "script": "./index.js",
             "vizion": false,
             "watch": [
@@ -22,8 +22,8 @@
               ]
         },
         {
-            "name": "fsg-gameserver",
-            "cwd": "./fsg-gameserver",
+            "name": "gameserver",
+            "cwd": "./gameserver",
             "script": "./index.js",
             "vizion": false,
             "watch": [
@@ -41,8 +41,8 @@
               ]
         },
         {
-            "name": "fsg-websocket",
-            "cwd": "./fsg-websocket",
+            "name": "websocket",
+            "cwd": "./websocket",
             "script": "./index.js",
             "vizion": false,
             "watch": [
@@ -58,8 +58,8 @@
               ]
         },
         {
-            "name": "fsg-matchmaker",
-            "cwd": "./fsg-matchmaker",
+            "name": "matchmaker",
+            "cwd": "./matchmaker",
             "script": "./index.js",
             "vizion": false,
             "watch": [
@@ -75,8 +75,8 @@
               ]
         },
         {
-            "name": "fsg-gitworker",
-            "cwd": "./fsg-gitworker",
+            "name": "gitworker",
+            "cwd": "./gitworker",
             "script": "./gitwebhook.js",
             "vizion": false,
             "watch": [

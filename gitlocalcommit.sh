@@ -12,44 +12,44 @@ echo "============================="
 echo ">>>> COMMIT LOCAL TO: "$BRANCH
 echo ">>>> Message: "$MESSAGE
 echo "============================="
-echo ">>>> COMMIT LOCAL fsg-api"
-cd fsg-api
+echo ">>>> COMMIT LOCAL api"
+cd api
 git add .
 git commit -m "$1"
 cd ..
 echo "=========================================================="
-echo ">>>> COMMIT LOCAL fsg-client"
-cd fsg-client
+echo ">>>> COMMIT LOCAL client"
+cd client
 git add .
 git commit -m "$1"
 cd ..
 echo "=========================================================="
-echo ">>>> COMMIT LOCAL fsg-gameserver"
-cd fsg-gameserver
+echo ">>>> COMMIT LOCAL gameserver"
+cd gameserver
 git add .
 git commit -m "$1"
 cd ..
 echo "=========================================================="
-echo ">>>> COMMIT LOCAL fsg-matchmaker"
-cd fsg-matchmaker
+echo ">>>> COMMIT LOCAL matchmaker"
+cd matchmaker
 git add .
 git commit -m "$1"
 cd ..
 echo "=========================================================="
-echo ">>>> COMMIT LOCAL fsg-shared"
-cd fsg-shared
+echo ">>>> COMMIT LOCAL shared"
+cd shared
 git add .
 git commit -m "$1"
 cd ..
 echo "=========================================================="
-echo ">>>> COMMIT LOCAL fsg-websocket"
-cd fsg-websocket
+echo ">>>> COMMIT LOCAL websocket"
+cd websocket
 git add .
 git commit -m "$1"
 cd ..
 echo "=========================================================="
-echo ">>>> COMMIT LOCAL fsg-gitworker"
-cd fsg-gitworker
+echo ">>>> COMMIT LOCAL gitworker"
+cd gitworker
 git add .
 git commit -m "$1"
 cd ..
@@ -72,13 +72,13 @@ git add .
 git commit -m "$1"
 cd ../..
 echo "=========================================================="
-echo ">>>> COMMIT templates/fivesecondgames"
-cd templates/fivesecondgames
+echo ">>>> COMMIT templates/acosgames"
+cd templates/acosgames
 git add .
 git commit -m "$1"
 cd ../..
 echo "=========================================================="
-echo ">>>> COMMIT LOCAL fsg-platform"
+echo ">>>> COMMIT LOCAL acos-platform"
 git add .
 git commit -m "$1"
 echo "=========================================================="

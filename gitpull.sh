@@ -4,38 +4,38 @@
 
 
 echo "=========================================================="
-echo ">>>> PULL fsg-api"
-cd fsg-api
+echo ">>>> PULL api"
+cd api
 git pull origin main
 cd ..
 echo "=========================================================="
-echo ">>>> PULL fsg-client"
-cd fsg-client
+echo ">>>> PULL client"
+cd client
 git pull origin main
 cd ..
 echo "=========================================================="
-echo ">>>> PULL fsg-gameserver"
-cd fsg-gameserver
+echo ">>>> PULL gameserver"
+cd gameserver
 git pull origin main
 cd ..
 echo "=========================================================="
-echo ">>>> PULL fsg-matchmaker"
-cd fsg-matchmaker
+echo ">>>> PULL matchmaker"
+cd matchmaker
 git pull origin main
 cd ..
 echo "=========================================================="
-echo ">>>> PULL fsg-shared"
-cd fsg-shared
+echo ">>>> PULL shared"
+cd shared
 git pull origin main
 cd ..
 echo "=========================================================="
-echo ">>>> PULL fsg-websocket"
-cd fsg-websocket
+echo ">>>> PULL websocket"
+cd websocket
 git pull origin main
 cd ..
 echo "=========================================================="
-echo ">>>> PULL fsg-gitworker"
-cd fsg-gitworker
+echo ">>>> PULL gitworker"
+cd gitworker
 git pull origin main
 cd ..
 echo "=========================================================="
@@ -54,12 +54,12 @@ cd templates/rockpaperscissors
 git pull origin main
 cd ../..
 echo "=========================================================="
-echo ">>>> PULL templates/fivesecondgames"
-cd templates/fivesecondgames
+echo ">>>> PULL templates/acosgames"
+cd templates/acosgames
 git pull origin main
 cd ../..
 echo "=========================================================="
-echo ">>>> PULL fsg-platform"
+echo ">>>> PULL platform"
 git pull origin main
 git submodule update --remote
 echo "=========================================================="
