@@ -5,17 +5,11 @@
             "cwd": "./api",
             "script": "./index.js",
             "vizion": false,
-            "watch": [
-                "src/**",
-                "index.js"
-            ],
-            "ignore_watch": [
-                "public",
-                "sessions",
-                "node_modules"
-            ],
-            "watch_options": {
-                "followSymlinks": true
+            "instances": "1",
+            "exec_mode": "cluster",
+            "env": {
+                "NODE_ENV": "production",
+                "ACOSENV": "production"
             },
             "node_args": [
                 "--max_old_space_size=1000"
@@ -26,15 +20,11 @@
             "cwd": "./gameserver",
             "script": "./index.js",
             "vizion": false,
-            "watch": [
-                "saved/**",
-                "src/**",
-                "index.js"
-            ],
-            "ignore_watch": ["serverScripts","node_modules"],
-            "source_map_support": true,
-            "watch_options": {
-                "followSymlinks": true
+            "instances": "1",
+            "exec_mode": "cluster",
+            "env": {
+                "NODE_ENV": "production",
+                "ACOSENV": "production"
             },
             "node_args": [
                 "--max_old_space_size=2000"
@@ -45,13 +35,11 @@
             "cwd": "./websocket",
             "script": "./index.js",
             "vizion": false,
-            "watch": [
-                "src/**",
-                "index.js"
-            ],
-            "ignore_watch": ["node_modules"],
-            "watch_options": {
-                "followSymlinks": true
+            "instances": "1",
+            "exec_mode": "cluster",
+            "env": {
+                "NODE_ENV": "production",
+                "ACOSENV": "production"
             },
             "node_args": [
                 "--max_old_space_size=2000"
@@ -62,13 +50,11 @@
             "cwd": "./matchmaker",
             "script": "./index.js",
             "vizion": false,
-            "watch": [
-                "src/**",
-                "index.js"
-            ],
-            "ignore_watch": ["node_modules"],
-            "watch_options": {
-                "followSymlinks": true
+            "instances": "1",
+            "exec_mode": "cluster",
+            "env": {
+                "NODE_ENV": "production",
+                "ACOSENV": "production"
             },
             "node_args": [
                 "--max_old_space_size=500"
@@ -79,12 +65,11 @@
             "cwd": "./gitworker",
             "script": "./gitwebhook.js",
             "vizion": false,
-            "watch": [
-                "gitwebhook.js"
-            ],
-            "ignore_watch": ["node_modules"],
-            "watch_options": {
-                "followSymlinks": true
+            "instances": "1",
+            "exec_mode": "cluster",
+            "env": {
+                "NODE_ENV": "production",
+                "ACOSENV": "production"
             },
             "node_args": [
                 "--max_old_space_size=200"
