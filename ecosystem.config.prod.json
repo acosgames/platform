@@ -12,7 +12,7 @@
                 "ACOSENV": "production"
             },
             "node_args": [
-                "--max_old_space_size=1000"
+                "--max_old_space_size=3000"
               ]
         },
         {
@@ -27,7 +27,7 @@
                 "ACOSENV": "production"
             },
             "node_args": [
-                "--max_old_space_size=2000"
+                "--max_old_space_size=3000"
               ]
         },
         {
@@ -42,7 +42,7 @@
                 "ACOSENV": "production"
             },
             "node_args": [
-                "--max_old_space_size=2000"
+                "--max_old_space_size=3000"
               ]
         },
         {
@@ -57,7 +57,7 @@
                 "ACOSENV": "production"
             },
             "node_args": [
-                "--max_old_space_size=500"
+                "--max_old_space_size=2000"
               ]
         },
         {
@@ -72,7 +72,7 @@
                 "ACOSENV": "production"
             },
             "node_args": [
-                "--max_old_space_size=200"
+                "--max_old_space_size=1000"
               ]
         }
     ]
