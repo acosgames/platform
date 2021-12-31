@@ -8,12 +8,10 @@
             "instances": "1",
             "exec_mode": "cluster",
             "env": {
-                "NODE_ENV": "production",
-                "ACOSENV": "production"
+                "NODE_ENV": "production"
             },
             "env_production": {
-                "NODE_ENV": "production",
-                "ACOSENV": "production"
+                "NODE_ENV": "production"
             },
             "node_args": [
                 "--max_old_space_size=3000"
@@ -27,12 +25,10 @@
             "instances": "1",
             "exec_mode": "cluster",
             "env": {
-                "NODE_ENV": "production",
-                "ACOSENV": "production"
+                "NODE_ENV": "production"
             },
             "env_production": {
-                "NODE_ENV": "production",
-                "ACOSENV": "production"
+                "NODE_ENV": "production"
             },
             "node_args": [
                 "--max_old_space_size=3000"
@@ -46,12 +42,10 @@
             "instances": "1",
             "exec_mode": "cluster",
             "env": {
-                "NODE_ENV": "production",
-                "ACOSENV": "production"
+                "NODE_ENV": "production"
             },
             "env_production": {
-                "NODE_ENV": "production",
-                "ACOSENV": "production"
+                "NODE_ENV": "production"
             },
             "node_args": [
                 "--max_old_space_size=3000"
@@ -65,12 +59,10 @@
             "instances": "1",
             "exec_mode": "cluster",
             "env": {
-                "NODE_ENV": "production",
-                "ACOSENV": "production"
+                "NODE_ENV": "production"
             },
             "env_production": {
-                "NODE_ENV": "production",
-                "ACOSENV": "production"
+                "NODE_ENV": "production"
             },
             "node_args": [
                 "--max_old_space_size=2000"
@@ -84,12 +76,10 @@
             "instances": "1",
             "exec_mode": "cluster",
             "env": {
-                "NODE_ENV": "production",
-                "ACOSENV": "production"
+                "NODE_ENV": "production"
             },
             "env_production": {
-                "NODE_ENV": "production",
-                "ACOSENV": "production"
+                "NODE_ENV": "production"
             },
             "node_args": [
                 "--max_old_space_size=1000"
