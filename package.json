@@ -9,7 +9,7 @@
     "client:dev": "npm start --prefix client",
     "server": "export NODE_OPTIONS=\"--max-old-space-size=8192\" && pm2 start ecosystem.config.json --watch --no-daemon",
     "server:dev": "pm2 start ecosystem.config.json --watch",
-    "server:prod": "pm2 start ecosystem.config.prod.json --watch --no-daemon",
+    "server:prod": "pm2 start ecosystem.config.prod.json",
     "kill": "taskkill //im node.exe //F",
     "stop": "pm2 stop ecosystem.config.json",
     
