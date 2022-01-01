@@ -38,16 +38,16 @@
 	url = git@github.com:fivesecondgames/tictactoe.git
 	update = merge 
 	branch = main
-[submodule "templates/poptrivia"]
-	path = templates/poptrivia
-	url = git@github.com:fivesecondgames/poptrivia.git
-	update = merge 
-	branch = main
-[submodule "templates/rockpaperscissors"]
-	path = templates/rockpaperscissors
-	url = git@github.com:fivesecondgames/rockpaperscissors.git
-	update = merge 
-	branch = main
+# [submodule "templates/poptrivia"]
+# 	path = templates/poptrivia
+# 	url = git@github.com:fivesecondgames/poptrivia.git
+# 	update = merge 
+# 	branch = main
+# [submodule "templates/rockpaperscissors"]
+# 	path = templates/rockpaperscissors
+# 	url = git@github.com:fivesecondgames/rockpaperscissors.git
+# 	update = merge 
+# 	branch = main
 [submodule "templates/acosgames"]
 	path = templates/acosgames
 	url = git@github.com:acosgames/acosgames.git
