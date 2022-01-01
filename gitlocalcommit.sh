@@ -59,18 +59,18 @@ cd templates/tictactoe
 git add .
 git commit -m "$1"
 cd ../..
-echo "=========================================================="
-echo ">>>> COMMIT templates/poptrivia"
-cd templates/poptrivia
-git add .
-git commit -m "$1"
-cd ../..
-echo "=========================================================="
-echo ">>>> COMMIT templates/rockpaperscissors"
-cd templates/rockpaperscissors
-git add .
-git commit -m "$1"
-cd ../..
+# echo "=========================================================="
+# echo ">>>> COMMIT templates/poptrivia"
+# cd templates/poptrivia
+# git add .
+# git commit -m "$1"
+# cd ../..
+# echo "=========================================================="
+# echo ">>>> COMMIT templates/rockpaperscissors"
+# cd templates/rockpaperscissors
+# git add .
+# git commit -m "$1"
+# cd ../..
 echo "=========================================================="
 echo ">>>> COMMIT templates/acosgames"
 cd templates/acosgames

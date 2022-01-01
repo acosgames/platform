@@ -67,20 +67,20 @@ git add .
 git commit -m "$1"
 git push origin $BRANCH
 cd ../..
-echo "=========================================================="
-echo ">>>> COMMIT templates/poptrivia"
-cd templates/poptrivia
-git add .
-git commit -m "$1"
-git push origin $BRANCH
-cd ../..
-echo "=========================================================="
-echo ">>>> COMMIT templates/rockpaperscissors"
-cd templates/rockpaperscissors
-git add .
-git commit -m "$1"
-git push origin $BRANCH
-cd ../..
+# echo "=========================================================="
+# echo ">>>> COMMIT templates/poptrivia"
+# cd templates/poptrivia
+# git add .
+# git commit -m "$1"
+# git push origin $BRANCH
+# cd ../..
+# echo "=========================================================="
+# echo ">>>> COMMIT templates/rockpaperscissors"
+# cd templates/rockpaperscissors
+# git add .
+# git commit -m "$1"
+# git push origin $BRANCH
+# cd ../..
 echo "=========================================================="
 echo ">>>> COMMIT templates/acosgames"
 cd templates/acosgames

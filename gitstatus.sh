@@ -43,16 +43,16 @@ echo ">>>> STATUS templates/tictactoe"
 cd templates/tictactoe
 git status
 cd ../..
-echo "=========================================================="
-echo ">>>> STATUS templates/poptrivia"
-cd templates/poptrivia
-git status
-cd ../..
-echo "=========================================================="
-echo ">>>> STATUS templates/rockpaperscissors"
-cd templates/rockpaperscissors
-git status
-cd ../..
+# echo "=========================================================="
+# echo ">>>> STATUS templates/poptrivia"
+# cd templates/poptrivia
+# git status
+# cd ../..
+# echo "=========================================================="
+# echo ">>>> STATUS templates/rockpaperscissors"
+# cd templates/rockpaperscissors
+# git status
+# cd ../..
 echo "=========================================================="
 echo ">>>> STATUS templates/acosgames"
 cd templates/acosgames
