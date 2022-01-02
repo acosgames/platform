@@ -35,7 +35,7 @@
 	branch = main
 [submodule "templates/tictactoe"]
 	path = templates/tictactoe
-	url = git@github.com:fivesecondgames/tictactoe.git
+	url = git@github.com:acosgames/tictactoe.git
 	update = merge 
 	branch = main
 # [submodule "templates/poptrivia"]
