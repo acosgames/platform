@@ -15,6 +15,12 @@
             "node_args": [
                 "--inspect=10001"
             ],
+            "env": {
+                "NODE_ENV": "localhost"
+            },
+            "env_mobile": {
+                "NODE_ENV": "mobile"
+            },
             "ignore_watch": [
                 "public",
                 "sessions",
@@ -38,6 +44,12 @@
             "node_args": [
                 "--inspect=10003"
             ],
+            "env": {
+                "NODE_ENV": "localhost"
+            },
+            "env_mobile": {
+                "NODE_ENV": "mobile"
+            },
             "ignore_watch": [
                 "serverScripts/**",
                 "node_modules/shared/node_modules/**"
@@ -58,6 +70,12 @@
             "node_args": [
                 "--inspect=10004"
             ],
+            "env": {
+                "NODE_ENV": "localhost"
+            },
+            "env_mobile": {
+                "NODE_ENV": "mobile"
+            },
             "ignore_watch": ["node_modules/shared/node_modules/**"]
         },
         {
@@ -75,6 +93,12 @@
             "node_args": [
                 "--inspect=10005"
             ],
+            "env": {
+                "NODE_ENV": "localhost"
+            },
+            "env_mobile": {
+                "NODE_ENV": "mobile"
+            },
             "ignore_watch": ["node_modules/shared/node_modules/**"]
         },
         {
@@ -90,6 +114,12 @@
             "node_args": [
                 "--inspect=10006"
             ],
+            "env": {
+                "NODE_ENV": "localhost"
+            },
+            "env_mobile": {
+                "NODE_ENV": "mobile"
+            },
             "ignore_watch": ["node_modules/shared/node_modules/**"]
         }
     ]
