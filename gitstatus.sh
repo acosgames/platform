@@ -39,6 +39,11 @@ cd gitworker
 git status
 cd ..
 echo "=========================================================="
+echo ">>>> STATUS docs"
+cd docs
+git status
+cd ..
+echo "=========================================================="
 echo ">>>> STATUS templates/tictactoe"
 cd templates/tictactoe
 git status

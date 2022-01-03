@@ -67,13 +67,13 @@ git add .
 git commit -m "$1"
 git push origin $BRANCH
 cd ../..
-# echo "=========================================================="
-# echo ">>>> COMMIT templates/poptrivia"
-# cd templates/poptrivia
-# git add .
-# git commit -m "$1"
-# git push origin $BRANCH
-# cd ../..
+echo "=========================================================="
+echo ">>>> COMMIT docs"
+cd docs
+git add .
+git commit -m "$1"
+git push origin $BRANCH
+cd ..
 # echo "=========================================================="
 # echo ">>>> COMMIT templates/rockpaperscissors"
 # cd templates/rockpaperscissors

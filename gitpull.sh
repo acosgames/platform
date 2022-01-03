@@ -39,6 +39,11 @@ cd gitworker
 git pull origin main
 cd ..
 echo "=========================================================="
+echo ">>>> PULL docs"
+cd docs
+git pull origin main
+cd ..
+echo "=========================================================="
 echo ">>>> PULL templates/tictactoe"
 cd templates/tictactoe
 git pull origin main

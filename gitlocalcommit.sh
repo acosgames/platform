@@ -54,6 +54,12 @@ git add .
 git commit -m "$1"
 cd ..
 echo "=========================================================="
+echo ">>>> COMMIT LOCAL docs"
+cd docs
+git add .
+git commit -m "$1"
+cd ..
+echo "=========================================================="
 echo ">>>> COMMIT templates/tictactoe"
 cd templates/tictactoe
 git add .

@@ -53,6 +53,13 @@ npm audit fix
 npm link shared
 cd ..
 echo "=========================================================="
+echo ">>>> NPM INSTALL docs"
+cd docs
+npm install
+npm audit fix
+npm link shared
+cd ..
+echo "=========================================================="
 echo ">>>> NPM INSTALL templates/tictactoe"
 cd templates/tictactoe
 npm install
