@@ -86,5 +86,5 @@ cd ..
 echo "=========================================================="
 echo ">>>> NPM INSTALL platform"
 npm install
-npm audit fix
+# npm audit fix
 echo "=========================================================="
