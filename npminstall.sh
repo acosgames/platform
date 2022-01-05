@@ -6,42 +6,42 @@ echo "=========================================================="
 echo ">>>> NPM INSTALL shared"
 cd shared
 npm install
-npm audit fix
+# npm audit fix
 npm link
 cd ..
 echo "=========================================================="
 echo ">>>> NPM INSTALL api"
 cd api
 npm install
-npm audit fix
+# npm audit fix
 npm link shared
 cd ..
 echo "=========================================================="
 echo ">>>> NPM INSTALL client"
 cd client
 npm install
-npm audit fix
+# npm audit fix
 npm link shared
 cd ..
 echo "=========================================================="
 echo ">>>> NPM INSTALL gameserver"
 cd gameserver
 npm install
-npm audit fix
+# npm audit fix
 npm link shared
 cd ..
 echo "=========================================================="
 echo ">>>> NPM INSTALL matchmaker"
 cd matchmaker
 npm install
-npm audit fix
+# npm audit fix
 npm link shared
 cd ..
 echo "=========================================================="
 echo ">>>> NPM INSTALL websocket"
 cd websocket
 npm install
-npm audit fix
+# npm audit fix
 npm link shared
 npm run installws
 cd ..
@@ -49,14 +49,14 @@ echo "=========================================================="
 echo ">>>> NPM INSTALL gitworker"
 cd gitworker
 npm install
-npm audit fix
+# npm audit fix
 npm link shared
 cd ..
 echo "=========================================================="
 echo ">>>> NPM INSTALL docs"
 cd docs
 npm install
-npm audit fix
+# npm audit fix
 npm link shared
 cd ..
 # echo "=========================================================="
