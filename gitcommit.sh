@@ -60,13 +60,13 @@ git add .
 git commit -m "$1"
 git push origin $BRANCH
 cd ..
-echo "=========================================================="
-echo ">>>> COMMIT templates/tictactoe"
-cd templates/tictactoe
-git add .
-git commit -m "$1"
-git push origin $BRANCH
-cd ../..
+# echo "=========================================================="
+# echo ">>>> COMMIT templates/tictactoe"
+# cd templates/tictactoe
+# git add .
+# git commit -m "$1"
+# git push origin $BRANCH
+# cd ../..
 echo "=========================================================="
 echo ">>>> COMMIT docs"
 cd docs
@@ -74,20 +74,6 @@ git add .
 git commit -m "$1"
 git push origin $BRANCH
 cd ..
-# echo "=========================================================="
-# echo ">>>> COMMIT templates/rockpaperscissors"
-# cd templates/rockpaperscissors
-# git add .
-# git commit -m "$1"
-# git push origin $BRANCH
-# cd ../..
-echo "=========================================================="
-echo ">>>> COMMIT templates/acosgames"
-cd templates/acosgames
-git add .
-git commit -m "$1"
-git push origin $BRANCH
-cd ../..
 echo "=========================================================="
 echo ">>>> COMMIT platform"
 git add .

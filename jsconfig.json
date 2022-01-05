@@ -11,10 +11,6 @@
     "websocket/node_modules",
     "gitworker/node_modules",
     "shared/node_modules",
-    "templates/acosgames/node_modules",
-    "templates/tictactoe/node_modules",
-    "templates/poptrivia/node_modules",
-    "templates/rockpaperscissors/node_modules",
     "*bundle*.js"
   ],
   "include": [
@@ -24,10 +20,6 @@
     "websocket/**/*",
     "gitworker/**/*",
     "shared/**/*",
-    "matchmaker/**/*",
-    "templates/acosgames/**/*",
-    "templates/tictactoe/**/*",
-    "templates/poptrivia/**/*",
-    "templates/rockpaperscissors/**/*",
+    "matchmaker/**/*"
   ]
 }

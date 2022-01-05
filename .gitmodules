@@ -38,11 +38,11 @@
 	url = git@github.com:acosgames/acosgames.github.io.git
 	update = merge 
 	branch = main
-[submodule "templates/tictactoe"]
-	path = templates/tictactoe
-	url = git@github.com:acosgames/tictactoe.git
-	update = merge 
-	branch = main
+# [submodule "templates/tictactoe"]
+# 	path = templates/tictactoe
+# 	url = git@github.com:acosgames/tictactoe.git
+# 	update = merge 
+# 	branch = main
 # [submodule "templates/poptrivia"]
 # 	path = templates/poptrivia
 # 	url = git@github.com:fivesecondgames/poptrivia.git
@@ -53,8 +53,8 @@
 # 	url = git@github.com:fivesecondgames/rockpaperscissors.git
 # 	update = merge 
 # 	branch = main
-[submodule "templates/acosgames"]
-	path = templates/acosgames
-	url = git@github.com:acosgames/acosgames.git
-	update = merge 
-	branch = main
+# [submodule "templates/acosgames"]
+# 	path = templates/acosgames
+# 	url = git@github.com:acosgames/acosgames.git
+# 	update = merge 
+# 	branch = main

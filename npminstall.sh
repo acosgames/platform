@@ -59,30 +59,30 @@ npm install
 npm audit fix
 npm link shared
 cd ..
-echo "=========================================================="
-echo ">>>> NPM INSTALL templates/tictactoe"
-cd templates/tictactoe
-npm install
-npm audit fix
-cd ../..
-echo "=========================================================="
-echo ">>>> NPM INSTALL templates/poptrivia"
-cd templates/poptrivia
-npm install
-npm audit fix
-cd ../..
-echo "=========================================================="
-echo ">>>> NPM INSTALL templates/rockpaperscissors"
-cd templates/rockpaperscissors
-npm install
-npm audit fix
-cd ../..
-echo "=========================================================="
-echo ">>>> NPM INSTALL templates/acosgames"
-cd templates/acosgames
-npm install
-npm audit fix
-cd ../..
+# echo "=========================================================="
+# echo ">>>> NPM INSTALL templates/tictactoe"
+# cd templates/tictactoe
+# npm install
+# npm audit fix
+# cd ../..
+# echo "=========================================================="
+# echo ">>>> NPM INSTALL templates/poptrivia"
+# cd templates/poptrivia
+# npm install
+# npm audit fix
+# cd ../..
+# echo "=========================================================="
+# echo ">>>> NPM INSTALL templates/rockpaperscissors"
+# cd templates/rockpaperscissors
+# npm install
+# npm audit fix
+# cd ../..
+# echo "=========================================================="
+# echo ">>>> NPM INSTALL templates/acosgames"
+# cd templates/acosgames
+# npm install
+# npm audit fix
+# cd ../..
 echo "=========================================================="
 echo ">>>> NPM INSTALL platform"
 npm install

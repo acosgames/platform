@@ -43,11 +43,11 @@ echo ">>>> PULL docs"
 cd docs
 git pull origin main
 cd ..
-echo "=========================================================="
-echo ">>>> PULL templates/tictactoe"
-cd templates/tictactoe
-git pull origin main
-cd ../..
+# echo "=========================================================="
+# echo ">>>> PULL templates/tictactoe"
+# cd templates/tictactoe
+# git pull origin main
+# cd ../..
 # echo "=========================================================="
 # echo ">>>> PULL templates/poptrivia"
 # cd templates/poptrivia
@@ -58,11 +58,11 @@ cd ../..
 # cd templates/rockpaperscissors
 # git pull origin main
 # cd ../..
-echo "=========================================================="
-echo ">>>> PULL templates/acosgames"
-cd templates/acosgames
-git pull origin main
-cd ../..
+# echo "=========================================================="
+# echo ">>>> PULL templates/acosgames"
+# cd templates/acosgames
+# git pull origin main
+# cd ../..
 echo "=========================================================="
 echo ">>>> PULL platform"
 git pull origin main

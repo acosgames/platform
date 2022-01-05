@@ -59,12 +59,12 @@ cd docs
 git add .
 git commit -m "$1"
 cd ..
-echo "=========================================================="
-echo ">>>> COMMIT templates/tictactoe"
-cd templates/tictactoe
-git add .
-git commit -m "$1"
-cd ../..
+# echo "=========================================================="
+# echo ">>>> COMMIT templates/tictactoe"
+# cd templates/tictactoe
+# git add .
+# git commit -m "$1"
+# cd ../..
 # echo "=========================================================="
 # echo ">>>> COMMIT templates/poptrivia"
 # cd templates/poptrivia
@@ -77,12 +77,12 @@ cd ../..
 # git add .
 # git commit -m "$1"
 # cd ../..
-echo "=========================================================="
-echo ">>>> COMMIT templates/acosgames"
-cd templates/acosgames
-git add .
-git commit -m "$1"
-cd ../..
+# echo "=========================================================="
+# echo ">>>> COMMIT templates/acosgames"
+# cd templates/acosgames
+# git add .
+# git commit -m "$1"
+# cd ../..
 echo "=========================================================="
 echo ">>>> COMMIT LOCAL acos-platform"
 git add .
