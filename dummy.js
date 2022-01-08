@@ -4,6 +4,7 @@
 //     console.log(genFullShortId(5));
 // }
 
+const axios = require('axios');
 
 const redis = require('./shared/services/redis');
 
@@ -14,14 +15,14 @@ function sleep(ms) {
 async function run() {
 
 
-    while (!redis.isActive) {
+    // while (!redis.isActive) {
 
-        console.warn("[WebSocket] waiting on redis...");
-        await this.sleep(1000);
-        //return;
-    }
+    //     console.warn("[WebSocket] waiting on redis...");
+    //     await this.sleep(1000);
+    //     //return;
+    // }
 
-    await redis.connect();
+    // await redis.connect();
 
     // let json = {
     //     timer: 999,
@@ -41,32 +42,59 @@ async function run() {
     // let result2 = await redis.hgetall('action-1');
     // console.log("hgetall", result2);
 
-    let members = [
-        { name: 'JOE', rating: 3000 },
-        { name: 'TIM', rating: 2000 },
-        { name: 'BOB', rating: 2500 },
-        { name: 'SID', rating: 3500 },
-        { name: 'SID1', rating: 3501 },
-        { name: 'SID2', rating: 2902 },
-        { name: 'SID3', rating: 2903 },
-        { name: 'SID4', rating: 2904 },
-        { name: 'SID5', rating: 2905 },
-        { name: 'SID6', rating: 2906 },
-        { name: 'SID7', rating: 2907 },
-        { name: 'SID8', rating: 3508 },
-        { name: 'SID9', rating: 3509 },
-        { name: 'SID10', rating: 3510 },
-        { name: 'SID11', rating: 3511 },
-        { name: 'SID12', rating: 3512 },
-        { name: 'SID13', rating: 3513 },
-        { name: 'SID14', rating: 3514 },
-    ]
+    // let members = [
+    //     { name: 'JOE', rating: 3000 },
+    //     { name: 'TIM', rating: 2000 },
+    //     { name: 'BOB', rating: 2500 },
+    //     { name: 'SID', rating: 3500 },
+    //     { name: 'SID1', rating: 3501 },
+    //     { name: 'SID2', rating: 2902 },
+    //     { name: 'SID3', rating: 2903 },
+    //     { name: 'SID4', rating: 2904 },
+    //     { name: 'SID5', rating: 2905 },
+    //     { name: 'SID6', rating: 2906 },
+    //     { name: 'SID7', rating: 2907 },
+    //     { name: 'SID8', rating: 3508 },
+    //     { name: 'SID9', rating: 3509 },
+    //     { name: 'SID10', rating: 3510 },
+    //     { name: 'SID11', rating: 3511 },
+    //     { name: 'SID12', rating: 3512 },
+    //     { name: 'SID13', rating: 3513 },
+    //     { name: 'SID14', rating: 3514 },
+    // ]
 
 
-    await updateLeaderboard('tictactoe', members);
+    // await updateLeaderboard('tictactoe', members);
 
-    let top10 = await getGameTop10Players('tictactoe');
-    let playerRanking = await getPlayerGameLeaderboard('tictactoe', '5SG');
+    // let top10 = await getGameTop10Players('tictactoe');
+    // let playerRanking = await getPlayerGameLeaderboard('tictactoe', '5SG');
+
+    let results = [];
+    let errors = [];
+    let count = 0;
+    console.time('stresstest');
+    while (count < 10000) {
+        axios.get('https://acos.games/api/v1/game/tictactoe')
+            .then(result => {
+                results.push(result.data);
+            })
+            .catch(e => {
+                // console.log(e);
+                errors.push(e);
+            });
+        await sleep(3);
+        count++;
+        // console.log(count);
+    }
+
+    while ((results.length + errors.length) < 10000) {
+        console.log("results: " + results.length, "errors: " + errors.length);
+        console.timeEnd('stresstest');
+        break;
+
+    }
+
+    // console.log(results.data);
 
 }
 

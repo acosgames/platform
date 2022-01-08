@@ -14,11 +14,9 @@
     "server:prod": "pm2 start ecosystem.config.prod.json --env production",
     "kill": "taskkill //im node.exe //F",
     "stop": "pm2 stop ecosystem.config.json",
-    
     "logs": "pm2 logs",
     "list": "pm2 list",
     "monit": "pm2 monit",
-    
     "dev-servers": "./node_modules/.bin/concurrently npm:dev-node npm:dev-gameserver",
     "dev-api": "cd api && npm start",
     "dev-client": "cd client && npm start",
@@ -43,5 +41,8 @@
     "concurrently": "^5.3.0",
     "nodemon": "^2.0.7",
     "npm-run-all": "^4.1.5"
+  },
+  "dependencies": {
+    "axios": "^0.24.0"
   }
 }
