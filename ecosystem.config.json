@@ -24,7 +24,8 @@
             "ignore_watch": [
                 "public",
                 "sessions",
-                "node_modules/shared/node_modules/**"
+                "node_modules/shared/node_modules/**",
+                "node_modules/shared/model/versions.json"
             ]
         },
         {
@@ -52,7 +53,8 @@
             },
             "ignore_watch": [
                 "serverScripts/**",
-                "node_modules/shared/node_modules/**"
+                "node_modules/shared/node_modules/**",
+                "node_modules/shared/model/versions.json"
             ]
         },
         {
@@ -76,7 +78,8 @@
             "env_mobile": {
                 "NODE_ENV": "mobile"
             },
-            "ignore_watch": ["node_modules/shared/node_modules/**"]
+            "ignore_watch": ["node_modules/shared/node_modules/**",
+                "node_modules/shared/model/versions.json"]
         },
         {
             "name": "matchmaker",
@@ -99,7 +102,8 @@
             "env_mobile": {
                 "NODE_ENV": "mobile"
             },
-            "ignore_watch": ["node_modules/shared/node_modules/**"]
+            "ignore_watch": ["node_modules/shared/node_modules/**",
+                "node_modules/shared/model/versions.json"]
         },
         {
             "name": "gitworker",
@@ -120,7 +124,8 @@
             "env_mobile": {
                 "NODE_ENV": "mobile"
             },
-            "ignore_watch": ["node_modules/shared/node_modules/**"]
+            "ignore_watch": ["node_modules/shared/node_modules/**",
+                "node_modules/shared/model/versions.json"]
         }
     ]
 }
