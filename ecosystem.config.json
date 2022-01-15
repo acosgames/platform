@@ -5,6 +5,7 @@
             "cwd": "./api",
             "script": "./index.js",
             "vizion": false,
+            "time": true,
             "instances": "1",
             "exec_mode": "cluster",
             "watch": [
@@ -33,6 +34,7 @@
             "cwd": "./gameserver",
             "script": "./index.js",
             "vizion": false,
+            "time": true,
             "instances": "1",
             "exec_mode": "cluster",
             "watch": [
@@ -62,6 +64,7 @@
             "cwd": "./websocket",
             "script": "./index.js",
             "vizion": false,
+            "time": true,
             "instances": "1",
             "exec_mode": "cluster",
             "watch": [
@@ -86,6 +89,7 @@
             "cwd": "./matchmaker",
             "script": "./index.js",
             "vizion": false,
+            "time": true,
             "instances": "1",
             "exec_mode": "cluster",
             "watch": [
@@ -110,6 +114,7 @@
             "cwd": "./gitworker",
             "script": "./gitwebhook.js",
             "vizion": false,
+            "time": true,
             "instances": "1",
             "exec_mode": "cluster",
             "watch": [
