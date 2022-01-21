@@ -8,13 +8,35 @@ const axios = require('axios');
 
 const redis = require('./shared/services/redis');
 
+const { encode, decode } = require('./shared/util/encoder');
+
+
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+
+
 async function run() {
 
 
+    let test = {
+        uint: (new Date()).getTime(),
+        int: -(new Date()).getTime()
+    }
+    console.log("original: ", test);
+
+    let bytes = encode(test);
+
+    console.log("bytes: ", bytes);
+    let json = decode(bytes);
+    console.log("decode: ", json);
+
+    // let id = BigInt(102938490234231n);
+
+    // let bytes = bnToBuf(id);
+    // console.log(id);
+    // console.log(bytes);
     // while (!redis.isActive) {
 
     //     console.warn("[WebSocket] waiting on redis...");
@@ -69,30 +91,30 @@ async function run() {
     // let top10 = await getGameTop10Players('tictactoe');
     // let playerRanking = await getPlayerGameLeaderboard('tictactoe', '5SG');
 
-    let results = [];
-    let errors = [];
-    let count = 0;
-    console.time('stresstest');
-    while (count < 10000) {
-        axios.get('https://acos.games/api/v1/game/tictactoe')
-            .then(result => {
-                results.push(result.data);
-            })
-            .catch(e => {
-                // console.log(e);
-                errors.push(e);
-            });
-        await sleep(3);
-        count++;
-        // console.log(count);
-    }
+    // let results = [];
+    // let errors = [];
+    // let count = 0;
+    // console.time('stresstest');
+    // while (count < 10000) {
+    //     axios.get('https://acos.games/api/v1/game/tictactoe')
+    //         .then(result => {
+    //             results.push(result.data);
+    //         })
+    //         .catch(e => {
+    //             // console.log(e);
+    //             errors.push(e);
+    //         });
+    //     await sleep(3);
+    //     count++;
+    //     // console.log(count);
+    // }
 
-    while ((results.length + errors.length) < 10000) {
-        console.log("results: " + results.length, "errors: " + errors.length);
-        console.timeEnd('stresstest');
-        break;
+    // while ((results.length + errors.length) < 10000) {
+    //     console.log("results: " + results.length, "errors: " + errors.length);
+    //     console.timeEnd('stresstest');
+    //     break;
 
-    }
+    // }
 
     // console.log(results.data);
 
