@@ -175,4 +175,76 @@ async function updateLeaderboard(game_slug, players) {
     return false;
 }
 
-run();
+// run();
+
+var dvbuff = new ArrayBuffer(16);
+var dv = new DataView(dvbuff);
+
+const TYPE_INT8 = 0;
+const TYPE_UINT8 = 1;
+const TYPE_INT16 = 2;
+const TYPE_UINT16 = 3;
+const TYPE_INT32 = 4;
+const TYPE_UINT32 = 5;
+
+function convertNumberToBytes(number, buffer) {
+    if (number >= -128 && number < 0) {
+        buffer.push(TYPE_INT8);
+        dv.setInt8(0, number);
+        buffer.push(dv.getUint8(0));
+    }
+    else if (number >= 0 && number <= 255) {
+        buffer.push(TYPE_UINT8);
+        dv.setUint8(0, number);
+        buffer.push(dv.getUint8(0));
+    }
+    else if (number >= -32768 && number < 0) {
+        buffer.push(TYPE_INT16);
+        dv.setInt16(0, number);
+        buffer.push(dv.getUint8(0));
+        buffer.push(dv.getUint8(1));
+    }
+    else if (number >= 0 && number <= 65535) {
+        buffer.push(TYPE_UINT16);
+        dv.setUint16(0, number);
+        buffer.push(dv.getUint8(0));
+        buffer.push(dv.getUint8(1));
+    }
+    else if (number >= -2147483648 && number < 0) {
+        buffer.push(TYPE_INT32);
+        dv.setInt32(0, number);
+        buffer.push(dv.getUint8(0));
+        buffer.push(dv.getUint8(1));
+        buffer.push(dv.getUint8(2));
+        buffer.push(dv.getUint8(3));
+    }
+    else if (number >= 0 && number <= 4294967295) {
+        buffer.push(TYPE_UINT32);
+        dv.setUint32(0, number);
+        buffer.push(dv.getUint8(0));
+        buffer.push(dv.getUint8(1));
+        buffer.push(dv.getUint8(2));
+        buffer.push(dv.getUint8(3));
+    }
+}
+
+function run2() {
+
+    let buffer = [];
+    //convert number to bytes
+    let test1 = 100;
+    let test2 = 123412341;
+    let test3 = -1432;
+
+    convertNumberToBytes(test1, buffer);
+    convertNumberToBytes(test2, buffer);
+    convertNumberToBytes(test3, buffer);
+
+    console.log([test1, test2, test3]);
+    console.log(buffer);
+
+    [100, 123412341, -1432]
+
+}
+
+run2();
