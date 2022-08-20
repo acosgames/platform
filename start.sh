@@ -4,6 +4,6 @@ docker run -d -p 5672:5672 -p 15672:15672 --name rabbitmq -e RABBITMQ_DEFAULT_US
 
 docker run -d -p 6379:6379 --name redis redis --requirepass "haha123hehe"
 
-docker exec -it redis redis-cli FLUSHALL
+# docker exec -it redis redis-cli FLUSHALL
 
 # mysqld
