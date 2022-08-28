@@ -75,7 +75,7 @@
         {
             "name": "gitworker",
             "cwd": "./gitworker",
-            "script": "./gitwebhook.js",
+            "script": "./index.js",
             "vizion": false,
             "time": true,
             "instances": "1",
