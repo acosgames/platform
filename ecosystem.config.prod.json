@@ -8,6 +8,8 @@
             "time": true,
             "instances": "1",
             "exec_mode": "cluster",
+            "restart_delay": 2000,
+            "exp_backoff_restart_delay": 1000,
             "env": {
                 "NODE_ENV": "production"
             },
@@ -26,6 +28,8 @@
             "time": true,
             "instances": "1",
             "exec_mode": "cluster",
+            "restart_delay": 2000,
+            "exp_backoff_restart_delay": 1000,
             "env": {
                 "NODE_ENV": "production"
             },
@@ -44,6 +48,8 @@
             "time": true,
             "instances": "1",
             "exec_mode": "cluster",
+            "restart_delay": 2000,
+            "exp_backoff_restart_delay": 1000,
             "env": {
                 "NODE_ENV": "production"
             },
@@ -62,6 +68,8 @@
             "time": true,
             "instances": "1",
             "exec_mode": "cluster",
+            "restart_delay": 2000,
+            "exp_backoff_restart_delay": 1000,
             "env": {
                 "NODE_ENV": "production"
             },
@@ -80,6 +88,8 @@
             "time": true,
             "instances": "1",
             "exec_mode": "cluster",
+            "restart_delay": 2000,
+            "exp_backoff_restart_delay": 1000,
             "env": {
                 "NODE_ENV": "production"
             },

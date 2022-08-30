@@ -8,6 +8,8 @@
             "time": true,
             "instances": "1",
             "exec_mode": "cluster",
+            "restart_delay": 2000,
+            "exp_backoff_restart_delay": 1000,
             "watch": [
                 "src/**",
                 "index.js",
@@ -37,6 +39,8 @@
             "time": true,
             "instances": "1",
             "exec_mode": "cluster",
+            "restart_delay": 2000,
+            "exp_backoff_restart_delay": 1000,
             "watch": [
                 "saved/**",
                 "serverScripts/**",
@@ -67,6 +71,8 @@
             "time": true,
             "instances": "1",
             "exec_mode": "cluster",
+            "restart_delay": 2000,
+            "exp_backoff_restart_delay": 1000,
             "watch": [
                 "src/**",
                 "index.js",
@@ -92,6 +98,8 @@
             "time": true,
             "instances": "1",
             "exec_mode": "cluster",
+            "restart_delay": 2000,
+            "exp_backoff_restart_delay": 1000,
             "watch": [
                 "src/**",
                 "index.js",
@@ -117,6 +125,8 @@
             "time": true,
             "instances": "1",
             "exec_mode": "cluster",
+            "restart_delay": 2000,
+            "exp_backoff_restart_delay": 1000,
             "watch": [
                 "*.js"
             ],
