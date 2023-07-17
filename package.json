@@ -36,7 +36,5 @@
   "bugs": {
     "url": "https://github.com/5SG/platform/issues"
   },
-  "homepage": "https://github.com/5SG/platform#readme",
-  "devDependencies": {},
-  "dependencies": {}
+  "homepage": "https://github.com/5SG/platform#readme"
 }
