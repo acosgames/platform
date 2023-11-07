@@ -1,146 +1,133 @@
 {
-    "apps": [
-        {
-            "name": "api",
-            "cwd": "./api",
-            "script": "./index.js",
-            "vizion": false,
-            "time": true,
-            "instances": "1",
-            "exec_mode": "cluster",
-            "restart_delay": 2000,
-            "exp_backoff_restart_delay": 1000,
-            "watch": [
-                "src/**",
-                "index.js",
-                "node_modules/shared/**"
-            ],
-            "node_args": [
-                "--inspect=10001"
-            ],
-            "env": {
-                "NODE_ENV": "localhost"
-            },
-            "env_mobile": {
-                "NODE_ENV": "mobile"
-            },
-            "ignore_watch": [
-                "public",
-                "sessions",
-                "node_modules/shared/node_modules/**",
-                "node_modules/shared/model/versions.json"
-            ]
-        },
-        {
-            "name": "gameserver",
-            "cwd": "./gameserver",
-            "script": "./index.js",
-            "vizion": false,
-            "time": true,
-            "instances": "1",
-            "exec_mode": "cluster",
-            "restart_delay": 2000,
-            "exp_backoff_restart_delay": 1000,
-            "watch": [
-                "saved/**",
-                "serverScripts/**",
-                "src/**",
-                "index.js",
-                "node_modules/shared/**"
-            ],
-            "node_args": [
-                "--inspect=10003"
-            ],
-            "env": {
-                "NODE_ENV": "localhost"
-            },
-            "env_mobile": {
-                "NODE_ENV": "mobile"
-            },
-            "ignore_watch": [
-                "serverScripts/**",
-                "node_modules/shared/node_modules/**",
-                "node_modules/shared/model/versions.json"
-            ]
-        },
-        {
-            "name": "websocket",
-            "cwd": "./websocket",
-            "script": "./index.js",
-            "vizion": false,
-            "time": true,
-            "instances": "1",
-            "exec_mode": "cluster",
-            "restart_delay": 2000,
-            "exp_backoff_restart_delay": 1000,
-            "watch": [
-                "src/**",
-                "index.js",
-                "node_modules/shared/**"
-            ],
-            "node_args": [
-                "--inspect=10004"
-            ],
-            "env": {
-                "NODE_ENV": "localhost"
-            },
-            "env_mobile": {
-                "NODE_ENV": "mobile"
-            },
-            "ignore_watch": ["node_modules/shared/node_modules/**",
-                "node_modules/shared/model/versions.json"]
-        },
-        {
-            "name": "matchmaker",
-            "cwd": "./matchmaker",
-            "script": "./index.js",
-            "vizion": false,
-            "time": true,
-            "instances": "1",
-            "exec_mode": "cluster",
-            "restart_delay": 2000,
-            "exp_backoff_restart_delay": 1000,
-            "watch": [
-                "src/**",
-                "index.js",
-                "node_modules/shared/**"
-            ],
-            "node_args": [
-                "--inspect=10005"
-            ],
-            "env": {
-                "NODE_ENV": "localhost"
-            },
-            "env_mobile": {
-                "NODE_ENV": "mobile"
-            },
-            "ignore_watch": ["node_modules/shared/node_modules/**",
-                "node_modules/shared/model/versions.json"]
-        },
-        {
-            "name": "gitworker",
-            "cwd": "./gitworker",
-            "script": "./index.js",
-            "vizion": false,
-            "time": true,
-            "instances": "1",
-            "exec_mode": "cluster",
-            "restart_delay": 2000,
-            "exp_backoff_restart_delay": 1000,
-            "watch": [
-                "*.js"
-            ],
-            "node_args": [
-                "--inspect=10006"
-            ],
-            "env": {
-                "NODE_ENV": "localhost"
-            },
-            "env_mobile": {
-                "NODE_ENV": "mobile"
-            },
-            "ignore_watch": ["node_modules/shared/node_modules/**",
-                "node_modules/shared/model/versions.json"]
-        }
-    ]
+  "apps": [
+    {
+      "name": "api",
+      "cwd": "./api",
+      "script": "./index.js",
+      "vizion": false,
+      "time": true,
+      "instances": "1",
+      "exec_mode": "cluster",
+      "restart_delay": 2000,
+      "exp_backoff_restart_delay": 1000,
+      "watch": ["src/**", "index.js", "node_modules/shared/**"],
+      "node_args": ["--inspect=10001"],
+      "env": {
+        "NODE_ENV": "localhost"
+      },
+      "env_mobile": {
+        "NODE_ENV": "mobile"
+      },
+      "ignore_watch": [
+        "public",
+        "sessions",
+        "node_modules/shared/node_modules/**",
+        "node_modules/shared/test/**",
+        "node_modules/shared/model/versions.json"
+      ]
+    },
+    {
+      "name": "gameserver",
+      "cwd": "./gameserver",
+      "script": "./index.js",
+      "vizion": false,
+      "time": true,
+      "instances": "1",
+      "exec_mode": "cluster",
+      "restart_delay": 2000,
+      "exp_backoff_restart_delay": 1000,
+      "watch": [
+        "saved/**",
+        "serverScripts/**",
+        "src/**",
+        "index.js",
+        "node_modules/shared/**"
+      ],
+      "node_args": ["--inspect=10003"],
+      "env": {
+        "NODE_ENV": "localhost"
+      },
+      "env_mobile": {
+        "NODE_ENV": "mobile"
+      },
+      "ignore_watch": [
+        "serverScripts/**",
+        "node_modules/shared/node_modules/**",
+        "node_modules/shared/test/**",
+        "node_modules/shared/model/versions.json"
+      ]
+    },
+    {
+      "name": "websocket",
+      "cwd": "./websocket",
+      "script": "./index.js",
+      "vizion": false,
+      "time": true,
+      "instances": "1",
+      "exec_mode": "cluster",
+      "restart_delay": 2000,
+      "exp_backoff_restart_delay": 1000,
+      "watch": ["src/**", "index.js", "node_modules/shared/**"],
+      "node_args": ["--inspect=10004"],
+      "env": {
+        "NODE_ENV": "localhost"
+      },
+      "env_mobile": {
+        "NODE_ENV": "mobile"
+      },
+      "ignore_watch": [
+        "node_modules/shared/node_modules/**",
+        "node_modules/shared/test/**",
+        "node_modules/shared/model/versions.json"
+      ]
+    },
+    {
+      "name": "matchmaker",
+      "cwd": "./matchmaker",
+      "script": "./index.js",
+      "vizion": false,
+      "time": true,
+      "instances": "1",
+      "exec_mode": "cluster",
+      "restart_delay": 2000,
+      "exp_backoff_restart_delay": 1000,
+      "watch": ["src/**", "index.js", "node_modules/shared/**"],
+      "node_args": ["--inspect=10005"],
+      "env": {
+        "NODE_ENV": "localhost"
+      },
+      "env_mobile": {
+        "NODE_ENV": "mobile"
+      },
+      "ignore_watch": [
+        "node_modules/shared/node_modules/**",
+        "node_modules/shared/test/**",
+        "node_modules/shared/model/versions.json"
+      ]
+    },
+    {
+      "name": "gitworker",
+      "cwd": "./gitworker",
+      "script": "./index.js",
+      "vizion": false,
+      "time": true,
+      "instances": "1",
+      "exec_mode": "cluster",
+      "restart_delay": 2000,
+      "exp_backoff_restart_delay": 1000,
+      "watch": ["*.js"],
+      "node_args": ["--inspect=10006"],
+      "env": {
+        "NODE_ENV": "localhost"
+      },
+      "env_mobile": {
+        "NODE_ENV": "mobile"
+      },
+      "ignore_watch": [
+        "node_modules/shared/node_modules/**",
+        "node_modules/shared/test/**",
+        "node_modules/shared/model/versions.json"
+      ]
+    }
+  ]
 }

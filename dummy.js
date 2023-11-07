@@ -8,7 +8,7 @@ const axios = require('axios');
 
 const redis = require('./shared/services/redis');
 
-const { encode, decode } = require('./shared/util/encoder');
+const { encode, decode } = require('acos-json-encoder');
 
 
 function sleep(ms) {
