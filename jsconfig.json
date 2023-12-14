@@ -9,6 +9,7 @@
     "client/node_modules",
     "gameserver/node_modules",
     "websocket/node_modules",
+    "matchmaker/node_modules",
     "gitworker/node_modules",
     "shared/node_modules",
     "*bundle*.js"
