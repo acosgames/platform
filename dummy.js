@@ -122,7 +122,7 @@ async function run() {
 
 async function getGameTop10Players(game_slug) {
 
-    let rankings = await redis.zrevrange(game_slug + '/lb', 0, 10);
+    let rankings = await redis.zrevrange(game_slug + '/rankings', 0, 10);
 
     for (var i = 0; i < rankings.length; i++) {
         rankings[i].rank = (i + 1);
@@ -134,10 +134,10 @@ async function getGameTop10Players(game_slug) {
 }
 
 async function getPlayerGameLeaderboard(game_slug, player) {
-    let rank = await redis.zrevrank(game_slug + '/lb', player);
+    let rank = await redis.zrevrank(game_slug + '/rankings', player);
     console.log("rank: ", game_slug, player, rank);
 
-    let rankings = await redis.zrevrange(game_slug + '/lb', Math.max(0, rank - 1), rank + 1);
+    let rankings = await redis.zrevrange(game_slug + '/rankings', Math.max(0, rank - 1), rank + 1);
     console.log("rankings raw: ", rankings);
     let playerPos = 0;
     for (var i = 0; i < rankings.length; i++) {
@@ -166,7 +166,7 @@ async function updateLeaderboard(game_slug, players) {
             members.push({ value: player.name, score: player.rating });
         }
 
-        let result = await redis.zadd(game_slug + '/lb', members);
+        let result = await redis.zadd(game_slug + '/rankings', members);
         return result;
     }
     catch (e) {
