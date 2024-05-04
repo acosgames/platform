@@ -1,26 +1,13 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "target": "es6"
+    "target": "es5"
   },
   "exclude": [
     "node_modules",
-    "api/node_modules",
-    "client/node_modules",
-    "gameserver/node_modules",
-    "websocket/node_modules",
-    "matchmaker/node_modules",
-    "gitworker/node_modules",
-    "shared/node_modules",
+    "**/node_modules/*",
+    "api/public/*",
+    "client/src/assets/*",
     "*bundle*.js"
-  ],
-  "include": [
-    "api/**/*",
-    "client/**/*",
-    "gameserver/**/*",
-    "websocket/**/*",
-    "gitworker/**/*",
-    "shared/**/*",
-    "matchmaker/**/*"
   ]
 }
