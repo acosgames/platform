@@ -18,6 +18,39 @@ USE `forkoff`;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `achievement_definition`
+--
+
+DROP TABLE IF EXISTS `achievement_definition`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `achievement_definition` (
+  `achievement_id` varchar(45) DEFAULT NULL,
+  `achievement_name` varchar(32) NOT NULL,
+  `achivement_description` varchar(45) DEFAULT NULL,
+  `achievement_icon` varchar(45) DEFAULT NULL,
+  `stat_definition_id` varchar(45) DEFAULT NULL,
+  `goal_valueINT` varchar(45) DEFAULT NULL,
+  `goal_valueFLOAT` varchar(45) DEFAULT NULL,
+  `goal_valueSTRING` varchar(45) DEFAULT NULL,
+  `award_item` int DEFAULT NULL,
+  `award_xp` int DEFAULT NULL,
+  `award_gamepoints` int DEFAULT NULL,
+  `multiple` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`achievement_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `achievement_definition`
+--
+
+LOCK TABLES `achievement_definition` WRITE;
+/*!40000 ALTER TABLE `achievement_definition` DISABLE KEYS */;
+/*!40000 ALTER TABLE `achievement_definition` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `achievement_icons`
 --
 
@@ -884,4 +917,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-05-22 23:07:48
+-- Dump completed on 2024-05-22 23:09:10
