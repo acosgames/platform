@@ -6,4 +6,6 @@ docker run -d -p 6379:6379 --name redis redis --requirepass "haha123hehe"
 
 # docker exec -it redis redis-cli FLUSHALL
 
+# redis-cli --pass haha123hehe FLUSHALL
+
 # mysqld
