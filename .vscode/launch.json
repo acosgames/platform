@@ -10,18 +10,13 @@
             "request": "launch",
             "type": "node-terminal"
         },
-    
+
         {
             "name": "Launch via NPM",
             "request": "launch",
-            "runtimeArgs": [
-                "run-script",
-                "server:dev"
-            ],
+            "runtimeArgs": ["run-script", "server:dev"],
             "runtimeExecutable": "npm",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
+            "skipFiles": ["<node_internals>/**"],
             "type": "node"
         },
         // {
