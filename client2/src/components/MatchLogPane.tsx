@@ -1,0 +1,56 @@
+import { useState } from "react";
+import { friends } from "../data/mockData";
+
+export function MatchLogPane() {
+  const [isExpanded, setIsExpanded] = useState(true);
+  const [entries] = useState([
+    { text: "You captured Objective A", timestamp: Date.now() - 45000 },
+    { text: "DragonSlayer scored +220", timestamp: Date.now() - 120000 },
+    { text: "SpeedDemon eliminated 2 players", timestamp: Date.now() - 180000 },
+    { text: "Team bonus activated", timestamp: Date.now() - 300000 },
+    { text: "You reached streak x3", timestamp: Date.now() - 480000 },
+    { text: `${friends[0]?.name ?? "Teammate"} pinged a flank route`, timestamp: Date.now() - 600000 },
+  ]);
+
+  const formatTimeAgo = (timestamp: number): string => {
+    const secondsAgo = Math.floor((Date.now() - timestamp) / 1000);
+
+    if (secondsAgo < 60) {
+      return `${secondsAgo}s ago`;
+    }
+
+    const minutesAgo = Math.floor(secondsAgo / 60);
+    return `${minutesAgo}m ago`;
+  };
+
+  return (
+    <section className="rounded-lg border border-white/20 bg-linear-to-b from-card to-card/85  dark:from-gray-950 dark:to-black backdrop-blur-sm ring-1 ring-white/5 p-3.5 space-y-2.5 shrink-0 overflow-hidden shadow-[0_10px_24px_rgba(0,0,0,0.32)]">
+      <div className="flex items-center cursor-n-resize justify-between" onClick={() => setIsExpanded((prev) => !prev)}>
+        <h3 className="text-sm font-semibold text-foreground">Match Logs</h3>
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] text-cyan-700 dark:text-cyan-300">Live Feed</span>
+          <button
+            type="button"
+            aria-label={isExpanded ? "Collapse match logs" : "Expand match logs"}
+            className="cursor-pointer h-6 w-6 rounded-md border border-white/15 bg-white/5 text-foreground/80 hover:text-foreground hover:border-cyan-400/40 transition-colors"
+          >
+            {isExpanded ? "▾" : "▸"}
+          </button>
+        </div>
+      </div>
+
+      {isExpanded ? (
+        <div className="max-h-28 overflow-y-auto panel-scrollbar pr-1 space-y-1.5">
+          {entries.map((entry, idx) => (
+            <div key={`${entry.text}-${idx}`} className="rounded-md border border-white/10 bg-black/15 px-2.5 py-1.5">
+              <div className="flex items-start justify-between gap-2">
+                <p className="text-[11px] text-foreground/90 flex-1">{entry.text}</p>
+                <span className="text-[10px] text-muted-foreground whitespace-nowrap shrink-0">{formatTimeAgo(entry.timestamp)}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : null}
+    </section>
+  );
+}

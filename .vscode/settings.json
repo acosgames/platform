@@ -1,4 +1,11 @@
 {
   "typescript.suggest.autoImports": true,
-  "typescript.suggest.includeCompletionsForImportStatements": true
+  "typescript.suggest.includeCompletionsForImportStatements": true,
+
+  "files.watcherExclude": {
+      "**/.git/objects/**": true,
+      "**/.git/subtree-cache/**": true,
+      "**/node_modules/**": true
+  }
+
 }

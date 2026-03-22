@@ -1,0 +1,8 @@
+{
+  "https": {
+    "cdn": "https://cdn.acos.games/file/acospub/",
+    "api": "https://acos.games",
+    "ws": "wss://acos.games"
+  },
+  "REACT_APP_PUBLIC_VAPID_KEY": "BD8CvsM2QEkBQGV3eNmCmbKBpxJ4JRCDTXSSb4qAyo0iw5SBwQq5LkN34SRVZNUGyC0UUn9QjZWHXAh92oQ45cE"
+}
