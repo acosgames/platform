@@ -24,7 +24,7 @@ export function PlayScreen() {
   const navigate = useNavigate();
   const playSurfaceRef = useRef<HTMLElement | null>(null);
   const game = games.find((g) => g.id === id);
-  const [countdown, setCountdown] = useState(5);
+  const [countdown, setCountdown] = useState(5000);
   const [showVsScreen, setShowVsScreen] = useState(true);
   const [vsExiting, setVsExiting] = useState(false);
   const [isTheaterMode, setIsTheaterMode] = useState(false);

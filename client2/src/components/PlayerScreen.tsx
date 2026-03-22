@@ -108,10 +108,10 @@ export function PlayerScreen({
   };
 
   return (
-    <div className="relative z-10 h-full flex items-center justify-center px-4 py-12">
+    <div className="absolute inset-0 z-10 flex items-center justify-center p-4 sm:p-6">
       {showVsScreen ? (
-        <div className={`${vsExiting ? "vs-screen-exit" : "vs-screen-enter"} w-full max-w-5xl rounded-2xl border border-white/15 bg-black/90 backdrop-blur-md p-5 sm:p-6 space-y-5`}>
-          <div className="flex items-center gap-3">
+        <div className={`${vsExiting ? "vs-screen-exit" : "vs-screen-enter"} w-full h-full rounded-2xl border border-white/15 bg-black/90 backdrop-blur-md p-5 sm:p-6 flex flex-col justify-start gap-5`}>
+          <div className="flex-1 flex  items-start gap-3">
             <div className="flex items-center gap-3 min-w-0">
               <img src={gameImageUrl} alt={`${gameName} cover`} className="w-14 h-14 rounded-lg object-cover border border-white/20" />
               <div className="min-w-0">
@@ -123,8 +123,8 @@ export function PlayerScreen({
 
           {renderMatchIntro()}
 
-          <div className="text-center">
-            <p className="flex items-center justify-center gap-2 text-sm sm:text-base text-white/90">
+          <div className="flex-1 flex items-end justify-center">
+            <p className="flex items-center justify-center gap-2 text-sm sm:text-base text-white/90 text-center">
               {countdown > 0 ? (
                 <>
                   Match starts in <span className="text-xl font-bold text-white">{countdown}</span>
