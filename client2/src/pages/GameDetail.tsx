@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { PlayIcon } from "@heroicons/react/24/solid";
+import { useEffect, useState } from "react";
+import { HeartIcon, PlayIcon } from "@heroicons/react/24/solid";
 import { Link, useParams, useNavigate } from "react-router";
 import { currentPlayer, games, leaderboard } from "../data/mockData";
 import { type MatchType } from "../components/ScoreboardPane";
@@ -25,6 +25,8 @@ export function GameDetail() {
   const [statsCountryFilter, setStatsCountryFilter] = useState("all");
   const [statsMetricFilter, setStatsMetricFilter] = useState<StatsMetric>("score");
   const [statsWindowFilter, setStatsWindowFilter] = useState<TimeWindow>("season");
+  const [isHearted, setIsHearted] = useState(false);
+  const [heartReactionCount, setHeartReactionCount] = useState(0);
   const game = games.find((g) => g.id === id);
 
   if (!game) {
@@ -66,6 +68,24 @@ export function GameDetail() {
   const handlePlayNow = () => {
     enqueue({ gameId: game.id, gameName: game.name });
     navigate(`/game/${game.id}/play`);
+  };
+
+  useEffect(() => {
+    setIsHearted(false);
+    setHeartReactionCount(heartReactions);
+  }, [heartReactions, game.id]);
+
+  const handleHeartToggle = () => {
+    setIsHearted((prev) => {
+      const next = !prev;
+      setHeartReactionCount((count) => Math.max(0, count + (next ? 1 : -1)));
+      return next;
+    });
+  };
+
+  const formatReactionCount = (count: number) => {
+    if (count < 1000) return count.toString();
+    return new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 }).format(count);
   };
 
   const tabs: Array<{ key: DetailTab; label: string }> = [
@@ -371,9 +391,20 @@ export function GameDetail() {
         <div className="absolute inset-0 bg-linear-to-r from-cyan-500/10 via-transparent to-purple-500/10" />
 
         <div className="absolute top-4 right-4 sm:top-5 sm:right-5 z-10">
-          <div className="shrink-0 rounded-full border border-rose-500/40 bg-rose-500/20 px-3 py-1.5 text-xs font-semibold text-rose-700 dark:border-rose-300/35 dark:bg-rose-500/15 dark:text-rose-200 shadow-[0_8px_24px_rgba(244,63,94,0.22)] backdrop-blur-sm">
-            ❤ {heartReactions.toLocaleString()}
-          </div>
+          <button
+            type="button"
+            onClick={handleHeartToggle}
+            className={`shrink-0 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold bg-transparent transition-all duration-200 active:scale-95 ${
+              isHearted
+                ? "border-rose-300/70 text-rose-100 shadow-[0_0_16px_rgba(244,63,94,0.28)]"
+                : "border-white/30 text-foreground hover:border-rose-300/55"
+            }`}
+            aria-pressed={isHearted}
+            aria-label={isHearted ? "Remove heart reaction" : "Add heart reaction"}
+          >
+            <HeartIcon className={`h-3.5 w-3.5 text-rose-500 ${isHearted ? "animate-pulse" : ""}`} />
+            <span>{formatReactionCount(heartReactionCount)}</span>
+          </button>
         </div>
 
         <div className="absolute right-4 bottom-4 sm:right-6 sm:bottom-6 z-10">
@@ -460,34 +491,39 @@ export function GameDetail() {
           </section>
 
       {/* Bottom tabbed detail section */}
-      <section className="rounded-2xl border border-cyan-400/20 bg-card/95 p-4 sm:p-5 space-y-4">
-        <div className="flex items-center justify-between gap-3">
+      {/* <section className="rounded-2xl  border-cyan-400/20 bg-card/95 p-4 sm:p-5 space-y-4"> */}
+        {/* <div className="flex items-center justify-between gap-3">
           <h2 className="text-base sm:text-lg font-bold text-transparent bg-clip-text bg-linear-to-r from-cyan-300 via-blue-300 to-purple-300">
             Game Hub
           </h2>
           <span className="text-[11px] px-2 py-1 rounded-full border border-cyan-500/30 bg-cyan-500/10 text-cyan-800 dark:text-cyan-200">Live Data</span>
-        </div>
+        </div> */}
 
-        <div className="flex flex-wrap gap-2">
-          {tabs.map((tab) => (
-            <button
-              key={tab.key}
-              type="button"
-              onClick={() => setActiveTab(tab.key)}
-              className={`h-8 px-3.5 rounded-full text-xs font-semibold border transition-all ${
-                activeTab === tab.key
-                  ? "border-cyan-400/45 bg-linear-to-r from-cyan-500/20 to-blue-500/20 text-cyan-800 dark:text-cyan-100 shadow-[0_0_16px_rgba(0,217,255,0.25)]"
-                  : "border-white/12 bg-white/5 text-foreground/70 hover:border-cyan-400/35 hover:text-cyan-700 dark:hover:text-cyan-100"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-        <div className="rounded-xl border border-white/10 bg-card/60 p-3.5 sm:p-4">
-          {renderTabPanel()}
-        </div>
+        <section className=" ">
+          <div className="rounded-xl px-2  bg-black/99">
+            <div className="overflow-y-hidden overflow-x-auto  ">
+              <div className="min-w-max flex items-end gap-1  border-white/12">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.key}
+                    type="button"
+                    onClick={() => setActiveTab(tab.key)}
+                    className={`relative -mb-px h-9 px-3.5 pt-5 pb-10 text-sm font-normal border-b-2 transition-colors whitespace-nowrap ${
+                      activeTab === tab.key
+                        ? "border-cyan-300 text-white-50 "
+                        : "border-transparent text-foreground/50 hover:text-cyan-100 "
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="p-3.5 sm:p-4">
+            {renderTabPanel()}
+          </div>
+        {/* </div> */}
       </section>
 
       

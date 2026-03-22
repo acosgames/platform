@@ -1,44 +1,36 @@
 import type { LeaderboardEntry } from "../../data/mockData";
+import { SparklesIcon } from "@heroicons/react/24/solid";
 import { LeaderboardPlayerRow } from "./LeaderboardPlayerRow";
 import type { SeasonKey, SeasonOption } from "./leaderboardTypes";
 
-export function DivisionLeaderboardTab({
-  divisionSeasonFilter,
-  seasonOptions,
-  divisionGroups,
-  onDivisionSeasonChange,
-}: {
+export function DivisionLeaderboardTab(props: {
   divisionSeasonFilter: SeasonKey;
   seasonOptions: SeasonOption[];
   divisionGroups: Record<string, LeaderboardEntry[]>;
   onDivisionSeasonChange: (value: SeasonKey) => void;
 }) {
+  const { divisionGroups } = props;
+
   return (
     <div className="space-y-3">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-        <label className="space-y-1">
-          <span className="text-[10px] uppercase tracking-wide text-muted-foreground">Season</span>
-          <select
-            value={divisionSeasonFilter}
-            onChange={(e) => onDivisionSeasonChange(e.target.value as SeasonKey)}
-            className="h-9 w-full rounded-lg border border-white/10 bg-black/20 px-2.5 text-xs text-foreground outline-none"
-          >
-            {seasonOptions.map((season) => (
-              <option key={season.key} value={season.key}>{season.label}</option>
-            ))}
-          </select>
-        </label>
-        <div className="rounded-lg bg-black/18 px-3 py-2 flex items-center justify-between">
-          <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Division Capacity</p>
-          <p className="text-xs font-semibold text-cyan-100">30 max players</p>
-        </div>
-      </div>
+    
 
       {Object.entries(divisionGroups).map(([divisionName, entries]) => (
         <section key={divisionName} className="space-y-2">
-          <div className="flex items-center justify-between rounded-lg bg-cyan-500/12 px-3 py-2">
-            <p className="text-xs font-semibold text-cyan-100">Division: {divisionName}</p>
-            <p className="text-[10px] text-white/70">{entries.length} players</p>
+          <div className="relative overflow-hidden rounded-xl border border-cyan-300/30 bg-linear-to-r from-cyan-500/22 via-cyan-400/10 to-transparent px-3.5 py-2.5">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_10%_50%,rgba(34,211,238,0.2),transparent_45%)]" />
+            <div className="relative flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-cyan-100/75">Division</p>
+                <div className="mt-0.5 flex items-center gap-1.5 min-w-0">
+                  <SparklesIcon className="h-3.5 w-3.5 shrink-0 text-cyan-200" />
+                  <p className="text-sm sm:text-base font-black text-cyan-50 truncate">{divisionName}</p>
+                </div>
+              </div>
+              <div className="shrink-0 rounded-full border border-cyan-200/35 bg-black/25 px-2.5 py-1">
+                <p className="text-[10px] font-semibold text-cyan-100">{entries.length} players</p>
+              </div>
+            </div>
           </div>
           <div className="space-y-2">
             {entries.map((entry, idx) => (

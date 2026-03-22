@@ -118,6 +118,19 @@ export function Layout() {
             </div>
           </aside>
         </div>
+
+        {/* Footer */}
+        <footer className="border-t border-cyan-500/20 bg-linear-to-r from-background via-card to-background backdrop-blur-xl">
+          <div className="container mx-auto px-4 sm:px-6 lg:pr-84 py-3.5">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs">
+              <p className="text-muted-foreground">© {new Date().getFullYear()} ACOS Platform. All rights reserved.</p>
+              <div className="flex items-center gap-3 text-muted-foreground">
+                <span className="text-cyan-400/80">Status: Online</span>
+                <span>Build: Beta</span>
+              </div>
+            </div>
+          </div>
+        </footer>
       </div>
       <MatchmakingQueueIndicator />
     </div>
