@@ -14,8 +14,18 @@ type ScoreboardRow = {
   team?: "Team Alpha" | "Team Omega";
 };
 
+type DecoratedScoreboardRow = ScoreboardRow & {
+  gameRank: string;
+  stats: {
+    kills: number;
+    assists: number;
+    objectives: number;
+    pingMs: number;
+  };
+};
+
 export function ScoreboardPane({ matchType }: { matchType: MatchType }) {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded] = useState(true);
   const letterRank = (idx: number) => String.fromCharCode(65 + (idx % 26));
   const buildStats = (score: number, idx: number, wins?: number) => {
     const kills = Math.max(2, Math.round(score / 520) + idx);
@@ -68,69 +78,95 @@ export function ScoreboardPane({ matchType }: { matchType: MatchType }) {
     baseRows.slice(3, 6).map((row) => ({ ...row, team: "Team Omega" as const }))
   );
 
-  const renderRow = (
-    row: {
-      name: string;
-      score: number;
-      status: "You" | "Live";
-      country: string;
-      avatarUrl: string;
-      gameRank: string;
-      stats: { kills: number; assists: number; objectives: number; pingMs: number };
-    },
-    idx: number,
-  ) => {
+  const renderTableRow = (row: DecoratedScoreboardRow, idx: number) => {
     const countrycode = (row.country || "US").toUpperCase();
     const flagSrc = `${config.https.cdn}images/country/${countrycode}.svg`;
 
     return (
-      <div
+      <tr
         key={`${row.name}-${idx}`}
-        className={`rounded-md border px-2.5 py-2 flex items-start justify-between gap-2 ${
-          row.status === "You"
-            ? "border-cyan-300/35 bg-cyan-500/10"
-            : "border-white/10 bg-black/15"
-        }`}
+        className={`${row.status === "You" ? "bg-cyan-500/10" : "bg-black/15"} border-t border-white/10 first:border-t-0`}
       >
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2 min-w-0">
-            <img src={row.avatarUrl} alt={row.name} className="h-8 w-8 rounded-md object-cover border border-white/20 shrink-0" />
-            <div className="min-w-0">
-              <p className="text-xs font-semibold text-foreground truncate">{row.name}</p>
-              <div className="flex pt-0.5 gap-1.5 min-w-0 items-center">
-                <img src={flagSrc} alt={`${countrycode} flag`} className="w-5 h-3 rounded-[2px] object-cover border border-white/20 shrink-0" title={countrycode} />
-                <p className="text-[11px] text-white/75 truncate">{countrycode}</p>
-              </div>
+        <td className="align-top px-1.5 py-1.5 text-right">
+          <img
+            src={row.avatarUrl}
+            alt={row.name}
+            className="h-10 w-10 min-h-10 min-w-10 inline rounded-xl object-cover border border-white/60"
+          />
+        </td>
+
+        <td className="align-top px-1 py-1.5 min-w-0">
+          <p className="w-full text-xs font-semibold text-foreground truncate">{row.name}</p>
+          <div className="mt-1 min-w-0 flex items-center gap-1.5">
+            <img
+              src={flagSrc}
+              alt={`${countrycode} flag`}
+              className="w-5 h-3 rounded-[2px] object-cover border border-white/20 shrink-0"
+              title={countrycode}
+            />
+            <p className="text-[11px] text-white/75 shrink-0">{countrycode}</p>
+
+            <div className="flex-1 min-w-0 flex items-center gap-1.5">
+              <span className="text-[10px] font-bold px-1.5 py-px rounded border border-cyan-400/45 bg-cyan-500/15 text-cyan-400 dark:text-cyan-200 shrink-0">
+                {row.gameRank}
+              </span>
+              {row.status === "You" ? (
+                <span className="text-[10px] font-semibold px-1.5 py-px rounded border border-emerald-400/45 bg-emerald-500/15 text-emerald-400 dark:text-emerald-200 shrink-0">
+                  YOU
+                </span>
+              ) : null}
+              {/* Reserved space for additional user badges */}
+              <div className="flex-1 min-w-0" />
             </div>
           </div>
-          <div className="mt-1 grid grid-cols-4 gap-1 text-[10px]">
-            <span className="rounded border border-white/10 bg-white/5 px-1.5 py-0.5 text-white/85 text-center">
-              K <span className="font-semibold text-white">{row.stats.kills}</span>
-            </span>
-            <span className="rounded border border-white/10 bg-white/5 px-1.5 py-0.5 text-white/85 text-center">
-              A <span className="font-semibold text-white">{row.stats.assists}</span>
-            </span>
-            <span className="rounded border border-white/10 bg-white/5 px-1.5 py-0.5 text-white/85 text-center">
-              OBJ <span className="font-semibold text-white">{row.stats.objectives}</span>
-            </span>
-            <span className="rounded border border-white/10 bg-white/5 px-1.5 py-0.5 text-white/85 text-center">
-              P <span className="font-semibold text-white">{row.stats.pingMs}</span>
-            </span>
-          </div>
-        </div>
-        <div className="shrink-0 flex flex-col items-end justify-start gap-1">
-          <p className="text-xs font-semibold text-cyan-800 dark:text-cyan-200">{row.score.toLocaleString()}</p>
-          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-cyan-400/45 bg-cyan-500/15 text-cyan-800 dark:text-cyan-200">
-            {row.gameRank}
-          </span>
-        </div>
-      </div>
+        </td>
+
+        <td className="align-top px-1 py-1.5 text-right text-[11px] leading-4 text-white/90">{row.stats.kills}</td>
+        <td className="align-top px-1 py-1.5 text-right text-[11px] leading-4 text-white/90">{row.stats.assists}</td>
+        <td className="align-top px-1 py-1.5 text-right text-[11px] leading-4 text-white/90">{row.stats.objectives}</td>
+        <td className="align-top px-1 py-1.5 text-right text-[11px] leading-4 text-white/90">{row.stats.pingMs}</td>
+        <td className="align-top px-1 py-1.5 text-right text-[11px] leading-4 font-semibold text-cyan-400 dark:text-cyan-200">
+          {row.score.toLocaleString()}
+        </td>
+      </tr>
     );
   };
 
+  const hasTeams = teamAlphaRows.length > 0 && teamOmegaRows.length > 0;
+
+  const renderList = (rows: DecoratedScoreboardRow[], keyOffset = 0) => (
+    <div className="overflow-hidden ">
+      <table className="w-full table-fixed border-collapse">
+        <colgroup>
+          <col className="w-10" />
+          <col className="w-28"/>
+          <col className="w-7" />
+          <col className="w-7" />
+          <col className="w-7" />
+          <col className="w-7" />
+          <col className="w-10" />
+        </colgroup>
+        <thead>
+          <tr className="">
+            <th aria-hidden="true" className="px-1.5 py-1 text-left" />
+            <th className="px-1 py-1 text-left text-[10px] uppercase tracking-wide text-white/50 font-semibold">Player</th>
+            <th className="px-1 py-1 text-right text-[10px] uppercase tracking-wide text-white/50 font-semibold">K</th>
+            <th className="px-1 py-1 text-right text-[10px] uppercase tracking-wide text-white/50 font-semibold">A</th>
+            <th className="px-1 py-1 text-right text-[10px] uppercase tracking-wide text-white/50 font-semibold">Obj</th>
+            <th className="px-1 py-1 text-right text-[10px] uppercase tracking-wide text-white/50 font-semibold">MS</th>
+            <th className="px-1 py-1 text-right text-[10px] uppercase tracking-wide text-white/50 font-semibold">SCORE</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row, idx) => renderTableRow(row, keyOffset + idx))}
+        </tbody>
+      </table>
+    </div>
+  );
+
   return (
-    <section className="rounded-lg border border-white/20 bg-linear-to-b from-card to-card/85  dark:from-gray-950 dark:to-black backdrop-blur-sm ring-1 ring-white/5 p-3.5 space-y-2.5 shrink-0 overflow-hidden shadow-[0_10px_24px_rgba(0,0,0,0.32)]">
-      <div className="cursor-n-resize flex items-center justify-between" onClick={() => setIsExpanded((prev) => !prev)}>
+    <section className="flex-1 min-h-0 flex flex-col  space-y-2.5 overflow-hidden ">
+      {/* <div className="cursor-n-resize flex items-center justify-between" onClick={() => setIsExpanded((prev) => !prev)}>
         <h3 className="text-sm font-semibold text-foreground">Scoreboard</h3>
         <div className="flex items-center gap-2">
           <span className="text-[11px] text-cyan-700 dark:text-cyan-300">
@@ -144,28 +180,28 @@ export function ScoreboardPane({ matchType }: { matchType: MatchType }) {
             {isExpanded ? "▾" : "▸"}
           </button>
         </div>
-      </div>
+      </div> */}
 
       {isExpanded ? (
-        <div className="max-h-64 overflow-y-auto panel-scrollbar pr-1 space-y-2">
+        <div className="flex-1 min-h-0 overflow-y-auto panel-scrollbar pr-1 space-y-2">
           {matchType === "1v1" ? (
-            <div className="space-y-1.5">{oneVOneRows.map((row, idx) => renderRow(row, idx))}</div>
+            renderList(oneVOneRows)
           ) : null}
 
           {matchType === "free-for-all" ? (
-            <div className="space-y-1.5">{freeForAllRows.map((row, idx) => renderRow(row, idx))}</div>
+            renderList(freeForAllRows)
           ) : null}
 
-          {matchType === "team-based" ? (
+          {matchType === "team-based" && hasTeams ? (
             <div className="space-y-2">
-              <div className="space-y-1.5">
-                <p className="text-[10px] uppercase tracking-wide text-cyan-200 font-semibold">Team Alpha</p>
-                {teamAlphaRows.map((row, idx) => renderRow(row, idx))}
+              <div className="space-y-0">
+                <p className="text-[10px] uppercase tracking-wide text-cyan-200 font-semibold px-2">Team Alpha</p>
+                {renderList(teamAlphaRows)}
               </div>
 
-              <div className="space-y-1.5 pt-1 border-t border-white/10">
-                <p className="text-[10px] uppercase tracking-wide text-rose-200 font-semibold">Team Omega</p>
-                {teamOmegaRows.map((row, idx) => renderRow(row, 100 + idx))}
+              <div className="space-y-0 pt-1 border-t border-white/10">
+                <p className="text-[10px] uppercase tracking-wide text-rose-200 font-semibold px-2">Team Omega</p>
+                {renderList(teamOmegaRows, 100)}
               </div>
             </div>
           ) : null}

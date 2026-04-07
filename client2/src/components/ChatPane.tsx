@@ -89,13 +89,13 @@ export function ChatPane() {
   }, [quickChatOpen]);
 
   return (
-    <section className={`rounded-lg border border-slate-300/65 dark:border-white/20 bg-linear-to-b from-slate-50/95 to-slate-100/90  dark:from-gray-950 dark:to-black backdrop-blur-sm ring-1 ring-slate-300/40 dark:ring-white/5 p-3.5 shadow-[0_10px_24px_rgba(0,0,0,0.22)] dark:shadow-[0_10px_24px_rgba(0,0,0,0.32)] ${isCollapsed ? "shrink-0" : "flex-1 min-h-0 flex flex-col"}`}>
+    <section className={`flex-1 bg-card  p-3.5 ${isCollapsed ? "shrink-0" : "flex-1 min-h-0 flex flex-col"}`}>
       <div className={`cursor-n-resize flex items-center justify-between ${isCollapsed ? "" : "mb-2.5"}`} onClick={() => {
               setIsCollapsed((v) => !v);
               setQuickChatOpen(false);
             }} >
         <h3 className="text-sm font-semibold text-foreground">Game Chat</h3>
-        <div className="flex items-center gap-2">
+        {/* <div className="flex items-center gap-2">
           <span className="text-[11px] text-cyan-700 dark:text-cyan-300">Live</span>
           <button
             type="button"
@@ -109,7 +109,7 @@ export function ChatPane() {
           >
             {isCollapsed ? "▸" : "▾"}
           </button>
-        </div>
+        </div> */}
       </div>
 
       {!isCollapsed && (
@@ -127,26 +127,24 @@ export function ChatPane() {
           return (
             <div
               key={msg.id}
-              className="px-1 py-1 border-b border-white/8 last:border-b-0"
+              className="px-1 py-0.5 border-b border-white/8 last:border-b-0"
             >
-              <div className="flex items-start justify-between gap-2 mb-0.5">
-                <div className="flex items-center gap-2 min-w-0">
-                  <img src={sender.avatarUrl} alt={msg.sender} className="w-5 h-5 rounded-full object-cover border border-white/20 shrink-0" />
-                  <div className="flex items-center gap-1.5 min-w-0">
-                    <span className={`text-[11px] font-medium truncate ${isMe ? "text-cyan-800 dark:text-cyan-200" : "text-foreground"}`}>
-                      {msg.sender}
-                    </span>
-                    <img
-                      src={flagSrc}
-                      alt={`${countrycode} flag`}
-                      className="w-3.5 h-2.5 rounded-[2px] object-cover border border-white/20 shrink-0"
-                      title={countrycode}
-                    />
-                  </div>
+              <div className="flex gap-0.5 min-w-0">
+                <img src={sender.avatarUrl} alt={msg.sender} className="w-6 h-6 rounded-md object-cover border border-white/20 shrink-0" />
+                <div className="inline leading-none">
+                  <img
+                    src={flagSrc}
+                    alt={`${countrycode} flag`}
+                    className="w-4 h-3 mr-0.5 inline-block rounded-[2px] object-cover border border-white/20 wrap-anywhere"
+                    title={countrycode}
+                  />
+                  <span className={`text-sm  wrap-anywhere font-medium ${isMe ? "text-cyan-400 dark:text-cyan-200" : "text-foreground"}`}>
+                    {msg.sender}
+                  </span>
+                  <span className={`text-sm mr-1`}>:</span>
+                  <span className="text-xs text-white/85  wrap-anywhere">{msg.message}</span>
                 </div>
-                <span className="text-[10px] text-muted-foreground whitespace-nowrap">{msg.timestamp}</span>
               </div>
-              <p className="text-[11px] text-white/85 leading-snug wrap-break-word">{msg.message}</p>
             </div>
           );
         })}
@@ -174,7 +172,7 @@ export function ChatPane() {
           </button>
 
           {quickChatOpen && (
-            <div className="absolute bottom-9 right-0 z-30 w-36 rounded-xl bg-popover border border-white/10 shadow-2xl shadow-black/50 py-1.5 overflow-hidden">
+            <div className="absolute bottom-9 right-0 z-30 w-36 rounded-md bg-popover border border-white/10 shadow-2xl shadow-black/50 py-1.5 overflow-hidden">
               {QUICK_CHATS.map((msg) => (
                 <button
                   key={msg}

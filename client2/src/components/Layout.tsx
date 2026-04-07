@@ -1,138 +1,273 @@
 import { useEffect, useState } from "react";
-import { Outlet, useLocation } from "react-router";
-import { Bars3BottomRightIcon, XMarkIcon } from "@heroicons/react/24/solid";
-import { PlayRightPanel } from "./PlayRightPanel";
-import { RightPanel } from "./RightPanel";
+import { Link, Outlet, useLocation } from "react-router";
+import { XMarkIcon } from "@heroicons/react/24/solid";
+import { QueueList } from "./QueueList";
+import { FriendsList } from "./FriendsList";
+import { ChatPane } from "./ChatPane";
+import { CompressedGamerCard } from "./CompressedGamerCard";
 import { MatchmakingQueueIndicator } from "./MatchmakingQueueIndicator";
+import { PowerBar, type PowerTabKey } from "./PowerBar";
+import { SettingsPane } from "./SettingsPane";
+// import { useBucket } from "../actions/bucket";
+// import { btToast } from "../actions/buckets";
+import { hideToast } from "../actions/toast";
+import { SignInPane } from "./SignInPane";
+import { useBucket } from "@/actions/bucket";
+import { btLoggedIn } from "@/actions/buckets";
 // import { Gamepad2, Sparkles } from "lucide-react";
 
+
+let layoutRenderCount = 0;
+
+const screens: { [key: string]: string } = {
+    sm: '640px',
+    md: '768px',
+    lg: '1024px',
+    xl: '1280px',
+    '2xl': '1536px',
+};
+
+const screensPx: { [key: string]: number } = {
+    sm: 640,
+    md: 768,
+    lg: 1024,
+    xl: 1280,
+    '2xl': 1536,
+};
+
+function checkBreakpoint(breakpoint: string) {
+    const query = `(min-width: ${screens[breakpoint]})`;
+    return window.matchMedia(query).matches;
+}
+
+
 export function Layout() {
-  const location = useLocation();
-  const [mobilePanelOpen, setMobilePanelOpen] = useState(false);
-  const [theme, setTheme] = useState<"light" | "dark">(() => {
-    if (typeof window === "undefined") return "dark";
-    const stored = window.localStorage.getItem("theme-mode");
-    if (stored === "light" || stored === "dark") return stored;
-    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-  });
+    const location = useLocation();
+    // const toast = useBucket(btToast);
+    let toast = { open: false, title: "", description: "", status: "success", duration: 3000, isClosable: true, id: 1 };
+    const [activePowerTab, setActivePowerTab] = useState<PowerTabKey | null>(null);
+    const [isDockedWide, setIsDockedWide] = useState(false);
+    // const [twBreakpoints, setTwBreakpoints] = useState(getTailwindBreakpoints());
 
-  useEffect(() => {
-    const root = document.documentElement;
-    root.classList.remove("light", "dark");
-    root.classList.add(theme);
-    window.localStorage.setItem("theme-mode", theme);
-  }, [theme]);
+    let [isLargeScreen, setIsLargeScreen] = useState(checkBreakpoint('lg'));
 
-  const isPlayRoute = /^\/game\/[^/]+\/play$/.test(location.pathname);
-  const activeRightPanel = isPlayRoute ? <PlayRightPanel /> : <RightPanel />;
+    useEffect(() => {
+        if (!toast?.open) return;
+        if (!toast.duration || toast.duration <= 0) return;
 
-  return (
-    <div className="h-screen overflow-hidden flex flex-col play-layout-root">
-      <div className="h-full overflow-y-auto panel-scrollbar">
-        {/* Header */}
-        <header className="play-layout-header bg-linear-to-r from-background via-card to-background border-b border-cyan-500/20 backdrop-blur-xl relative overflow-hidden">
-          <div className="absolute inset-0 bg-linear-to-r from-cyan-500/5 via-purple-500/5 to-pink-500/5" />
-          <div className="container mx-auto px-4 sm:px-6 lg:pr-84 py-4 relative">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="relative">
-                  <div className="absolute inset-0 bg-linear-to-r from-cyan-400 to-purple-500 rounded-lg blur-lg opacity-50" />
-                  <div className="relative w-12 h-12 bg-linear-to-br from-cyan-500 to-purple-500 rounded-lg flex items-center justify-center shadow-xl">
-                    {/* <Gamepad2 className="w-7 h-7 text-white" /> */}
-                  </div>
+        const activeToastId = toast.id;
+        const timeout = window.setTimeout(() => {
+            hideToast(activeToastId);
+        }, toast.duration);
+
+        return () => window.clearTimeout(timeout);
+    }, [toast]);
+
+
+    useEffect(() => {
+        // Use a window resize listener or a React useEffect hook to update dynamically
+        // Example using a window listener:
+        const handleResize = () => {
+
+            let isLarge = window.screen.width >= screensPx['lg'];
+            if (isLargeScreen != isLarge)
+                setIsLargeScreen(isLarge);
+
+            // setIsLargeScreen(checkBreakpoint('lg'));
+            // Logic to determine the current active breakpoint based on window.innerWidth
+            // You'll need to parse the 'rem' values to 'px' for direct comparison.
+        };
+
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+
+    const isPlayRoute = /^\/game\/[^/]+\/play$/.test(location.pathname);
+    const isPowerPanelOpen = activePowerTab !== null;
+    const isDockedOpenWide = isLargeScreen && isDockedWide && isPowerPanelOpen;
+
+    // let isLargeScreen = checkBreakpoint('lg');
+
+    console.log("Layout Render Count:", ++layoutRenderCount);
+    return (
+        <>
+            <div className="absolute inset-0 w-full h-full bg-slate-950 overflow-hidden -z-2">
+                <svg className="background-svg top" width="calc(100% + 160px)" height="100%">
+                    <pattern id="pattern-aztec-top" x="0" y="0" width="160" height="78" patternUnits="userSpaceOnUse">
+                        <path stroke="white" opacity="0.3"
+                            strokeWidth="4" fill="none" d="m 0 32 h 28 v -20 h -10 v 10 h -10 v -20 h 30 v 30 h 30 v -20 h -10 v 10 h -10 v -20 h 30 v 30 h 30 v -20 h -10 v 10 h -10 v -20 h 30 v 30 h 30 v -20 h -10 v 10 h -10 v -20 h 30 v 32" />
+                    </pattern>
+                    <rect x="0" y="0" width="100%" height="100%" fill="url(#pattern-aztec-top)"></rect>
+                </svg>
+                <svg className="background-svg bottom" width="calc(100% + 160px)" height="100%">
+                    <pattern id="pattern-aztec-bottom" x="0" y="0" width="160" height="78" patternUnits="userSpaceOnUse">
+                        <path stroke="white" opacity="0.3"
+                            strokeWidth="4" fill="none" d="m 0 71 h 18 v -30 h 30 v 20 h -10 v -10 h -10 v 20 h 30 v -30 h 30 v 20 h -10 v -10 h -10 v 20 h 30 v -30 h 30 v 20 h -10 v -10 h -10 v 20 h 30 v -30 h 30 v 20 h -10 v -10 h -10 v 20 h 30 m -178 -30 h 8 v 20 h -8" />
+                    </pattern>
+                    <rect x="0" y="0" width="100%" height="100%" fill="url(#pattern-aztec-bottom)"></rect>
+                </svg>
+            </div>
+            <div className="w-full h-screen overflow-hidden flex flex-col play-layout-root">
+                {toast?.open ? (
+                    <div className="fixed top-4 right-4 z-90 w-[min(92vw,22rem)] rounded-md border border-white/15 bg-background/95 backdrop-blur-xl p-3 shadow-[0_10px_35px_rgba(0,0,0,0.35)]">
+                        <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                                <p
+                                    className={`text-sm font-semibold truncate ${toast.status === "success"
+                                        ? "text-emerald-300"
+                                        : toast.status === "warning"
+                                            ? "text-amber-300"
+                                            : toast.status === "error"
+                                                ? "text-rose-300"
+                                                : "text-cyan-300"
+                                        }`}
+                                >
+                                    {toast.title}
+                                </p>
+                                {toast.description ? <p className="mt-1 text-xs text-muted-foreground">{toast.description}</p> : null}
+                            </div>
+
+                            {toast.isClosable ? (
+                                <button
+                                    type="button"
+                                    onClick={() => hideToast(toast.id)}
+                                    className="shrink-0 h-7 w-7 rounded-full border border-white/15 bg-black/20 text-white/70 hover:text-white hover:border-cyan-300/45 transition-colors flex items-center justify-center"
+                                    aria-label="Close toast"
+                                >
+                                    <XMarkIcon className="h-4 w-4" />
+                                </button>
+                            ) : null}
+                        </div>
+                    </div>
+                ) : null}
+
+                <div className="relative flex flex-row w-full h-screen panel-scrollbar overflow-y-auto">
+
+                    <div className="play-layout-main-shell flex-1 flex flex-col h-full pt-12.5">
+                        {/* Header */}
+                        <header className="play-layout-header fixed top-0 left-0 right-0 z-50 w-full h-12.5 min-h-12.5 max-h-12.5 box-border bg-black border-b border-cyan-500/20 backdrop-blur-xl">
+                            <div className="absolute w-full inset-0 bg-linear-to-r from-cyan-500/5 via-purple-500/5 to-pink-500/5" />
+                            <div className="w-full h-full mx-auto px-2 lg:px-4 relative">
+                                <div className="w-full h-full flex items-center justify-between gap-3">
+                                    <div className="flex items-center gap-3 min-w-0">
+                                        <Link to="/" className="flex items-center gap-2.5">
+                                            <img
+                                                src="https://assets.acos.games/acos-logo-2025.webp"
+                                                alt="ACOS"
+                                                className="h-8 w-auto object-contain"
+                                            />
+                                            <span className="font-acos-logo text-2xl font-semibold text-foreground leading-none">ACOS</span>
+                                        </Link>
+                                    </div>
+
+                                    <PowerBar
+                                        activePowerTab={activePowerTab}
+                                        setActivePowerTab={setActivePowerTab}
+                                        isLargeScreen={isLargeScreen}
+                                        isDockedWide={isDockedWide}
+                                        setIsDockedWide={setIsDockedWide}
+                                    />
+                                </div>
+                            </div>
+                        </header>
+
+                        {/* Main content + footer — shift right when panel is docked */}
+                        <div
+                            className="flex-1 flex flex-col min-h-0 transition-[padding-right] duration-200"
+                            style={{ paddingRight: isDockedOpenWide ? "23rem" : undefined }}
+                        >
+
+                        {/* Main content */}
+                        <div className="flex-1 play-layout-content relative container mx-auto px-2 lg:px-20">
+                            <div className="flex flex-col gap-4 lg:gap-6">
+                                {/* Main content area */}
+                                <div className="flex-1 min-w-0">
+                                    <Outlet />
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                        {/* Footer */}
+                        <footer className="border-t border-cyan-500/20 bg-linear-to-r from-background via-card to-background backdrop-blur-xl">
+                            <div className="container mx-auto px-2  lg:px-20 py-3.5">
+                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs">
+                                    <p className="text-muted-foreground">© {new Date().getFullYear()} ACOS Platform. All rights reserved.</p>
+                                    <div className="flex items-center gap-3 text-muted-foreground">
+                                        <span className="text-cyan-400/80">Status: Online</span>
+                                        <span>Build: Beta</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </footer>
+                        </div>{/* end padding wrapper */}
+                    </div>
+
                 </div>
 
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <h1 className="text-transparent bg-clip-text bg-linear-to-r from-cyan-400 via-purple-400 to-pink-400">ACOS</h1>
-                    {/* <Sparkles className="w-5 h-5 text-yellow-400" /> */}
-                  </div>
-                  <p className="text-xs text-muted-foreground truncate">Multiplayer Gaming Portal</p>
-                </div>
-              </div>
+                {isPowerPanelOpen && !isDockedOpenWide ? (
+                    <button
+                        type="button"
+                        className="fixed inset-0 z-40 bg-black/35"
+                        onClick={() => setActivePowerTab(null)}
+                        aria-label="Close power panel"
+                    />
+                ) : null}
 
-              <button
-                type="button"
-                onClick={() => setTheme((prev) => (prev === "dark" ? "light" : "dark"))}
-                className="shrink-0 h-9 px-3 rounded-full border border-white/15 bg-card/70 hover:bg-card transition-colors text-xs font-semibold text-foreground flex items-center gap-2"
-                aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
-              >
-                <span className="text-sm leading-none">{theme === "dark" ? "☀" : "☾"}</span>
-                {theme === "dark" ? "Light" : "Dark"}
-              </button>
+                <aside
+                    className={`power-panel ${isPowerPanelOpen ? "power-panel-open" : ""} ${isDockedOpenWide ? "docked " : ""}`}
+                    aria-hidden={!isPowerPanelOpen}
+                >
+                    {isDockedOpenWide ? (
+                        <div className="power-panel-sidebar-bar">
+                            <PowerBar
+                                activePowerTab={activePowerTab}
+                                setActivePowerTab={setActivePowerTab}
+                                isLargeScreen={isLargeScreen}
+                                isDockedWide={isDockedWide}
+                                setIsDockedWide={setIsDockedWide}
+                                className="flex h-12.5 items-center justify-center gap-1.5 px-2"
+                            />
+                        </div>
+                    ) : null}
+                    <div className="power-panel-content panel-scrollbar flex flex-col">
+                        {activePowerTab === "profile" ? (<>
+                            <ShowLoginOrGamerCard />
+                            <QueueList />
+                            <ChatPane />
+                            </>) : null}
+                        
+                        {/* {activePowerTab === "queue" ? <QueueList /> : null} */}
+                        {/* {activePowerTab === "chat" ? <ChatPane /> : null} */}
+                        {activePowerTab === "friends" ? <FriendsList /> : null}
+                        {activePowerTab === "settings" ? <SettingsPane isPlayRoute={isPlayRoute} /> : null}
+                    </div>
+                </aside>
+
+                <MatchmakingQueueIndicator />
             </div>
-          </div>
-        </header>
 
-        {/* Main content */}
-        <div className="play-layout-content relative container mx-auto px-4 sm:px-6 lg:pr-84 py-4 sm:py-6">
-          <div className="flex flex-col gap-4 lg:gap-6">
-            {/* Main content area */}
-            <div className="flex-1 min-w-0">
-              <Outlet />
-            </div>
-          </div>
+        </>
+    );
+}
 
-          {/* Right panel rail (desktop) */}
-          <aside className="play-layout-rail hidden lg:block fixed top-0 right-0 z-30 h-screen w-80 border-l border-cyan-400/15 bg-background/92 backdrop-blur-xl p-3 pr-2">
-            {activeRightPanel}
-          </aside>
+function ShowLoginOrGamerCard() {
+    // const [isLoggedIn, setIsLoggedIn] = useState(false);
+    let loggedIn = useBucket(btLoggedIn);
+    // let [loggedIn, player, latency, wsConnected, duplicatetabs] = useBuckets([btLoggedIn, btUser, btLatency, btWebsocketConnected, btDuplicateTabs]);
 
-          {/* Mobile/tablet bottom trigger */}
-          <button
-            type="button"
-            onClick={() => setMobilePanelOpen(true)}
-            className="lg:hidden fixed bottom-4 right-4 z-40 h-11 w-11 rounded-full border border-cyan-400/35 bg-card/90 backdrop-blur-md text-cyan-300 shadow-[0_0_18px_rgba(0,217,255,0.2)] hover:text-cyan-200 hover:border-cyan-300/55 transition-colors flex items-center justify-center"
-            aria-label="Open right panel"
-          >
-            <Bars3BottomRightIcon className="h-5 w-5" />
-          </button>
+    // console.log("Render Count:", ++renderCount, { loggedIn, player, latency, wsConnected, duplicatetabs });
+    if( (!loggedIn || loggedIn == "LURKER" || loggedIn == "CHECKING") ) {
+      return <SignInPane onSignIn={() => false} />
+    }
 
-          {/* Mobile backdrop */}
-          {mobilePanelOpen && (
-            <button
-              type="button"
-              className="lg:hidden fixed inset-0 z-40 bg-black/45"
-              onClick={() => setMobilePanelOpen(false)}
-              aria-label="Close right panel"
-            />
-          )}
-
-          {/* Mobile slide-in right panel */}
-          <aside
-            className={`lg:hidden fixed top-0 right-0 bottom-0 z-50 w-[min(86vw,22rem)] border-l border-white/10 bg-background/95 backdrop-blur-xl transition-transform duration-300 ${
-              mobilePanelOpen ? "translate-x-0" : "hidden translate-x-full"
-            }`}
-            aria-hidden={!mobilePanelOpen}
-          >
-            <button
-              type="button"
-              onClick={() => setMobilePanelOpen(false)}
-              className="absolute bottom-4 -left-8 h-10 w-10 rounded-full border border-white/20 bg-background/95 text-white/80 hover:text-white hover:border-cyan-300/50 flex items-center justify-center shadow-lg"
-              aria-label="Close right panel"
-            >
-              <XMarkIcon className="h-5 w-5" />
-            </button>
-            <div className="h-full overflow-y-auto p-4 panel-scrollbar">
-              {activeRightPanel}
-            </div>
-          </aside>
-        </div>
-
-        {/* Footer */}
-        <footer className="border-t border-cyan-500/20 bg-linear-to-r from-background via-card to-background backdrop-blur-xl">
-          <div className="container mx-auto px-4 sm:px-6 lg:pr-84 py-3.5">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs">
-              <p className="text-muted-foreground">© {new Date().getFullYear()} ACOS Platform. All rights reserved.</p>
-              <div className="flex items-center gap-3 text-muted-foreground">
-                <span className="text-cyan-400/80">Status: Online</span>
-                <span>Build: Beta</span>
-              </div>
-            </div>
-          </div>
-        </footer>
-      </div>
-      <MatchmakingQueueIndicator />
-    </div>
-  );
+    // if( player ) {
+      return <CompressedGamerCard  />;
+    // }
+    
+    // return <></>
 }

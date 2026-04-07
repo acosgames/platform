@@ -205,9 +205,13 @@ export const leaderboard: LeaderboardEntry[] = [
   { rank: 3, player: 'ChampionX', score: 14235, wins: 295, country: 'JP' },
   { rank: 4, player: 'ShadowKnight', score: 13780, wins: 276, country: 'US' },
   { rank: 5, player: 'LegendKiller', score: 13120, wins: 254, country: 'DE' },
-  { rank: 6, player: 'WarriorKing', score: 12650, wins: 241, country: 'BR' },
-  { rank: 7, player: 'NightRider', score: 12340, wins: 228, country: 'GB' },
-  { rank: 8, player: 'StormBreaker', score: 11890, wins: 215, country: 'FR' }
+  { rank: 6, player: 'LegendKillerASDF', score: 13120, wins: 254, country: 'DE' },
+  { rank: 7, player: 'WarriorKing', score: 12650, wins: 241, country: 'BR' },
+  { rank: 8, player: 'WarriorKingASDF', score: 12650, wins: 241, country: 'BR' },
+  { rank: 9, player: 'NightRider', score: 12340, wins: 228, country: 'GB' },
+  { rank: 10, player: 'NightRiderASDF', score: 12340, wins: 228, country: 'GB' },
+  { rank: 11, player: 'StormBreaker', score: 11890, wins: 215, country: 'FR' },
+  { rank: 12, player: 'StormBreakerASDF', score: 11890, wins: 215, country: 'FR' }
 ];
 
 export const achievements: Achievement[] = [

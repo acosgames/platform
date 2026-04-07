@@ -43,9 +43,9 @@ export function GamerCard({ isOnline = true }: GamerCardProps) {
   }, [menuOpen]);
 
   return (
-    <div className="relative z-10 rounded-xl bg-linear-to-b from-slate-50/95 to-slate-100/90 dark:from-card dark:to-card border border-slate-300/65 dark:border-white/10 overflow-visible shadow-[0_10px_24px_rgba(0,0,0,0.22)] dark:shadow-lg">
+    <div className="relative z-10 rounded-md bg-linear-to-b from-slate-50/95 to-slate-100/90 dark:from-card dark:to-card border border-slate-300/65 dark:border-white/10 overflow-visible shadow-[0_10px_24px_rgba(0,0,0,0.22)] dark:shadow-lg">
       {/* Banner */}
-      <div className="h-20 rounded-t-xl overflow-hidden relative">
+      <div className="h-20 rounded-t-md overflow-hidden relative">
         <div className="absolute inset-0 bg-linear-to-br from-cyan-600/50 via-purple-700/50 to-pink-600/50" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(0,217,255,0.15)_0%,transparent_70%)]" />
         {/* Subtle grid pattern */}
@@ -74,7 +74,7 @@ export function GamerCard({ isOnline = true }: GamerCardProps) {
         </button>
 
         {menuOpen && (
-          <div className="absolute right-0 top-9 w-44 rounded-xl bg-popover border border-white/10 shadow-2xl shadow-black/50 py-1.5 overflow-hidden">
+          <div className="absolute right-0 top-9 w-44 rounded-md bg-popover border border-white/10 shadow-2xl shadow-black/50 py-1.5 overflow-hidden">
             {MENU_OPTIONS.map((opt) => (
               <button
                 key={opt.label}
@@ -138,7 +138,7 @@ export function GamerCard({ isOnline = true }: GamerCardProps) {
         <div className="space-y-1.5">
           <div className="flex items-center gap-2.5">
             {/* Level badge */}
-            <div className="w-7 h-7 rounded-lg bg-linear-to-br from-cyan-500 to-purple-600 flex items-center justify-center shadow-[0_0_10px_rgba(0,217,255,0.3)] shrink-0">
+            <div className="w-7 h-7 rounded-md bg-linear-to-br from-cyan-500 to-purple-600 flex items-center justify-center shadow-[0_0_10px_rgba(0,217,255,0.3)] shrink-0">
               <span className="text-xs font-black text-white leading-none">{player.level}</span>
             </div>
 

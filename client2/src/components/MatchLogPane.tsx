@@ -2,7 +2,7 @@ import { useState } from "react";
 import { friends } from "../data/mockData";
 
 export function MatchLogPane() {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded] = useState(true);
   const [entries] = useState([
     { text: "You captured Objective A", timestamp: Date.now() - 45000 },
     { text: "DragonSlayer scored +220", timestamp: Date.now() - 120000 },
@@ -24,8 +24,8 @@ export function MatchLogPane() {
   };
 
   return (
-    <section className="rounded-lg border border-white/20 bg-linear-to-b from-card to-card/85  dark:from-gray-950 dark:to-black backdrop-blur-sm ring-1 ring-white/5 p-3.5 space-y-2.5 shrink-0 overflow-hidden shadow-[0_10px_24px_rgba(0,0,0,0.32)]">
-      <div className="flex items-center cursor-n-resize justify-between" onClick={() => setIsExpanded((prev) => !prev)}>
+    <section className=" space-y-2.5 shrink-0 overflow-hidden ">
+      {/* <div className="flex items-center cursor-n-resize justify-between" onClick={() => setIsExpanded((prev) => !prev)}>
         <h3 className="text-sm font-semibold text-foreground">Match Logs</h3>
         <div className="flex items-center gap-2">
           <span className="text-[11px] text-cyan-700 dark:text-cyan-300">Live Feed</span>
@@ -37,10 +37,10 @@ export function MatchLogPane() {
             {isExpanded ? "▾" : "▸"}
           </button>
         </div>
-      </div>
+      </div> */}
 
       {isExpanded ? (
-        <div className="max-h-28 overflow-y-auto panel-scrollbar pr-1 space-y-1.5">
+        <div className="h-full overflow-y-auto panel-scrollbar pr-1 space-y-1">
           {entries.map((entry, idx) => (
             <div key={`${entry.text}-${idx}`} className="rounded-md border border-white/10 bg-black/15 px-2.5 py-1.5">
               <div className="flex items-start justify-between gap-2">

@@ -37,7 +37,7 @@ export function MatchmakingQueueIndicator() {
 
   return (
     <div className="fixed bottom-4 left-1/2 z-60 w-[min(92vw,34rem)] -translate-x-1/2 pointer-events-none">
-      <div className="pointer-events-auto rounded-2xl border border-cyan-300/35 bg-linear-to-r from-slate-950/96 via-slate-900/96 to-cyan-950/96 backdrop-blur-xl shadow-[0_18px_48px_rgba(0,0,0,0.45),0_0_30px_rgba(34,211,238,0.25)] overflow-hidden">
+      <div className="pointer-events-auto rounded-md border border-cyan-300/35 bg-linear-to-r from-slate-950/96 via-slate-900/96 to-cyan-950/96 backdrop-blur-xl shadow-[0_18px_48px_rgba(0,0,0,0.45),0_0_30px_rgba(34,211,238,0.25)] overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(34,211,238,0.2),transparent_42%),radial-gradient(circle_at_82%_50%,rgba(56,189,248,0.15),transparent_45%)]" />
         <div className="relative p-3.5 sm:p-4">
           <div className="flex items-center justify-between gap-3">

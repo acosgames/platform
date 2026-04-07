@@ -3,79 +3,38 @@
 echo "=========================================================="
 echo ">>>> NPM AUDIT FIX shared"
 cd shared
-# npm install
 npm audit fix
-# npm link
-cd ..
 echo "=========================================================="
 echo ">>>> NPM AUDIT FIX api"
-cd api
-# npm install
+cd ../api
 npm audit fix
-cd ..
 echo "=========================================================="
-echo ">>>> NPM AUDIT FIX client"
-cd client
-# npm install --legacy-peer-deps
+echo ">>>> NPM AUDIT FIX client2"
+cd ../client2
 npm audit fix
-cd ..
 echo "=========================================================="
 echo ">>>> NPM AUDIT FIX gameserver"
-cd gameserver
-# npm install
+cd ../gameserver
 npm audit fix
-cd ..
 echo "=========================================================="
 echo ">>>> NPM AUDIT FIX matchmaker"
-# cd matchmaker
-# npm install
+cd ../matchmaker
 npm audit fix
-cd ..
 echo "=========================================================="
 echo ">>>> NPM AUDIT FIX websocket"
-# cd websocket
-# npm install
+cd ../websocket
 npm audit fix
 npm run installws
-cd ..
 echo "=========================================================="
 echo ">>>> NPM AUDIT FIX gitworker"
-# cd gitworker
-# npm install
+cd ../gitworker
 npm audit fix
-cd ..
 echo "=========================================================="
 echo ">>>> NPM AUDIT FIX docs"
-# cd docs
-# npm install
+cd ../docs
 npm audit fix
-cd ..
-# echo "=========================================================="
-# echo ">>>> NPM AUDIT FIX templates/tictactoe"
-# cd templates/tictactoe
-# npm install
-# npm audit fix
-# cd ../..
-# echo "=========================================================="
-# echo ">>>> NPM AUDIT FIX templates/poptrivia"
-# cd templates/poptrivia
-# npm install
-# npm audit fix
-# cd ../..
-# echo "=========================================================="
-# echo ">>>> NPM AUDIT FIX templates/rockpaperscissors"
-# cd templates/rockpaperscissors
-# npm install
-# npm audit fix
-# cd ../..
-# echo "=========================================================="
-# echo ">>>> NPM AUDIT FIX templates/acosgames"
-# cd templates/acosgames
-# npm install
-# npm audit fix
-# cd ../..
 echo "=========================================================="
 echo ">>>> NPM AUDIT FIX platform"
-# npm install
+cd ..
 npm audit fix
 echo "=========================================================="

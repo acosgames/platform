@@ -11,12 +11,14 @@ export type IntroPlayer = {
 
 export function IntroPlayerCard({
   player,
+  team = "blue",
   emphasize = false,
   size = "standard",
   motionPhase = "enter",
   delayMs = 0,
 }: {
   player: IntroPlayer;
+  team?: "blue" | "red";
   emphasize?: boolean;
   size?: "compact" | "standard" | "hero";
   motionPhase?: "enter" | "exit";
@@ -24,41 +26,59 @@ export function IntroPlayerCard({
 }) {
   const isHero = size === "hero";
   const isCompact = size === "compact";
-  const rankSizeClass = isHero ? "h-6 w-6 text-md font-semibold" : isCompact ? "h-6 w-6 text-md font-semibold" : "h-8 w-8 text-sm";
+  const cardWidthClass = isHero
+    ? "w-56 sm:w-64 md:w-72 lg:w-80"
+    : isCompact
+      ? "w-40 sm:w-44 md:w-52 lg:w-60"
+      : "w-40 sm:w-44 md:w-60 lg:w-70 xl:w-80";
+  const portraitClass = isHero
+    ? "w-18 h-18 sm:w-20 sm:h-20 md:w-22 md:h-22 lg:w-24 lg:h-24"
+    : isCompact
+      ? "w-12 h-12 sm:w-13 sm:h-13 md:w-14 md:h-14"
+      : "w-14 h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 xl:w-22 xl:h-22";
+  const nameClass = isHero
+    ? "text-base sm:text-lg md:text-xl"
+    : isCompact
+      ? "text-xs sm:text-sm md:text-base"
+      : "text-sm lg:text-md";
+  const metaClass = isHero ? "text-[11px] sm:text-[12px] md:text-[13px]" : "text-[10px] lg:text-[12px]";
   const countrycode = (player.country || "US").toUpperCase();
   const flagSrc = `${config.https.cdn}images/country/${countrycode}.svg`;
+  const rankLabel = [player.rankLetter, player.rankLevel].filter(Boolean).join(" ");
 
   return (
     <article
-      className={`${motionPhase === "exit" ? "vs-card-exit" : "vs-card-enter"} rounded-xl border ${isCompact ? "p-2" : "p-3"} backdrop-blur-sm transition-transform ${isHero ? "w-52 max-w-full flex flex-col" : ""} ${
+      className={`${motionPhase === "exit" ? "vs-card-exit" : "vs-card-enter"} ${cardWidthClass} rounded-md transition-transform ${
         emphasize
-          ? "border-cyan-300/45 bg-cyan-500/15 shadow-[0_0_24px_rgba(34,211,238,0.35)]"
-          : "border-white/15 bg-black/30"
-      }`}
+          ? team == "blue" ? " ring-2 ring-white/90 -ring-offset-2" : "border-2 border-white/80 -ring-offset-2"
+          : ""
+      } ${team === "blue" ? 
+        "bg-primary bg-linear-to-br from-primary to-black/30 to-80%" : 
+        "bg-rose-600 bg-linear-to-br from-rose-600 to-black/30 to-80%"}`
+      }
       style={{ animationDelay: `${delayMs}ms` }}
     >
-      <div className={`${isCompact ? "flex items-stretch gap-2 space-y-0 " : isHero ? "h-full flex flex-col gap-1" : "h-full flex flex-col gap-1"}`}>
+      <div className="flex items-center gap-0.5">
         <img
           src={player.avatarUrl}
           alt={player.name}
-          className={`rounded-lg object-cover border border-white/25 ${isHero ? "w-full aspect-square" : isCompact ? "h-14 w-14 shrink-0" : "w-full h-20 sm:h-24"}`}
+          className={`rounded-md object-cover border border-white/25 shrink-0 ${portraitClass}`}
         />
 
-        <div className="inline-flex flex-col gap-1 overflow-hidden">
-          <div className="flex items-center justify-between gap-2">
-            <p className={`${isHero ? "text-base  sm:text-md" : isCompact ? "text-[14px]" : "text-sm"} font-semibold text-white truncate`}>{player.name}</p>
-          </div>
-          <div className="flex  gap-1.5 min-w-0 ">
-            <img src={flagSrc} alt={`${countrycode} flag`} className={`${isCompact ? "w-5 h-4" : "w-5 h-4"} rounded-[2px] object-cover border border-white/20 shrink-0`} title={countrycode} />
-            <p className={`${isCompact ? "text-[10px]" : "text-[11px]"} text-white/75 truncate`}>{countrycode}</p>
-          </div>
-        </div>
+        <div className={`flex flex-col gap-0.5 overflow-hidden min-w-0 p-0.5 lg:p-1 xl:p-1.5`}>
+          <p className={`${nameClass} font-semibold text-white truncate`}>
+            {player.name}
+          </p>
 
-        <span
-          className={`${rankSizeClass} ${isCompact ? "" : "mt-0"} absolute bottom-2 right-2 inline-flex items-center justify-center rounded-md px-1.5   text-white bg-linear-to-br from-slate-500 to-slate-950`}
-        >
-          {player.rankLetter}
-        </span>
+          <div className="flex items-center gap-1 min-w-0">
+            <img src={flagSrc} alt={`${countrycode} flag`} className="w-4 h-3 rounded-[2px] object-cover border border-white/20 shrink-0" title={countrycode} />
+            <p className={`${metaClass} text-white truncate`}>{countrycode}</p>
+          </div>
+
+          <p className={`${metaClass} font-semibold uppercase tracking-[0.06em] text-slate-100 truncate`}>
+            Rank {rankLabel}
+          </p>
+        </div>
       </div>
     </article>
   );

@@ -39,7 +39,7 @@ export function FriendsList() {
 
     return (
       <div
-        className={`rounded-md border px-2.5 py-2 transition-colors ${
+        className={`rounded-md border px-2.5 py-2 transition-colors h-full ${
           inParty
             ? "border-cyan-400/45 bg-cyan-500/12"
             : "border-white/10 bg-black/15"
@@ -86,7 +86,7 @@ export function FriendsList() {
   };
 
   return (
-    <section className="rounded-lg border border-slate-300/65 dark:border-white/20 bg-linear-to-b from-slate-50/95 to-slate-100/90 dark:from-card dark:to-card/85 backdrop-blur-sm ring-1 ring-slate-300/40 dark:ring-white/5 p-3.5 space-y-3 shrink-0 overflow-hidden shadow-[0_10px_24px_rgba(0,0,0,0.22)] dark:shadow-[0_10px_24px_rgba(0,0,0,0.32)]">
+    <section className="h-full rounded-md border border-slate-300/65 dark:border-white/20 bg-linear-to-b from-slate-50/95 to-slate-100/90 dark:from-card dark:to-card/85 backdrop-blur-sm ring-1 ring-slate-300/40 dark:ring-white/5 p-3.5 space-y-3 shrink-0 overflow-hidden shadow-[0_10px_24px_rgba(0,0,0,0.22)] dark:shadow-[0_10px_24px_rgba(0,0,0,0.32)]">
       <div className="flex items-center justify-between gap-2" onClick={() => setIsCollapsed((v) => !v)}>
         <h3 className="text-sm font-semibold text-foreground">Friends</h3>
         <div className="flex items-center gap-2">

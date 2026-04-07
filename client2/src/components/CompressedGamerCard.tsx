@@ -1,112 +1,148 @@
 import { useEffect, useRef, useState } from "react";
 import config from "../config";
-import { currentPlayer } from "../data/mockData";
+import { logout } from "@/actions/person";
+import { btDuplicateTabs, btLatency, btLoggedIn, btUser, btWebsocketConnected } from "@/actions/buckets";
+import { useBuckets } from "@/actions/bucket";
 
-interface CompressedGamerCardProps {
-  isOnline?: boolean;
-}
 
 const MENU_OPTIONS = [
-  { label: "Edit Profile", icon: "✏️" },
-  { label: "View Stats", icon: "📊" },
-  { label: "Achievements", icon: "🏆" },
-  { label: "Settings", icon: "⚙️" },
-  { label: "Sign Out", icon: "🚪", danger: true },
+    { label: "Edit Profile", icon: "✏️" },
+    { label: "View Stats", icon: "📊" },
+    { label: "Achievements", icon: "🏆" },
+    { label: "Settings", icon: "⚙️" },
+    { label: "Sign Out", icon: "🚪", danger: true, onClick: () => logout() },
 ];
 
-export function CompressedGamerCard({ isOnline = true }: CompressedGamerCardProps) {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
-  const player = currentPlayer;
-  const countrycode = (player.country || "US").toUpperCase();
-  const flagSrc = `${config.https.cdn}images/country/${countrycode}.svg`;
-  const xpPercent = Math.round((player.xp / player.maxXp) * 100);
+export function CompressedGamerCard() {
 
-  useEffect(() => {
-    function onOutsideClick(e: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setMenuOpen(false);
-      }
-    }
-    if (menuOpen) document.addEventListener("mousedown", onOutsideClick);
-    return () => document.removeEventListener("mousedown", onOutsideClick);
-  }, [menuOpen]);
 
-  return (
-    <div className="relative z-10 rounded-lg border border-white/20 bg-linear-to-b from-card to-card/85 backdrop-blur-sm ring-1 ring-white/5 px-3.5 py-3 shadow-[0_10px_24px_rgba(0,0,0,0.35)]">
-      <div className="flex items-start gap-3">
-        <div className="relative shrink-0">
-          <img src={player.avatarUrl} alt={player.name} className="w-12 h-12 rounded-full object-cover ring-2 ring-white/10" />
-          <span
-            className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-card ${
-              isOnline ? "bg-green-400 shadow-[0_0_6px_rgba(74,222,128,0.75)]" : "bg-muted"
-            }`}
-            title={isOnline ? "Online" : "Offline"}
-          />
-        </div>
+    let [loggedIn, player, latency, wsConnected, duplicatetabs] = useBuckets([btLoggedIn, btUser, btLatency, btWebsocketConnected, btDuplicateTabs]);
+    
+    const [menuOpen, setMenuOpen] = useState(false);
+    const menuRef = useRef<HTMLDivElement>(null);
 
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center justify-between gap-2">
-            <div className="min-w-0">
-              <div className="flex items-center gap-1.5">
-                <h3 className="text-sm font-semibold text-foreground truncate">{player.name}</h3>
-                <img src={flagSrc} alt={`${countrycode} flag`} className="w-4.5 h-3 rounded-[2px] object-cover border border-white/20" title={countrycode} />
-              </div>
-              <p className={`text-[11px] ${isOnline ? "text-green-400" : "text-muted-foreground"}`}>
-                {isOnline ? "Online" : "Offline"}
-              </p>
-            </div>
+    useEffect(() => {
+        function onOutsideClick(e: MouseEvent) {
+            if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+                setMenuOpen(false);
+            }
+        }
+        if (menuOpen) document.addEventListener("mousedown", onOutsideClick);
+        return () => document.removeEventListener("mousedown", onOutsideClick);
+    }, [menuOpen]);
 
-            <div className="flex items-center gap-2 shrink-0">
-              <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-md px-1.5 text-[11px] font-bold text-white bg-linear-to-br from-cyan-500 to-purple-600">
-                {player.level}
-              </span>
+    
+    if(!loggedIn || !player) return <></>
+    
+    
+    let isOnline = wsConnected && !duplicatetabs;
 
-              <div className="relative" ref={menuRef}>
-                <button
-                  onClick={() => setMenuOpen((v) => !v)}
-                  className="h-6 w-6 rounded-md border border-white/15 bg-black/25 hover:bg-black/45 transition-colors flex flex-col items-center justify-center gap-0.5"
-                  aria-label="Player options"
-                >
-                  <span className="h-0.75 w-0.75 rounded-full bg-white/80" />
-                  <span className="h-0.75 w-0.75 rounded-full bg-white/80" />
-                  <span className="h-0.75 w-0.75 rounded-full bg-white/80" />
-                </button>
+    let level = 1.3;//player.level || 1;
+    let xpPercent = Math.max(0, Math.min(100, (level - Math.trunc(level)) * 100));
 
-                {menuOpen && (
-                <div className="absolute right-0 top-9 w-44 rounded-xl bg-popover border border-white/10 shadow-2xl shadow-black/50 py-1.5 overflow-hidden">
-                    {MENU_OPTIONS.map((opt) => (
-                    <button
-                        key={opt.label}
-                        onClick={() => setMenuOpen(false)}
-                        className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm transition-colors hover:bg-white/10 text-left ${
-                        opt.danger ? "text-destructive hover:bg-destructive/50" : "text-foreground"
-                        }`}
-                    >
-                        <span className="text-base leading-none">{opt.icon}</span>
-                        {opt.label}
-                    </button>
-                    ))}
+    const countrycode = (player.countrycode || "US").toUpperCase();
+    const flagSrc = `${config.https.cdn}images/country/${countrycode}.svg`;
+    const avatarUrl = `${config.https.cdn}images/portraits/assorted-${player.portraitid || 1}-medium.webp`;
+    const latencyValue = Number(latency || 0);
+    // const tierLabel = player.rank || player.tier || player.division || "Contender";
+    // const statusLabel = duplicatetabs ? "Duplicate" : isOnline ? "Live" : "Offline";
+    // const latencyLabel = !wsConnected ? "Link Down" : duplicatetabs ? "Conflict" : `${latencyValue}ms`;
+    // const latencyTone = !wsConnected || duplicatetabs
+    //     ? "border-red-500/35 bg-red-500/12 text-red-200"
+    //     : latencyValue > 400
+    //         ? "border-orange-400/35 bg-orange-500/12 text-orange-200"
+    //         : latencyValue > 200
+    //             ? "border-yellow-400/35 bg-yellow-500/12 text-yellow-100"
+    //             : "border-green-400/35 bg-green-500/12 text-green-100";
+
+    
+
+    return (
+        <div className="relative z-10 overflow-visible    bg-card px-3 py-3  ">
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-[60%]  bg-[linear-gradient(130deg,rgba(20,98,255,0.82),rgba(0,0,0,0.0)_50%,rgba(240,36,72,0.9))]" />
+            <div className="pointer-events-none absolute inset-x-0 top-[60%] h-8 bg-[linear-gradient(180deg,rgba(0,0,0,0.22),transparent)]" />
+            <div className="flex items-center gap-3">
+                <div className="relative shrink-0">
+                    <div className="absolute -inset-0.5  bg-linear-to-br from-blue-500/60 via-white/15 to-red-500/60 opacity-80" />
+                    <div className="relative  bg-slate-950/85 p-0.5">
+                        <img src={avatarUrl} alt={player.displayname} className="h-16 w-16 rounded-md object-cover" />
+                    </div>
+                    <span
+                        className={`absolute -bottom-1 -right-1 h-3.5 w-3.5 rounded-full border-2 border-card ${isOnline ? "bg-green-400 shadow-[0_0_10px_rgba(96,165,250,0.85)]" : "bg-slate-500"}`}
+                        title={`${!wsConnected ? "Disconnected" : `${latencyValue}ms`}`}
+                    />
                 </div>
-                )}
-              </div>
-            </div>
-          </div>
 
-          <div className="mt-2 space-y-1">
-            <div className="flex items-center justify-between text-[11px]">
-              <span className="text-muted-foreground">XP</span>
-              <span className="text-cyan-700 dark:text-cyan-300 font-medium">{xpPercent}%</span>
+                <div className="min-w-0 flex-1">
+                    <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-1.5">
+                              
+                                
+                            </div>
+                            <h3 className="mt-1 truncate text-sm font-black uppercase tracking-[0.08em] text-white">
+                                {player.displayname}
+                                <img src={flagSrc} alt={`${countrycode} flag`} className="h-3 w-4.5 rounded-[2px] object-cover border border-white/20" title={countrycode} />
+                            </h3>
+                            {/* <div className="mt-1 flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.16em]">
+                                <span className={`inline-flex items-center rounded-sm border px-1.5 py-0.5 ${isOnline ? "border-blue-400/35 bg-blue-500/12 text-blue-100" : "border-white/12 bg-white/8 text-slate-300"}`}>
+                                    {statusLabel}
+                                </span>
+                                <span className={`inline-flex items-center rounded-sm border px-1.5 py-0.5 ${latencyTone}`}>
+                                    {latencyLabel}
+                                </span>
+                            </div> */}
+                        </div>
+
+                        <div className="flex items-start gap-2 shrink-0">
+                            {/* <div className="min-w-[2.8rem] rounded-md border border-white/10 bg-white/6 px-2 py-1 text-center leading-none">
+                                <div className="text-[8px] font-black uppercase tracking-[0.22em] text-white/60">LVL</div>
+                                <div className="mt-1 text-sm font-black text-white">{player.level}</div>
+                            </div> */}
+
+                            <div className="relative" ref={menuRef}>
+                                <button
+                                    onClick={() => setMenuOpen((v) => !v)}
+                                    className="h-7 w-7 rounded-md border border-white/12 bg-black/25 hover:border-blue-300/40 hover:bg-black/40 transition-colors flex flex-col items-center justify-center gap-0.5"
+                                    aria-label="Player options"
+                                >
+                                    <span className="h-0.75 w-0.75 rounded-full bg-white/80" />
+                                    <span className="h-0.75 w-0.75 rounded-full bg-white/80" />
+                                    <span className="h-0.75 w-0.75 rounded-full bg-white/80" />
+                                </button>
+
+                                {menuOpen && (
+                                    <div className="absolute right-0 top-10 z-20 w-44 overflow-hidden rounded-md border border-white/10 bg-popover shadow-2xl shadow-black/50 py-1.5">
+                                        {MENU_OPTIONS.map((opt) => (
+                                            <button
+                                                key={opt.label}
+                                                onClick={() => { setMenuOpen(false); opt.onClick?.(); }}
+                                                className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm transition-colors hover:bg-white/10 text-left ${opt.danger ? "text-destructive hover:bg-destructive/20" : "text-foreground"}`}
+                                            >
+                                                <span className="text-base leading-none">{opt.icon}</span>
+                                                {opt.label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="mt-2.5">
+                        <div className="mb-1 flex items-center justify-between text-[9px] font-bold uppercase tracking-[0.18em] text-white/65">
+                            <span>Level {player.level}</span>
+                            <span>{Math.round(xpPercent)}%</span>
+                        </div>
+                        <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
+                            <div
+                                className="h-full rounded-full bg-linear-to-r from-blue-500 via-white to-red-500"
+                                style={{ width: `${xpPercent}%` }}
+                            />
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div className="h-1.5 rounded-full bg-white/10 overflow-hidden">
-              <div
-                className="h-full rounded-full bg-linear-to-r from-cyan-500 via-blue-500 to-purple-500"
-                style={{ width: `${xpPercent}%` }}
-              />
-            </div>
-          </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 }

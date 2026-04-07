@@ -14,7 +14,12 @@
                 "NODE_ENV": "production"
             },
             "env_production": {
-                "NODE_ENV": "production"
+                "NODE_ENV": "production",
+                "DEBUG": 1
+            },
+            "env_proddev": {
+                "NODE_ENV": "production",
+                "DEBUG": 1
             },
             "node_args": [
                 "--max_old_space_size=3000"
@@ -36,6 +41,10 @@
             "env_production": {
                 "NODE_ENV": "production"
             },
+            "env_proddev": {
+                "NODE_ENV": "production",
+                "DEBUG": 1
+            },
             "node_args": [
                 "--max_old_space_size=3000"
               ]
@@ -55,6 +64,10 @@
             },
             "env_production": {
                 "NODE_ENV": "production"
+            },
+            "env_proddev": {
+                "NODE_ENV": "production",
+                "DEBUG": 1
             },
             "node_args": [
                 "--max_old_space_size=3000"
@@ -76,6 +89,10 @@
             "env_production": {
                 "NODE_ENV": "production"
             },
+            "env_proddev": {
+                "NODE_ENV": "production",
+                "DEBUG": 1
+            },
             "node_args": [
                 "--max_old_space_size=2000"
               ]
@@ -95,6 +112,10 @@
             },
             "env_production": {
                 "NODE_ENV": "production"
+            },
+            "env_proddev": {
+                "NODE_ENV": "production",
+                "DEBUG": 1
             },
             "node_args": [
                 "--max_old_space_size=1000"

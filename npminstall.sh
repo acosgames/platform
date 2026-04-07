@@ -1,90 +1,78 @@
 #!/bin/sh
-npm install -g yarn
+echo "=========================================================="
+echo ">>>> NPM INSTALL pm2 (global)"
 npm install -g pm2
 
 echo "=========================================================="
 echo ">>>> NPM INSTALL shared"
 cd shared
 npm install
-# npm audit fix
 npm link
-cd ..
 echo "=========================================================="
 echo ">>>> NPM INSTALL api"
-cd api
+cd ../api
 npm install
-# npm audit fix
 npm link shared
-cd ..
 echo "=========================================================="
 echo ">>>> NPM INSTALL client"
-cd client
+cd ../client
 npm install --legacy-peer-deps
-# npm audit fix
 npm link shared
-cd ..
 echo "=========================================================="
 echo ">>>> NPM INSTALL gameserver"
-cd gameserver
+cd ../gameserver
 npm install
-# npm audit fix
 npm link shared
-cd ..
 echo "=========================================================="
 echo ">>>> NPM INSTALL matchmaker"
-cd matchmaker
+cd ../matchmaker
 npm install
-# npm audit fix
 npm link shared
-cd ..
 echo "=========================================================="
 echo ">>>> NPM INSTALL websocket"
-cd websocket
+cd ../websocket
 npm install
-# npm audit fix
 npm link shared
 npm run installws
-cd ..
 echo "=========================================================="
 echo ">>>> NPM INSTALL gitworker"
-cd gitworker
+cd ../gitworker
 npm install
-# npm audit fix
 npm link shared
-cd ..
 echo "=========================================================="
 echo ">>>> NPM INSTALL docs"
-cd docs
+cd ../docs
 npm install
-# npm audit fix
 npm link shared
-cd ..
 # echo "=========================================================="
 # echo ">>>> NPM INSTALL templates/tictactoe"
 # cd templates/tictactoe
 # npm install
-# npm audit fix
 # cd ../..
 # echo "=========================================================="
 # echo ">>>> NPM INSTALL templates/poptrivia"
 # cd templates/poptrivia
 # npm install
-# npm audit fix
 # cd ../..
 # echo "=========================================================="
 # echo ">>>> NPM INSTALL templates/rockpaperscissors"
 # cd templates/rockpaperscissors
 # npm install
-# npm audit fix
 # cd ../..
 # echo "=========================================================="
 # echo ">>>> NPM INSTALL templates/acosgames"
 # cd templates/acosgames
 # npm install
-# npm audit fix
 # cd ../..
 echo "=========================================================="
 echo ">>>> NPM INSTALL platform"
+cd ..
 npm install
-# npm audit fix
 echo "=========================================================="
+
+
+# One last time
+echo "=========================================================="
+echo ">>>> NPM INSTALL shared"
+cd shared
+npm install

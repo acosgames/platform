@@ -17,7 +17,7 @@ export function DivisionLeaderboardTab(props: {
 
       {Object.entries(divisionGroups).map(([divisionName, entries]) => (
         <section key={divisionName} className="space-y-2">
-          <div className="relative overflow-hidden rounded-xl border border-cyan-300/30 bg-linear-to-r from-cyan-500/22 via-cyan-400/10 to-transparent px-3.5 py-2.5">
+          <div className="relative overflow-hidden rounded-md border border-cyan-300/30 bg-linear-to-r from-cyan-500/22 via-cyan-400/10 to-transparent px-3.5 py-2.5">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_10%_50%,rgba(34,211,238,0.2),transparent_45%)]" />
             <div className="relative flex items-center justify-between gap-3">
               <div className="min-w-0">
@@ -33,7 +33,7 @@ export function DivisionLeaderboardTab(props: {
             </div>
           </div>
           <div className="space-y-2">
-            {entries.map((entry, idx) => (
+            {entries.slice().sort((a, b) => b.score - a.score).map((entry, idx) => (
               <LeaderboardPlayerRow
                 key={`${divisionName}-${entry.player}`}
                 entry={entry}

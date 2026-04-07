@@ -7,6 +7,7 @@ import {
   MicrosoftLoginButton,
 } from "react-social-login-buttons";
 import config from "../config";
+import { createTempUser } from "@/actions/person";
 
 interface SignInPaneProps {
   onSignIn: () => void;
@@ -41,23 +42,7 @@ function getCountryOptions(): CountryOption[] {
     .sort((a, b) => a.label.localeCompare(b.label));
 }
 
-async function createTempAccount(payload: { displayname: string; portraitid: number; countrycode: string }) {
-  const response = await fetch("/login/temp", {
-    method: "POST",
-    credentials: "include",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
 
-  const data = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    const message = typeof data?.message === "string" ? data.message : "Could not create temporary account.";
-    throw new Error(message);
-  }
-
-  return data;
-}
 
 export function SignInPane({ onSignIn }: SignInPaneProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -126,6 +111,9 @@ export function SignInPane({ onSignIn }: SignInPaneProps) {
     //     portraitid: portraitId,
     //     countrycode: countryCode,
     //   });
+        
+    await createTempUser({ displayname: cleanDisplayName, portraitid: portraitId, countrycode: countryCode });
+      
 
       onSignIn();
       onCloseSignIn();
@@ -152,7 +140,7 @@ export function SignInPane({ onSignIn }: SignInPaneProps) {
         onClick={onCloseSignIn}
       />
 
-      <div className="relative w-full max-w-xl rounded-2xl border border-white/15 bg-card/95 p-4 sm:p-5 space-y-4 shadow-[0_20px_40px_rgba(0,0,0,0.45)] bg-linear-to-b from-slate-50/95 to-slate-100/90 dark:from-gray-950 dark:to-black">
+      <div className="relative w-full max-w-xl rounded-md border border-white/15 bg-card/95 p-4 sm:p-5 space-y-4 bg-linear-to-b from-slate-50/95 to-slate-100/90 dark:from-gray-950 dark:to-black">
         <div className="flex items-center justify-between gap-3">
           <h3 className="text-base font-semibold text-foreground">Create Account</h3>
           <button
@@ -170,9 +158,9 @@ export function SignInPane({ onSignIn }: SignInPaneProps) {
             <button
               type="button"
               onClick={() => setIsPortraitModalOpen(true)}
-              className="group relative rounded-xl border border-white/15 bg-black/25 p-1 hover:border-cyan-400/45 transition-colors"
+              className="group relative rounded-md border border-white/15 bg-black/25 p-1 hover:border-cyan-400/45 transition-colors"
             >
-              <img src={portraitSrc} alt={`Portrait ${portraitId}`} className="w-32 h-32 rounded-lg object-cover" />
+              <img src={portraitSrc} alt={`Portrait ${portraitId}`} className="w-32 h-32 rounded-md object-cover" />
               <span className="absolute bottom-1 left-1/2 -translate-x-1/2 text-[10px] px-1.5 py-0.5 rounded bg-black/65 text-white/85 opacity-0 group-hover:opacity-100 transition-opacity">
                 Change
               </span>
@@ -208,7 +196,7 @@ export function SignInPane({ onSignIn }: SignInPaneProps) {
                 </button>
 
                 {isCountryOpen && (
-                  <div className="absolute z-20 mt-1 w-full rounded-xl border border-white/15 bg-popover shadow-2xl shadow-black/45 overflow-hidden">
+                  <div className="absolute z-20 mt-1 w-full rounded-md border border-white/15 bg-popover shadow-2xl shadow-black/45 overflow-hidden">
                     <div className="p-2 border-b border-white/10">
                       <input
                         value={countrySearch}
@@ -293,7 +281,7 @@ export function SignInPane({ onSignIn }: SignInPaneProps) {
         onClick={() => setIsPortraitModalOpen(false)}
       />
 
-      <div className="relative w-full max-w-4xl rounded-2xl border border-white/15 bg-card/95 p-4 space-y-3 shadow-[0_20px_40px_rgba(0,0,0,0.5)]">
+      <div className="relative w-full max-w-4xl rounded-md border border-white/15 bg-card/95 p-4 space-y-3 shadow-[0_20px_40px_rgba(0,0,0,0.5)]">
         <div className="flex items-center justify-between gap-3">
           <h4 className="text-sm font-semibold text-foreground">Choose Portrait</h4>
           <button
@@ -307,13 +295,13 @@ export function SignInPane({ onSignIn }: SignInPaneProps) {
         </div>
 
         <div className="max-h-[68vh] overflow-y-auto panel-scrollbar pr-1" onScroll={onPortraitScroll}>
-          <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-9 gap-2">
+          <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-7 gap-2">
             {Array.from({ length: portraitVisibleCount }, (_, idx) => idx + 1).map((id) => (
               <button
                 key={id}
                 type="button"
                 onClick={() => onPickPortrait(id)}
-                className={`rounded-lg border p-1 transition-colors ${
+                className={`rounded-md border p-1 transition-colors ${
                   id === portraitId
                     ? "border-cyan-300/60 bg-cyan-500/18"
                     : "border-white/12 bg-black/25 hover:border-cyan-400/40"
@@ -335,7 +323,7 @@ export function SignInPane({ onSignIn }: SignInPaneProps) {
 
   return (
     <>
-      <section className="relative rounded-lg border border-cyan-500/35 dark:border-cyan-400/35 bg-linear-to-b from-cyan-50/95 to-slate-100/90 dark:from-card dark:to-card/85 backdrop-blur-sm ring-1 ring-cyan-500/20 dark:ring-cyan-300/15 p-3.5 space-y-3 shrink-0 overflow-hidden shadow-[0_10px_24px_rgba(0,0,0,0.22)] dark:shadow-[0_10px_24px_rgba(0,0,0,0.35)]">
+      <section className="relative rounded-md border border-cyan-500/35 dark:border-cyan-400/35 bg-linear-to-b from-cyan-50/95 to-slate-100/90 dark:from-card dark:to-card/85 backdrop-blur-sm ring-1 ring-cyan-500/20 dark:ring-cyan-300/15 p-3.5 space-y-3 shrink-0 overflow-hidden shadow-[0_10px_24px_rgba(0,0,0,0.22)] dark:shadow-[0_10px_24px_rgba(0,0,0,0.35)]">
         <div className="absolute inset-0 bg-linear-to-br from-cyan-500/10 via-transparent to-purple-500/10 pointer-events-none" />
 
         <div className="relative space-y-0.5">
