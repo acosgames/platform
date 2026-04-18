@@ -2,9 +2,9 @@ import { POST, GET } from "./http";
 
 // import { getUser } from "./person";
 import { wsJoinRankedGame, wsJoinBetaGame } from "./ws";
-import ACOSEncoder from "acos-json-encoder";
+import {createDefaultDict} from "acos-json-encoder";
 import ACOSDictionary from 'shared/model/acos-dictionary.json';
-ACOSEncoder.createDefaultDict(ACOSDictionary);
+createDefaultDict(ACOSDictionary);
 
 import {
     btGame,
@@ -76,7 +76,7 @@ export async function findGame(game_slug:string) {
         return game;
     } catch (e) {
         console.error(e);
-        btGame.set(null);
+        btGame.set({});
         LOADED('game/' + game_slug);
         throw "E_GAMENOTFOUND";
     }
@@ -99,7 +99,7 @@ export async function findGamePerson(game_slug: string) {
             throw "E_GAMENOTFOUND";
         }
 
-        let player_stats = btPlayerStats.get((bucket) => bucket[game_slug]) || {};
+        let player_stats = btPlayerStats.get((bucket:any) => bucket[game_slug]) || {} as Record<string, any>;
         if (result.player) {
             player_stats = result.player;
             btPlayerStats.assign({ [game_slug]: player_stats });

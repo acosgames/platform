@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npm run server:dev & npm run client",
+    "start": "sh build.sh && npm run server:all",
     "client2": "npm start --prefix client2",
     "client:dev": "npm start --prefix client2",
     "client:mobile": "npm run build:mobile --prefix client2",
@@ -14,7 +14,7 @@
     "server:dev": "pm2 start ecosystem.config.json --watch  --no-daemon",
     "server:mobile": "pm2 start ecosystem.config.json  --env mobile --watch --no-daemon",
     "server:prod": "pm2 start ecosystem.config.prod.json --env production",
-    "server:all": "npm start --prefix api & npm start --prefix websocket & npm start --prefix gameserver & npm start --prefix matchmaker & npm start --prefix gitworker",
+    "server:all": "concurrently --ks -n Client,API,WebSocket,GameServer,Matchmaker,GitWorker,Shared \"npm start --prefix client2\" \"npm start --prefix api\" \"npm start --prefix websocket\" \"npm start --prefix gameserver\" \"npm start --prefix matchmaker\" \"npm start --prefix gitworker\" \"npm start --prefix shared\"",
     "kill": "taskkill //im node.exe //F",
     "stop": "pm2 stop ecosystem.config.json",
     "logs": "pm2 logs",
@@ -37,5 +37,8 @@
   "bugs": {
     "url": "https://github.com/5SG/platform/issues"
   },
-  "homepage": "https://github.com/5SG/platform#readme"
+  "homepage": "https://github.com/5SG/platform#readme",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
 }

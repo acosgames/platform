@@ -1,3 +1,4 @@
+import type { PartyQueue } from "shared/types/queue";
 import { btRankingUpdate } from "../buckets";
 import { addGameQueue, onQueueStats } from "../queue";
 import { onPong, wsLeaveQueue } from "../ws";
@@ -27,8 +28,8 @@ export const handlePong: WSIncomingHandler = (context) => {
 export const handleAddedQueue: WSIncomingHandler = (context) => {
     logIncoming("[Incoming] queue:", context);
 
-    const payload = context.msg.payload as { queues?: any };
-    addGameQueue(payload?.queues);
+    const payload = context.msg.payload as PartyQueue;
+    addGameQueue(payload);
 
     return "return";
 };

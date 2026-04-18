@@ -20,7 +20,7 @@ import {
     btUser,
 } from "./buckets";
 
-export function setCurrentRoom(room_slug: string) {
+export function setCurrentRoom(room_slug: string | null) {
     btRoomSlug.set(room_slug);
 }
 
@@ -28,7 +28,7 @@ export function getCurrentRoom() {
     return btRoomSlug.get() || null;
 }
 
-export function setLastJoinType(type: string) {
+export function setLastJoinType(type: string | null) {
     btLastJoin.set(type);
 }
 
@@ -37,7 +37,7 @@ export function getLastJoinType() {
 }
 
 export function getGamePanel(id: string) {
-    return btGamePanels.get((bucket) => bucket[id]);
+    return btGamePanels.get((bucket:any) => bucket[id]);
 }
 
 export function getGamePanels() {
@@ -135,7 +135,7 @@ export function setPrimaryGamePanel(gamepanel: any) {
 
         let game_slug = gamepanel?.room?.game_slug;
         if (game_slug) {
-            let game = btGames.get((bucket) => bucket[game_slug]);
+            let game = btGames.get((bucket:any) => bucket[game_slug]);
             if (game) {
                 updateBrowserTitle(game.name);
             }
@@ -188,22 +188,40 @@ export function cleanupGamePanels() {
     }
 }
 
-export function createGamePanel() {
-    let gp: any = {};
-    gp.id = -1;
-    gp.available = false;
-    gp.loaded = false;
-    gp.ready = false;
-    gp.forfeit = false;
-    gp.canvasRef = null;
-    gp.gamestate = null;
-    gp.gameover = false;
-    gp.iframe = null;
-    gp.room = null;
-    gp.active = true;
-    gp.showGameover = false;
-    gp.showPregame = false;
-    gp.closeOverlay = false;
+export interface IGamePanel {
+    id: number;
+    available: boolean;
+    loaded: boolean;
+    ready: boolean;
+    forfeit: boolean;
+    canvasRef: HTMLElement | null;
+    gamestate: any;
+    gameover: boolean;
+    iframe: HTMLIFrameElement | null;
+    room: RoomInfo & GameInfo | null;
+    active: boolean;
+    showGameover: boolean;
+    showPregame: boolean;
+    closeOverlay: boolean;
+}
+
+export function createGamePanel(): IGamePanel {
+    let gp: IGamePanel = {
+        id: -1,
+        available: false,
+        loaded: false,
+        ready: false,
+        forfeit: false,
+        canvasRef: null,
+        gamestate: null,
+        gameover: false,
+        iframe: null,
+        room: null,
+        active: true,
+        showGameover: false,
+        showPregame: false,
+        closeOverlay: false,
+    };
     return gp;
 }
 
@@ -339,7 +357,7 @@ export function addRooms(roomList: any[]) {
 }
 
 export function addRoom(msg: any) {
-    let gamepanel = findGamePanelByRoom(msg.room_slug || msg.room.room_slug);
+    let gamepanel = findGamePanelByRoom(msg.payload?.room?.room_slug);
 
     if (gamepanel) {
         return gamepanel;
@@ -353,23 +371,23 @@ export function addRoom(msg: any) {
 
     //reserve and update gamepanel
     gamepanel = reserveGamePanel();
-    gamepanel.room = msg.room;
-    if (msg.room.isReplay) {
-        gamepanel.gamestate = msg.payload[1].payload;
+    gamepanel.room = msg.payload?.room;
+    if (msg.payload?.room?.isReplay) {
+        gamepanel.gamestate = msg.payload[1]?.payload;
         gamepanel.room.history = msg.payload;
     } else {
-        gamepanel.gamestate = msg.payload;
+        gamepanel.gamestate = msg.payload?.gamestate;
     }
 
     btShowLoadingBox.assign({ [gamepanel.id]: true });
     updateGamePanel(gamepanel);
 
-    if (!msg.room.isReplay) {
+    if (!msg.payload?.room?.isReplay) {
         //should we make it primary immediately? might need to change this
         setPrimaryGamePanel(gamepanel);
     }
 
-    rooms[msg.room.room_slug] = { room: msg.room, gamestate: msg.payload };
+    rooms[msg.payload?.room?.room_slug] = { room: msg.payload?.room, gamestate: msg.payload?.gamestate };
     btRooms.set(rooms);
     setWithExpiry("rooms", JSON.stringify(rooms), 120);
 
@@ -427,7 +445,7 @@ export function getRoomStatus(room_slug: string) {
     let gamepanel = findGamePanelByRoom(room_slug);
     if (!gamepanel) return "NOTEXIST";
 
-    return btGameStatus.get((bucket) => bucket[gamepanel.id] || "NOTEXIST");
+    return btGameStatus.get((bucket: any) => bucket[gamepanel.id] || "NOTEXIST");
 }
 
 export function updateRoomStatus(room_slug: string | null) {

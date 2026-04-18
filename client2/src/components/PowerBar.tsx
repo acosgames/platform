@@ -1,18 +1,12 @@
 import { ArrowsRightLeftIcon } from "@heroicons/react/24/solid";
-import {  Settings2, UserRound, Users } from "lucide-react";
-
+import { Settings2, UserRound, Users } from "lucide-react";
 import { useBucket } from "@/actions/bucket";
-import { btUser } from "@/actions/buckets";
+import { btActivePowerTab, btIsDockedWide, btIsLargeScreen, btUser, type PowerTabKey } from "@/actions/buckets";
 import config from "../config";
 
-export type PowerTabKey = "profile" | "queue" | "friends" | "chat" | "settings";
+export type { PowerTabKey };
 
 type PowerBarProps = {
-    activePowerTab: PowerTabKey | null;
-    setActivePowerTab: React.Dispatch<React.SetStateAction<PowerTabKey | null>>;
-    isLargeScreen: boolean;
-    isDockedWide: boolean;
-    setIsDockedWide: React.Dispatch<React.SetStateAction<boolean>>;
     className?: string;
 };
 
@@ -24,27 +18,20 @@ const powerItems = [
     { key: "settings", label: "Settings", Icon: Settings2 },
 ] as const;
 
-export function PowerBar({
-    activePowerTab,
-    setActivePowerTab,
-    isLargeScreen,
-    isDockedWide,
-    setIsDockedWide,
-    className,
-}: PowerBarProps) {
+export function PowerBar({ className }: PowerBarProps) {
+    const activePowerTab = useBucket(btActivePowerTab);
+    const isDockedWide = useBucket(btIsDockedWide);
+    const isLargeScreen = useBucket(btIsLargeScreen);
+    const user = useBucket(btUser);
 
-    let user = useBucket(btUser);
-    if (!user) {
-        return null;
-    }
-    const avatarUrl = `${config.https.cdn}images/portraits/assorted-${user.portraitid || 1}-medium.webp`;
-    
+    const avatarUrl = `${config.https.cdn}images/portraits/assorted-${user?.portraitid || 1}-medium.webp`;
+
     return (
         <div className={className ?? "flex h-full items-center gap-1.5 shrink-0"}>
             {isLargeScreen ? (
                 <button
                     type="button"
-                    onClick={() => setIsDockedWide((prev) => !prev)}
+                    onClick={() => btIsDockedWide.set((prev) => !prev)}
                     className={`power-bar-btn ${isDockedWide ? "power-bar-btn-active" : ""}`}
                     aria-label={isDockedWide ? "Undock sidebar" : "Dock sidebar"}
                     title={isDockedWide ? "Undock sidebar" : "Dock sidebar"}
@@ -59,7 +46,7 @@ export function PowerBar({
                     <button
                         key={`powerbar-${key}`}
                         type="button"
-                        onClick={() => setActivePowerTab((prev) => (prev === key ? null : key))}
+                        onClick={() => btActivePowerTab.set((prev) => (prev === key ? null : (key as PowerTabKey)))}
                         className={`power-bar-btn ${isActive ? "power-bar-btn-active" : ""}`}
                         aria-label={label}
                         title={label}
@@ -68,7 +55,7 @@ export function PowerBar({
                         {key === "profile" ? (
                             <img
                                 src={avatarUrl}
-                                alt={user.name}
+                                alt={user?.displayname ?? "Profile"}
                                 className={`h-10 w-10 rounded-full object-cover border ${isActive ? "border-cyan-300" : "border-white/30"}`}
                             />
                         ) : (

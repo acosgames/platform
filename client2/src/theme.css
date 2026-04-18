@@ -373,7 +373,7 @@ svg.background-svg.bottom{
   }
 
 .play-surface {
-    padding-top: min(56.25% + 56px, -132px + 100vh); 
+    /* padding-top: min(56.25% + 56px, -132px + 100vh);  */
     height: calc(-132px + 100vh);
     width: calc(100%);
   }

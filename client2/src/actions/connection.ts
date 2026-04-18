@@ -298,7 +298,7 @@ export async function recvFrameMessage(evt: MessageEvent<any>) {
     // if (action.payload && action.payload.cell) {
     //     action.payload.cell = 100;
     // }
-    let byteLen = await wsSend(action);
+    let byteLen = await wsSend({ type: "gameaction", payload: action });
     console.log("[Outgoing] Action:", "[" + byteLen + " bytes]", action);
     // }
 }
@@ -344,6 +344,10 @@ export async function wsIncomingMessage(message: WSMessage) {
         return;
     }
 
+    if( msg.type == 'gameupdate') {
+        msg = msg.payload;
+    }
+
     const incomingHandler = wsIncomingHandlers[msg.type];
     if (!incomingHandler) {
         console.log(
@@ -366,18 +370,19 @@ export async function wsIncomingMessage(message: WSMessage) {
     }
 
     if (msg.payload) {
-        const payload = msg.payload as any;
-        let gamepanel = findGamePanelByRoom(msg?.room_slug || msg.room?.room_slug || null);
-        let room = gamepanel?.room;
-        let gamestate = gamepanel?.gamestate; //JSON.parse(JSON.stringify(gamepanel?.gamestate));
-        if (!gamestate) return;
+        // const payload = msg.payload as any;
+        // let { gamestate, room } = msg.payload;
+        let gamepanel = findGamePanelByRoom(msg?.room_slug || msg?.room?.room_slug || msg?.payload?.room?.room_slug || null);
+        // let room = gamepanel?.room;
+        // let gamestate = gamepanel?.gamestate; //JSON.parse(JSON.stringify(gamepanel?.gamestate));
+        if (!gamepanel?.gamestate) return;
 
         // console.log("[Previous State]: ", gamestate);
         if (msg.type == "private") {
-            updateRoomPrivateMessage(gamepanel, gamestate, room, payload, user);
+            updateRoomPrivateMessage(gamepanel, gamepanel?.gamestate, gamepanel?.room, msg.payload?.player, user);
             return;
         } else {
-            msg.payload = updateRoomPublicMessage(gamepanel, gamestate, payload);
+            msg.payload = updateRoomPublicMessage(gamepanel, gamepanel?.gamestate, msg.payload);
         }
     }
 
@@ -444,7 +449,7 @@ function updateRoomPrivateMessage(gamepanel:any, gamestate:any, room:any, payloa
     // getRoom(msg.room_slug);
     //UPDATE PLAYER STATS FOR THIS GAME
     if (room?.mode == "rank" && payload?._played) {
-        let player_stat = btPlayerStats.get((bucket) => bucket[room.game_slug]);
+        let player_stat = btPlayerStats.get((bucket:any) => bucket[room.game_slug]);
         // let player_stat = player_stats[room.game_slug]
         if (player_stat) {
             if (payload._win) player_stat.win = payload._win;
@@ -466,7 +471,7 @@ function updateRoomPrivateMessage(gamepanel:any, gamestate:any, room:any, payloa
 
 
 async function postIncomingMessage(msg: ACOSMessage) {
-    let gamepanel = findGamePanelByRoom(msg?.room_slug || msg.room?.room_slug || null);
+    let gamepanel = findGamePanelByRoom(msg?.room_slug || msg?.room?.room_slug || msg?.payload?.room?.room_slug || null);
     let room = gamepanel.room;
     const payload = msg.payload as any;
     // let gamestate = gamepanel.gamestate;
@@ -477,7 +482,7 @@ async function postIncomingMessage(msg: ACOSMessage) {
             if (room.mode == "rank") {
                 let player = payload.players[user.shortid];
 
-                let player_stat = btPlayerStats.get((bucket) => bucket[room.game_slug]);
+                let player_stat = btPlayerStats.get((bucket:any) => bucket[room.game_slug]);
                 // let player_stat = player_stats[room.game_slug] || {};
                 if (player_stat) {
                     if (player.rating) player_stat.rating = player.rating;

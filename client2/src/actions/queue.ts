@@ -1,21 +1,26 @@
 
 import { btGame, btGames, btJoinQueues, btQueueStats, btQueues } from './buckets';
-
+import type { PartyQueue } from 'shared/types/queue';
 
 export async function onQueueStats(msg:any) {
     btQueueStats.set(msg);
 }
 
-export async function addGameQueue(newQueues:any) {
+export async function addGameQueue(payload:PartyQueue) {
 
+    let players = payload.players || [];
+    let newQueues = payload.queues || [];
     let queues = btQueues.get() || localStorage.getItem('queues') || [];
 
     let queueMap: Record<string, boolean> = {};
     queues.forEach((q: any) => queueMap[q.game_slug + q.mode] = true);
 
+    let rating = players.reduce((acc: number, player: any) => acc + (player.rating || 0), 0) / (players.length || 1);
+
     newQueues.forEach((q: any) => {
         if (!queueMap[q.game_slug + q.mode])
             queues.push(q);
+        q.rating = rating;
     })
 
     btQueues.set(queues);
@@ -72,7 +77,7 @@ export function findQueue(game_slug: string) {
 
 export async function clearGameQueues() {
     btQueues.set([]);
-    btJoinQueues.set(null);
+    btJoinQueues.set([]);
     localStorage.setItem('queues', JSON.stringify([]));
     localStorage.removeItem('joinqueues');
 }

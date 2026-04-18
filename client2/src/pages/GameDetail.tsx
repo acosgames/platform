@@ -9,7 +9,7 @@ import { RankLeaderboardTab } from "../components/gameDetail/RankLeaderboardTab"
 import { StatsLeaderboardTab } from "../components/gameDetail/StatsLeaderboardTab";
 import { LiveMatchSection } from "../components/gameDetail/LiveMatchSection";
 import type { LeaderboardSubtab, SeasonKey, StatsMetric, TimeWindow } from "../components/gameDetail/leaderboardTypes";
-// import { useMatchmakingQueue } from "../context/MatchmakingQueueContext";
+
 import { StatCard } from "@/components/ui/StatCard";
 import { InfoPanel } from "@/components/ui/InfoPanel";
 import { PlayNow } from "@/components/ui/PlayNow";

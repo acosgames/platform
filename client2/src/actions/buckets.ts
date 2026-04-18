@@ -1,8 +1,8 @@
 import { bucket } from "./bucket";
-
+import type { PlayerFull } from "shared/types/player";
 export const btLeaderboard = bucket({});
 
-export const btUser = bucket(null);
+export const btUser = bucket<PlayerFull | null>(null);
 export const btGames = bucket({});
 export const btGame = bucket({});
 
@@ -34,15 +34,23 @@ export const btLocationPath = bucket("");
 
 export const btPrimaryCanvasRef = bucket(null);
 export const btChatUpdated = bucket(Date.now());
-export const btChannel = bucket([]);
+export const btChannel = bucket({});
 export const btLastChatSent = bucket(Date.now());
 
 export const btChatMessage = bucket("");
-export const btWebsocket = bucket(null);
+export const btWebsocket = bucket<WebSocket | null>(null);
 
-export const btRoomSlug = bucket(null);
-export const btQueues = bucket([]);
-export const btRooms = bucket([]);
+export const btRoomSlug = bucket<string | null>(null);
+
+
+export type QueueEntry = {
+  mode: string;
+  name?: string;
+  game_slug: string;
+  rating?: number;
+};
+export const btQueues = bucket<QueueEntry[] | null>([]);
+export const btRooms = bucket<{ [key: string]: any }>({});
 
 export const btLatency = bucket(0);
 export const btTimeleft = bucket({});
@@ -51,7 +59,7 @@ export const btTimeleftUpdated = bucket(0);
 export const btShowLoadingBox = bucket({});
 
 export const btChatToggle = bucket(false);
-export const btJoinQueues = bucket(false);
+export const btJoinQueues = bucket<Record<string, any> | null>([]);
 
 export const btWebsocketConnected = bucket(false);
 export const btDuplicateTabs = bucket(false);
@@ -59,7 +67,7 @@ export const btServerOffset = bucket(0);
 export const btOffsetTime = bucket(0);
 export const btPlayerStats = bucket({});
 
-export const btDevGameImages = bucket([]);
+export const btDevGameImages = bucket<any[]>([]);
 export const btDevGame = bucket({});
 export const btDevGames = bucket([]);
 export const btDevClientImages = bucket([]);
@@ -67,14 +75,14 @@ export const btDevClients = bucket([]);
 export const btDevServerImages = bucket([]);
 export const btDevServers = bucket([]);
 export const btDevServerError = bucket([]);
-export const btDevClientsError = bucket([]);
-export const btLoadingGames = bucket([]);
+export const btDevClientsError = bucket<any[]>([]);
+export const btLoadingGames = bucket<boolean>(false);
 export const btGameTemplates = bucket([]);
 
-export const btDevGameError = bucket([]);
+export const btDevGameError = bucket<any[]>([]);
 export const btLoadedDevGame = bucket(Date.now());
 export const btDevGameTeams = bucket([]);
-export const btDevClientsEnv = bucket(null);
+export const btDevClientsEnv = bucket({});
 export const btDevClientImagesById = bucket({});
 export const btDevClientBundles = bucket({});
 
@@ -99,7 +107,7 @@ export const btUserId = bucket(0);
 export const btLoadingDefaultCountry = bucket(false);
 export const btDefaultCountry = bucket("US");
 export const btProfile = bucket(null);
-export const btDisplayName = bucket(null);
+export const btDisplayName = bucket<string | null>(null);
 
 export const btLoadingProfile = bucket(false);
 export const btLoadingUser = bucket(false);
@@ -110,7 +118,7 @@ export const btJustCreatedName = bucket(false);
 export const btCheckingUserLogin = bucket(true);
 export const btQueueStats = bucket(null);
 export const btGamePanels = bucket([]);
-export const btLastJoin = bucket(null);
+export const btLastJoin = bucket<string | null>(null);
 
 export const btGamePanelById = bucket({});
 export const btPrimaryState = bucket({});
@@ -190,3 +198,10 @@ export const btAchievementIconId = bucket(Math.floor(Math.random() * (100 - 1 + 
 
 export const btClaimingAchievement = bucket(false);
 export const btAchievementAward = bucket(false);
+
+export const btModalShow = bucket<Record<string, boolean>>({});
+
+export type PowerTabKey = "profile" | "queue" | "friends" | "chat" | "settings";
+export const btActivePowerTab = bucket<PowerTabKey | null>(null);
+export const btIsDockedWide = bucket(false);
+export const btIsLargeScreen = bucket(false);

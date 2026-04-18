@@ -508,7 +508,7 @@ export async function createOrEditAchievement() {
 
 export async function updateGame() {
     try {
-        let form = btFormFields.get((form) => form["update-game_info"]);
+        let form = btFormFields.get((form:any) => form["update-game_info"]);
         let newGame = form; //btDevGame.get();
 
         //validated seperately

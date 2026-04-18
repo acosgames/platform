@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Link, Outlet, useLocation } from "react-router";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import { QueueList } from "./QueueList";
@@ -6,26 +6,17 @@ import { FriendsList } from "./FriendsList";
 import { ChatPane } from "./ChatPane";
 import { CompressedGamerCard } from "./CompressedGamerCard";
 import { MatchmakingQueueIndicator } from "./MatchmakingQueueIndicator";
-import { PowerBar, type PowerTabKey } from "./PowerBar";
+import { PowerBar } from "./PowerBar";
 import { SettingsPane } from "./SettingsPane";
-// import { useBucket } from "../actions/bucket";
 // import { btToast } from "../actions/buckets";
 import { hideToast } from "../actions/toast";
 import { SignInPane } from "./SignInPane";
 import { useBucket } from "@/actions/bucket";
-import { btLoggedIn } from "@/actions/buckets";
+import { btActivePowerTab, btIsDockedWide, btIsLargeScreen, btLoggedIn, btModalShow } from "@/actions/buckets";
 // import { Gamepad2, Sparkles } from "lucide-react";
 
 
 let layoutRenderCount = 0;
-
-const screens: { [key: string]: string } = {
-    sm: '640px',
-    md: '768px',
-    lg: '1024px',
-    xl: '1280px',
-    '2xl': '1536px',
-};
 
 const screensPx: { [key: string]: number } = {
     sm: 640,
@@ -35,21 +26,23 @@ const screensPx: { [key: string]: number } = {
     '2xl': 1536,
 };
 
-function checkBreakpoint(breakpoint: string) {
-    const query = `(min-width: ${screens[breakpoint]})`;
-    return window.matchMedia(query).matches;
-}
-
 
 export function Layout() {
     const location = useLocation();
     // const toast = useBucket(btToast);
     let toast = { open: false, title: "", description: "", status: "success", duration: 3000, isClosable: true, id: 1 };
-    const [activePowerTab, setActivePowerTab] = useState<PowerTabKey | null>(null);
-    const [isDockedWide, setIsDockedWide] = useState(false);
-    // const [twBreakpoints, setTwBreakpoints] = useState(getTailwindBreakpoints());
+    const activePowerTab = useBucket(btActivePowerTab);
+    const isDockedWide = useBucket(btIsDockedWide);
+    const isLargeScreen = useBucket(btIsLargeScreen);
+    const loggedIn = useBucket(btLoggedIn);
+    const isLoggedIn = !!loggedIn && loggedIn !== "LURKER" && loggedIn !== "CHECKING";
 
-    let [isLargeScreen, setIsLargeScreen] = useState(checkBreakpoint('lg'));
+    useEffect(() => {
+        if (!isLoggedIn) {
+            btActivePowerTab.set(null);
+            btIsDockedWide.set(false);
+        }
+    }, [isLoggedIn]);
 
     useEffect(() => {
         if (!toast?.open) return;
@@ -67,33 +60,29 @@ export function Layout() {
     useEffect(() => {
         // Use a window resize listener or a React useEffect hook to update dynamically
         // Example using a window listener:
-        const handleResize = () => {
-
-            let isLarge = window.screen.width >= screensPx['lg'];
-            if (isLargeScreen != isLarge)
-                setIsLargeScreen(isLarge);
-
-            // setIsLargeScreen(checkBreakpoint('lg'));
-            // Logic to determine the current active breakpoint based on window.innerWidth
-            // You'll need to parse the 'rem' values to 'px' for direct comparison.
+        const updateLargeScreen = () => {
+            btIsLargeScreen.set(window.screen.width >= screensPx['lg']);
         };
 
-        window.addEventListener('resize', handleResize);
+        updateLargeScreen();
+        window.addEventListener('resize', updateLargeScreen);
 
         return () => {
-            window.removeEventListener('resize', handleResize);
+            window.removeEventListener('resize', updateLargeScreen);
         };
     }, []);
 
     const isPlayRoute = /^\/game\/[^/]+\/play$/.test(location.pathname);
     const isPowerPanelOpen = activePowerTab !== null;
     const isDockedOpenWide = isLargeScreen && isDockedWide && isPowerPanelOpen;
+    const openSignIn = () => btModalShow.assign("signIn", true);
 
     // let isLargeScreen = checkBreakpoint('lg');
 
     console.log("Layout Render Count:", ++layoutRenderCount);
     return (
         <>
+            <SignInPane onSignIn={() => false} />
             <div className="absolute inset-0 w-full h-full bg-slate-950 overflow-hidden -z-2">
                 <svg className="background-svg top" width="calc(100% + 160px)" height="100%">
                     <pattern id="pattern-aztec-top" x="0" y="0" width="160" height="78" patternUnits="userSpaceOnUse">
@@ -163,13 +152,19 @@ export function Layout() {
                                         </Link>
                                     </div>
 
-                                    <PowerBar
-                                        activePowerTab={activePowerTab}
-                                        setActivePowerTab={setActivePowerTab}
-                                        isLargeScreen={isLargeScreen}
-                                        isDockedWide={isDockedWide}
-                                        setIsDockedWide={setIsDockedWide}
-                                    />
+                                    {isLoggedIn ? (
+                                        <PowerBar />
+                                    ) : (
+                                        <button
+                                            type="button"
+                                            onClick={openSignIn}
+                                            className="power-bar-btn"
+                                            aria-label="Sign in"
+                                            title="Sign in"
+                                        >
+                                            Sign In
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         </header>
@@ -213,7 +208,7 @@ export function Layout() {
                     <button
                         type="button"
                         className="fixed inset-0 z-40 bg-black/35"
-                        onClick={() => setActivePowerTab(null)}
+                        onClick={() => btActivePowerTab.set(null)}
                         aria-label="Close power panel"
                     />
                 ) : null}
@@ -224,14 +219,7 @@ export function Layout() {
                 >
                     {isDockedOpenWide ? (
                         <div className="power-panel-sidebar-bar">
-                            <PowerBar
-                                activePowerTab={activePowerTab}
-                                setActivePowerTab={setActivePowerTab}
-                                isLargeScreen={isLargeScreen}
-                                isDockedWide={isDockedWide}
-                                setIsDockedWide={setIsDockedWide}
-                                className="flex h-12.5 items-center justify-center gap-1.5 px-2"
-                            />
+                            <PowerBar className="flex h-12.5 items-center justify-center gap-1.5 px-2" />
                         </div>
                     ) : null}
                     <div className="power-panel-content panel-scrollbar flex flex-col">
@@ -239,8 +227,8 @@ export function Layout() {
                             <ShowLoginOrGamerCard />
                             <QueueList />
                             <ChatPane />
-                            </>) : null}
-                        
+                        </>) : null}
+
                         {/* {activePowerTab === "queue" ? <QueueList /> : null} */}
                         {/* {activePowerTab === "chat" ? <ChatPane /> : null} */}
                         {activePowerTab === "friends" ? <FriendsList /> : null}

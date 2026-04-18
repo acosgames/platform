@@ -60,15 +60,15 @@
     {
       "name": "websocket",
       "cwd": "./websocket",
-      "script": "./index.js",
+      "script": "npm",
+      "args": "run dev:npm",
       "vizion": false,
       "time": true,
       "instances": "1",
       "exec_mode": "cluster",
       "restart_delay": 2000,
-      "exp_backoff_restart_delay": 1000,
-      "watch": ["src/**", "index.js", "node_modules/shared/**"],
       "node_args": ["--inspect=10004"],
+      "exp_backoff_restart_delay": 1000,
       "env": {
         "NODE_ENV": "localhost"
       },

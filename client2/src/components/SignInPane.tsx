@@ -8,6 +8,8 @@ import {
 } from "react-social-login-buttons";
 import config from "../config";
 import { createTempUser } from "@/actions/person";
+import { useBucket, useBucketSelector } from "@/actions/bucket";
+import { btModalShow } from "@/actions/buckets";
 
 interface SignInPaneProps {
   onSignIn: () => void;
@@ -45,7 +47,10 @@ function getCountryOptions(): CountryOption[] {
 
 
 export function SignInPane({ onSignIn }: SignInPaneProps) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const showSignIn = useBucketSelector(btModalShow, (state) => state.signIn);
+
+  // const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPortraitModalOpen, setIsPortraitModalOpen] = useState(false);
   const [isCountryOpen, setIsCountryOpen] = useState(false);
   const [countrySearch, setCountrySearch] = useState("");
@@ -73,13 +78,12 @@ export function SignInPane({ onSignIn }: SignInPaneProps) {
 
   const onOpenSignIn = () => {
     setErrorMessage("");
-    setIsModalOpen(true);
+    btModalShow.assign({"signIn": true});
   };
 
   const onCloseSignIn = () => {
-    setIsCountryOpen(false);
     setCountrySearch("");
-    setIsModalOpen(false);
+    btModalShow.assign({"signIn": false, "country": false});
   };
 
   const onPickPortrait = (nextPortraitId: number) => {
@@ -106,14 +110,14 @@ export function SignInPane({ onSignIn }: SignInPaneProps) {
     setIsSubmitting(true);
 
     try {
-    //   await createTempAccount({
-    //     displayname: cleanDisplayName,
-    //     portraitid: portraitId,
-    //     countrycode: countryCode,
-    //   });
-        
-    await createTempUser({ displayname: cleanDisplayName, portraitid: portraitId, countrycode: countryCode });
-      
+      //   await createTempAccount({
+      //     displayname: cleanDisplayName,
+      //     portraitid: portraitId,
+      //     countrycode: countryCode,
+      //   });
+
+      await createTempUser({ displayname: cleanDisplayName, portraitid: portraitId, countrycode: countryCode });
+
 
       onSignIn();
       onCloseSignIn();
@@ -131,7 +135,7 @@ export function SignInPane({ onSignIn }: SignInPaneProps) {
     { label: "GitHub", Component: GithubLoginButton },
   ];
 
-  const signInModal = isModalOpen ? (
+  const signInModal = showSignIn ? (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 ">
       <button
         type="button"
@@ -255,7 +259,7 @@ export function SignInPane({ onSignIn }: SignInPaneProps) {
                   key={provider.label}
                   text={`Let's Go with ${provider.label}`}
                   type="button"
-                  onClick={() => {}}
+                  onClick={() => { }}
                   size="36px"
                   iconSize="16px"
                   align="center"
@@ -301,11 +305,10 @@ export function SignInPane({ onSignIn }: SignInPaneProps) {
                 key={id}
                 type="button"
                 onClick={() => onPickPortrait(id)}
-                className={`rounded-md border p-1 transition-colors ${
-                  id === portraitId
+                className={`rounded-md border p-1 transition-colors ${id === portraitId
                     ? "border-cyan-300/60 bg-cyan-500/18"
                     : "border-white/12 bg-black/25 hover:border-cyan-400/40"
-                }`}
+                  }`}
               >
                 <img
                   src={`${config.https.cdn}images/portraits/assorted-${id}-medium.webp`}
@@ -323,7 +326,7 @@ export function SignInPane({ onSignIn }: SignInPaneProps) {
 
   return (
     <>
-      <section className="relative rounded-md border border-cyan-500/35 dark:border-cyan-400/35 bg-linear-to-b from-cyan-50/95 to-slate-100/90 dark:from-card dark:to-card/85 backdrop-blur-sm ring-1 ring-cyan-500/20 dark:ring-cyan-300/15 p-3.5 space-y-3 shrink-0 overflow-hidden shadow-[0_10px_24px_rgba(0,0,0,0.22)] dark:shadow-[0_10px_24px_rgba(0,0,0,0.35)]">
+      {/* <section className="relative rounded-md border border-cyan-500/35 dark:border-cyan-400/35 bg-linear-to-b from-cyan-50/95 to-slate-100/90 dark:from-card dark:to-card/85 backdrop-blur-sm ring-1 ring-cyan-500/20 dark:ring-cyan-300/15 p-3.5 space-y-3 shrink-0 overflow-hidden shadow-[0_10px_24px_rgba(0,0,0,0.22)] dark:shadow-[0_10px_24px_rgba(0,0,0,0.35)]">
         <div className="absolute inset-0 bg-linear-to-br from-cyan-500/10 via-transparent to-purple-500/10 pointer-events-none" />
 
         <div className="relative space-y-0.5">
@@ -341,7 +344,7 @@ export function SignInPane({ onSignIn }: SignInPaneProps) {
             Sign In
           </span>
         </button>
-      </section>
+      </section> */}
 
       {typeof document !== "undefined" ? createPortal(signInModal, document.body) : null}
       {typeof document !== "undefined" ? createPortal(portraitModal, document.body) : null}

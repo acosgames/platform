@@ -1,27 +1,27 @@
 const ModeFromID = ["experimental", "rank", "public", "private"];
-const ModeFromName = {
+const ModeFromName: Record<string, number> = {
     experimental: 0,
     rank: 1,
     public: 2,
     private: 3,
 };
 
-export function getGameModeID(name) {
+export function getGameModeID(name: string): number {
     return ModeFromName[name];
 }
 
-export function getGameModeName(id) {
+export function getGameModeName(id: number): string {
     return ModeFromID[id];
 }
 
 export function calculateGameSize(
-    windowWidth,
-    windowHeight,
-    resow,
-    resoh,
-    offsetRatio,
-    prioritizeWidth
-) {
+    windowWidth: number,
+    windowHeight: number,
+    resow: number,
+    resoh: number,
+    offsetRatio?: number,
+    prioritizeWidth?: boolean
+): { bgWidth: number; bgHeight: number } {
     offsetRatio = offsetRatio || 1;
 
     windowWidth *= offsetRatio;

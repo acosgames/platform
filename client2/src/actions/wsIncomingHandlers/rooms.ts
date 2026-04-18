@@ -5,6 +5,8 @@ import { wsLeaveGame } from "../ws";
 import type { WSIncomingHandler } from "./types";
 import { logIncoming } from "./utils";
 
+import { router } from '../../routes';
+
 export const handleReady: WSIncomingHandler = () => {
     console.log("iframe is ready!");
     return "return";
@@ -52,7 +54,7 @@ export const handleInRooms: WSIncomingHandler = (context) => {
         return "return";
     }
 
-    return "continue";
+    return "return";
 };
 
 export const handleJoined: WSIncomingHandler = (context) => {
@@ -60,21 +62,22 @@ export const handleJoined: WSIncomingHandler = (context) => {
 
     addRoom(context.msg);
 
-    const room = (context.msg as ACOSMessage & { room?: { maxplayers?: number } }).room;
+    router.navigate(`/game/${context.msg.payload?.room?.game_slug}/play`);
+    const room = context.msg.payload?.room;
     if ((room?.maxplayers || 0) > 1) {
         clearGameQueues();
     }
 
     setLastJoinType("");
     context.timerLoop();
-    return "continue";
+    return "return";
 };
 
 export const handleError: WSIncomingHandler = (context) => {
     logIncoming("[Incoming] ERROR::", context);
     clearGameQueues();
     setLastJoinType("");
-    return "continue";
+    return "return";
 };
 
 export const handleDuplicateTabs: WSIncomingHandler = (context) => {

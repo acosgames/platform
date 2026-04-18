@@ -3,57 +3,63 @@ import { useSyncExternalStore, useRef, useCallback } from "react";
 export const compareStringified = (a: any, b: any) =>
     JSON.stringify(a) !== JSON.stringify(b);
 
-type BucketStore = {
-    state: any;
+type BucketStore<T = any> = {
+    state: T;
 }
 
-type BucketType = {
-    state: any;
-    store: BucketStore;
-    _get: () => BucketStore;
-    get: (selector?: (state: any) => any) => any;
-    set: (toValue: any | ((currentValue: any) => any)) => void;
-    cset: (toValue: any | ((currentValue: any) => any)) => void;
-    assign: (toValue: any) => void;
-    cassign: (toValue: any) => void;
-    subscribe: (subscriber: (store: BucketStore) => void) => () => void;
+type BucketType<T = any> = {
+    state: T;
+    store: BucketStore<T>;
+    _get: () => BucketStore<T>;
+    get: (selector?: (state: T) => any) => any;
+    set: (toValue: T | ((currentValue: T) => T)) => void;
+    cset: (toValue: T | ((currentValue: T) => T)) => void;
+    assign: (kvOrkey: Partial<T> | string, toValue?: any) => void;
+    cassign: (toValue: Partial<T>) => void;
+    subscribe: (subscriber: (store: BucketStore<T>) => void) => () => void;
     emit: () => void;
-    copy: (selector?: (state: any) => any) => any;
+    copy: (selector?: (state: T) => any) => any;
     _copy: () => any;
 };
 
-export const bucket = (initialState: any) => {
-    let subscribers = new Set<(store: BucketStore) => void>();
-    let newBucket: BucketType = {} as BucketType;
+export const bucket = <T = any>(initialState?: T): BucketType<T> => {
+    let subscribers = new Set<(store: BucketStore<T>) => void>();
+    let newBucket: BucketType<T> = {} as BucketType<T>;
 
     newBucket.store =
         typeof initialState === "undefined"
-            ? { state: null }
+            ? { state: null as unknown as T }
             : { state: initialState };
 
     newBucket._get = () => newBucket.store;
     newBucket.get = (selector) =>
         selector
-            ? selector(newBucket.store.state || {})
+            ? selector(newBucket.store.state)
             : newBucket.store.state;
     newBucket.set = (toValue) => {
-        if (typeof toValue === "function") {
-            toValue = toValue(newBucket.get());
-        }
-        newBucket.store = { state: toValue };
+        const resolved = typeof toValue === "function"
+            ? (toValue as (currentValue: T) => T)(newBucket.get())
+            : toValue as T;
+        newBucket.store = { state: resolved };
         newBucket.emit();
     };
     newBucket.cset = (toValue) => {
-        if (typeof toValue === "function") {
-            toValue = toValue(newBucket.get());
-        }
-        newBucket.store = { state: structuredClone(toValue) };
+        const resolved = typeof toValue === "function"
+            ? (toValue as (currentValue: T) => T)(newBucket.get())
+            : toValue as T;
+        newBucket.store = { state: structuredClone(resolved) };
         newBucket.emit();
     };
-    newBucket.assign = (toValue) => {
-        newBucket.store = {
-            state: Object.assign({}, newBucket.store.state, toValue),
-        };
+    newBucket.assign = (kvOrkey: Partial<T> | string, toValue?: any) => {
+        if (typeof kvOrkey === "string") {
+            newBucket.store = {
+                state: Object.assign({}, newBucket.store.state, { [kvOrkey]: toValue }),
+            };
+        } else {
+            newBucket.store = {
+                state: Object.assign({}, newBucket.store.state, kvOrkey),
+            };
+        }
         newBucket.emit();
     };
     newBucket.cassign = (toValue) => {
@@ -66,7 +72,7 @@ export const bucket = (initialState: any) => {
         };
         newBucket.emit();
     };
-    newBucket.subscribe = (subscriber: (store: { state: any }) => void) => {
+    newBucket.subscribe = (subscriber: (store: BucketStore<T>) => void) => {
         subscribers.add(subscriber);
         return () => {
             subscribers.delete(subscriber);
@@ -80,13 +86,13 @@ export const bucket = (initialState: any) => {
     return newBucket;
 };
 
-export function useBucket(bucket:BucketType, comparator?: (a: any, b: any) => boolean) {
+export function useBucket<T = any>(bucket: BucketType<T>, comparator?: (a: T, b: T) => boolean): T | undefined {
     let currentStore = useRef(bucket._get());
     const getSnapshot = () => bucket._get();
     let newState = useSyncExternalStore(
         useCallback(
             (cb) =>
-                bucket.subscribe((store: BucketStore) => {
+                bucket.subscribe((store: BucketStore<T>) => {
                     const nextStore = store;
                     if (
                         comparator &&
@@ -103,16 +109,16 @@ export function useBucket(bucket:BucketType, comparator?: (a: any, b: any) => bo
         getSnapshot,
         () => undefined
     );
-    return newState?.state;
+    return newState?.state as T | undefined;
 }
 
-export function useBucketSelector(bucket: BucketType, selector: (state: any) => any, comparator?: (a: any, b: any) => boolean) {
+export function useBucketSelector<T = any, R = any>(bucket: BucketType<T>, selector: (state: T) => R, comparator?: (a: R, b: R) => boolean): R {
     let currentStore = useRef(selector(bucket._get().state));
     const getSnapshot = () => selector(bucket._get().state);
     let newState = useSyncExternalStore(
         useCallback(
             (cb) =>
-                bucket.subscribe((store: BucketStore) => {
+                bucket.subscribe((store: BucketStore<T>) => {
                     const nextState = selector(store.state); //selector(store.state || {});
                     if (
                         comparator &&
@@ -131,13 +137,13 @@ export function useBucketSelector(bucket: BucketType, selector: (state: any) => 
     return newState;
 }
 
-export function useBucketSelectorX(bucket: BucketType, selector: (state: any) => any, comparator?: (a: any, b: any) => boolean) {
+export function useBucketSelectorX<T = any, R = any>(bucket: BucketType<T>, selector: (state: T) => R, comparator?: (a: R, b: R) => boolean): [R] {
     let currentStore = useRef(selector(bucket._get().state));
     const getSnapshot = () => selector(bucket._get().state);
     let newState = useSyncExternalStore(
         useCallback(
             (cb) =>
-                bucket.subscribe((store: BucketStore) => {
+                bucket.subscribe((store: BucketStore<T>) => {
                     const nextState = selector(store.state); //selector(store.state || {});
                     if (
                         comparator &&

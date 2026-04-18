@@ -5,18 +5,18 @@ import { getUser, isUserLoggedIn, validateLogin } from "./person";
 import { clearGameQueues, getJoinQueues } from "./queue";
 import { setLastJoinType, setRoomActive } from "./room";
 
-import ACOSEncoder from "acos-json-encoder"; // '../util/encoder';
+import { protoEncode, createDefaultDict, protoDecode } from "acos-json-encoder"; // '../util/encoder';
 import ACOSDictionary from 'shared/model/acos-dictionary.json';
-ACOSEncoder.createDefaultDict(ACOSDictionary);
+createDefaultDict(ACOSDictionary);
 
 import config from "../config";
 
 export function wsDecode(buffer: Uint8Array | ArrayBuffer | any): ACOSMessage {
-    return ACOSEncoder.decode(buffer);
+    return protoDecode(buffer);
 }
 
 export function wsEncode(data: ACOSMessage): Uint8Array | ArrayBuffer {
-    return ACOSEncoder.encode(data);
+    return protoEncode(data);
 }
 
 export function wsConnect(url?: string, onMessage?: (msg: any) => void, onOpen?: (evt: Event) => void, onError?: (evt: Event) => void): Promise<WebSocket> {
@@ -147,12 +147,12 @@ export function wsConnect(url?: string, onMessage?: (msg: any) => void, onOpen?:
 
 export async function wsLeaveGame(room_slug: string) {
     let ws = btWebsocket.get();
-    if (!ws || !ws.isReady) {
+    if (!ws || ws.readyState > 1) {
         setRoomActive(room_slug, false);
         return;
     }
 
-    let action = { type: "leave", room_slug };
+    let action = { type: "leave", payload: { room_slug } };
     let byteLen = await wsSend(action);
     console.log("[Outgoing] Leaving:", "[" + byteLen + " bytes]", action);
 
@@ -208,7 +208,7 @@ export async function wsJoinQueues(queues: any[], owner: any, attempt?: number) 
     }
 
     let ws = await reconnect(true);
-    if (!ws || !ws.isReady) {
+    if (!ws || ws.readyState > 1) {
         setTimeout(() => {
             wsJoinQueues(queues, owner, attempt + 1);
         }, 500);
@@ -234,7 +234,7 @@ export async function wsJoinGame(mode: string, game_slug: string) {
     if (!(await validateLogin())) return false;
 
     let ws = await reconnect(true);
-    if (!ws || !ws.isReady) {
+    if (!ws || ws.readyState > 1) {
         return;
     }
 
@@ -264,7 +264,7 @@ export async function wsJoinGame(mode: string, game_slug: string) {
 
 export async function wsSpectateGame(game_slug: string) {
     let ws = await reconnect(true);
-    if (!ws || !ws.isReady) {
+    if (!ws || ws.readyState > 1) {
         return;
     }
 
@@ -280,18 +280,18 @@ export async function wsSpectateGame(game_slug: string) {
     // console.timeEnd('ActionLoop');
 }
 
-export async function wsJoinBetaGame(game: any) {
+export async function wsJoinBetaGame(game_slug: string) {
     // gtag("event", "join", { mode: "experimental", game_slug: game.game_slug });
-    wsJoinGame("experimental", game.game_slug);
+    wsJoinGame("experimental", game_slug);
 }
 
-export async function wsJoinRankedGame(game: any) {
+export async function wsJoinRankedGame(game_slug: string) {
     // gtag("event", "join", { mode: "rank", game_slug: game.game_slug });
-    wsJoinGame("rank", game.game_slug);
+    wsJoinGame("rank", game_slug);
 }
 
-export async function wsJoinPublicGame(game: any) {
-    wsJoinGame("public", game.game_slug);
+export async function wsJoinPublicGame(game_slug: string) {
+    wsJoinGame("public", game_slug);
 }
 
 var forcedLatency:number = Math.round(RandRange(50, 200));
@@ -312,7 +312,7 @@ export async function wsSend(action: any) {
     if (!ws || !action) return false;
 
     try {
-        let buffer = ACOSEncoder.encode(action);
+        let buffer = protoEncode(action);
         ws.send(buffer);
         return buffer.byteLength;
     } catch (e) {
@@ -355,7 +355,7 @@ export function onPong(message: any) {
     btLatency.set(latency);
     btServerOffset.set(serverOffset);
     btOffsetTime.set(offsetTime);
-    btPlayerCount.set(message.playerCount || 0);
+    btPlayerCount.set(message?.payload?.playerCount || 0);
 }
 
 
@@ -384,7 +384,7 @@ export async function disconnect() {
 }
 export async function reconnect(skipQueues?: any) {
     let ws = btWebsocket.get();
-    if (ws && ws.isReady) {
+    if (ws && ws.readyState === WebSocket.OPEN) {
         return ws;
     }
 

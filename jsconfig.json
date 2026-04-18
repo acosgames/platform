@@ -3,7 +3,9 @@
     "module": "commonjs",
     "target": "es6",
     "paths": {
-      "shared/*": ["./shared/*"]
+      "shared/*": ["./shared/*"],
+      "@/*": ["./client2/src/*"],
+      "@client/*": ["./client2/src/*"]
     }
   },
   "exclude": [

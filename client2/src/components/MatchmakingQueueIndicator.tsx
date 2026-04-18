@@ -1,39 +1,37 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { BoltIcon, XMarkIcon } from "@heroicons/react/24/solid";
-import { useMatchmakingQueue } from "../context/MatchmakingQueueContext";
+import { useBucket } from "@/actions/bucket";
+import { btQueues, type QueueEntry } from "@/actions/buckets";
+import { clearGameQueues } from "@/actions/queue";
+import { wsLeaveQueue } from "@/actions/ws";
 
-function formatDuration(seconds: number): string {
-  const mins = Math.floor(seconds / 60);
-  const secs = seconds % 60;
-  return `${mins}:${secs.toString().padStart(2, "0")}`;
-}
+
 
 export function MatchmakingQueueIndicator() {
-  const { queue, cancelQueue } = useMatchmakingQueue();
-  const [now, setNow] = useState(Date.now());
+  const queues = (useBucket(btQueues) as QueueEntry[] | undefined) || [];
+  const queue = queues[0];
+  const isActive = queues.length > 0;
+
   const [dotStep, setDotStep] = useState(0);
 
-  useEffect(() => {
-    if (!queue.active) return;
+  const cancelQueue = () => {
+    wsLeaveQueue();
+    clearGameQueues();
+  };
 
-    const ticker = window.setInterval(() => setNow(Date.now()), 1000);
+  useEffect(() => {
+    if (!isActive) return;
+
     const dots = window.setInterval(() => setDotStep((step) => (step + 1) % 4), 450);
 
     return () => {
-      window.clearInterval(ticker);
       window.clearInterval(dots);
     };
-  }, [queue.active]);
+  }, [isActive]);
 
-  const elapsedSeconds = useMemo(() => {
-    if (!queue.active || !queue.queuedAt) return 0;
-    return Math.max(0, Math.floor((now - queue.queuedAt) / 1000));
-  }, [now, queue.active, queue.queuedAt]);
-
-  const etaRemaining = Math.max(0, queue.etaSeconds - elapsedSeconds);
   const dots = ".".repeat(dotStep);
 
-  if (!queue.active) return null;
+  if (!isActive || !queue) return null;
 
   return (
     <div className="fixed bottom-4 left-1/2 z-60 w-[min(92vw,34rem)] -translate-x-1/2 pointer-events-none">
@@ -53,10 +51,11 @@ export function MatchmakingQueueIndicator() {
 
               <div className="min-w-0">
                 <p className="text-[11px] uppercase tracking-[0.16em] text-cyan-200/80">Matchmaking Queue</p>
-                <p className="text-sm font-semibold text-white truncate">Searching for {queue.gameName}{dots}</p>
+                <p className="text-sm font-semibold text-white truncate">Searching for {queue?.name}{dots}</p>
                 <div className="mt-1 flex items-center gap-3 text-[11px] text-white/75">
-                  <span>Queued {formatDuration(elapsedSeconds)}</span>
-                  <span>ETA {formatDuration(etaRemaining)}</span>
+                  <span>Mode {queue?.mode}</span>
+                  <span>Rating {queue?.rating ?? "-"}</span>
+                  <span>{queues.length} in queue</span>
                 </div>
               </div>
             </div>
