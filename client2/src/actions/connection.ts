@@ -11,7 +11,7 @@ import { getUser } from "./person";
 
 // import config from "../config";
 
-import delta from "acos-json-delta";
+// import delta from "acos-json-delta";
 import {
     findGamePanelByIFrame,
     findGamePanelByRoom,
@@ -42,6 +42,8 @@ import {
 import { replaySendGameStart } from "./replay";
 import { wsDecode, wsSend } from "./ws";
 import { wsIncomingHandlers } from "./wsIncomingHandlers";
+import { GameStatus } from "@acosgames/framework";
+import { merge } from "acos-json-encoder";
 
 
 var messageQueue: { [key: string]: ACOSMessage[] } = {};
@@ -82,7 +84,7 @@ export function timerLoop(cb?: () => void) {
         //     continue;
         // }
 
-        let deadline = gamestate?.room?.timeend;
+        let deadline = gamestate?.room?.starttime + gamestate?.room?.timeend;
         if (!deadline) continue;
 
         if (
@@ -133,7 +135,6 @@ export function fastForwardMessages(room_slug: string) {
         console.log("Forwarding queued messages to iframe.");
         // for (var i = 0; i < mq.length; i++) {
 
-        //     gamestate = delta.merge(gamestate, mq[i]);
         let last = mq[mq.length - 1];
 
         // }
@@ -258,7 +259,7 @@ export async function recvFrameMessage(evt: MessageEvent<any>) {
             refreshGameState(room_slug);
 
             let gamestatus = gamestate?.room?.status;
-            if (gamestatus && gamestatus != "pregame") {
+            if (gamestatus && gamestatus != GameStatus.pregame) {
                 return;
             }
         }
@@ -279,6 +280,11 @@ export async function recvFrameMessage(evt: MessageEvent<any>) {
             }
         }, 300);
         return;
+    }
+
+    if( action.type == 'gamesettings' ) {
+            // let gamepanel = findGamePanelByRoom(room_slug);
+            return;
     }
 
     if (gamepanel.room.isReplay) return;
@@ -344,7 +350,7 @@ export async function wsIncomingMessage(message: WSMessage) {
         return;
     }
 
-    if( msg.type == 'gameupdate') {
+    if (msg.type == 'gameupdate') {
         msg = msg.payload;
     }
 
@@ -389,10 +395,11 @@ export async function wsIncomingMessage(message: WSMessage) {
     const payload = msg.payload as any;
 
     if (payload?.players) {
-        msg.local = payload.players[user.shortid];
-        if (msg.local) msg.local.shortid = user.shortid;
+        payload.local = payload.players.find((p: any) => p.shortid == user.shortid);
+        // msg.local = payload.players[user.shortid];
+        // if (msg.local) msg.local.shortid = user.shortid;
     } else {
-        msg.local = { displayname: user.displayname, shortid: user.shortid };
+        payload.local = { displayname: user.displayname, shortid: user.shortid };
     }
 
     let out = { local: msg.local, ...(payload || {}) };
@@ -405,7 +412,7 @@ export async function wsIncomingMessage(message: WSMessage) {
     updateRoomStatus(msg.room_slug || msg.room?.room_slug || null);
 }
 
-function updateRoomPublicMessage(gamepanel:any, gamestate:any, payload:any) {
+function updateRoomPublicMessage(gamepanel: any, gamestate: any, payload: any) {
     if (payload?.room?.timeend) {
         let latency = btLatency.get() || 0;
         let offsetTime = btOffsetTime.get() || 0;
@@ -413,13 +420,15 @@ function updateRoomPublicMessage(gamepanel:any, gamestate:any, payload:any) {
         payload.room.timeend += -offsetTime - latency / 2 - extra;
     }
 
-    gamestate.action = {};
-    gamestate.room.events = {};
+    if (payload?.action)
+        payload.action = {};
+    if (payload?.room?.events)
+        payload.room.events = [];
 
     let payloadStr = JSON.stringify(payload);
     let deltaState = JSON.parse(payloadStr);
     let mergedState = JSON.parse(payloadStr);
-    mergedState = delta.merge(gamestate, mergedState);
+    mergedState = merge(gamestate, mergedState);
     // msg.payload.delta = deltaState;
 
     mergedState.delta = deltaState;
@@ -442,14 +451,14 @@ function updateRoomPublicMessage(gamepanel:any, gamestate:any, payload:any) {
     return mergedState;
 }
 
-function updateRoomPrivateMessage(gamepanel:any, gamestate:any, room:any, payload:any, user:any) {
+function updateRoomPrivateMessage(gamepanel: any, gamestate: any, room: any, payload: any, user: any) {
     let player = gamestate.players[user.shortid];
-    player = delta.merge(player, payload);
+    player = merge(player, payload);
 
     // getRoom(msg.room_slug);
     //UPDATE PLAYER STATS FOR THIS GAME
     if (room?.mode == "rank" && payload?._played) {
-        let player_stat = btPlayerStats.get((bucket:any) => bucket[room.game_slug]);
+        let player_stat = btPlayerStats.get((bucket: any) => bucket[room.game_slug]);
         // let player_stat = player_stats[room.game_slug]
         if (player_stat) {
             if (payload._win) player_stat.win = payload._win;
@@ -482,7 +491,7 @@ async function postIncomingMessage(msg: ACOSMessage) {
             if (room.mode == "rank") {
                 let player = payload.players[user.shortid];
 
-                let player_stat = btPlayerStats.get((bucket:any) => bucket[room.game_slug]);
+                let player_stat = btPlayerStats.get((bucket: any) => bucket[room.game_slug]);
                 // let player_stat = player_stats[room.game_slug] || {};
                 if (player_stat) {
                     if (player.rating) player_stat.rating = player.rating;

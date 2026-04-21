@@ -3,7 +3,8 @@ import { GET } from "./http";
 import { addRoom, findGamePanelByRoom, updateGamePanel, updateRoomStatus } from "./room";
 import config from "../config";
 
-import delta from "acos-json-delta";
+// import delta from "acos-json-delta";
+import { merge } from "acos-json-encoder";
 
 export async function findGameReplays(game_slug:string) {
     try {
@@ -35,8 +36,8 @@ export function decodeReplay(data: any) {
     let msg = data;
 
     if (msg.length > 0) {
-        msg[0].payload = delta.merge({}, msg[0].payload);
-        msg[0].payload = delta.merge({}, msg[0].payload);
+        msg[0].payload = merge({}, msg[0].payload);
+        msg[0].payload = merge({}, msg[0].payload);
     }
 
     console.log("[REPLAY] json size", JSON.stringify(msg).length);
@@ -181,7 +182,7 @@ export function replayNextIndex(room_slug: string) {
     if (merged?.room?.events) {
         merged.room.events = {};
     }
-    delta.merge(merged, copy);
+    merge(merged, copy);
 
     merged.room_slug = history[0].room_slug;
 
@@ -192,7 +193,7 @@ export function replayNextIndex(room_slug: string) {
             let nextHistory = history[nextId + 1];
             let nextCopy = JSON.parse(JSON.stringify(nextHistory.payload));
             let nextMerged = JSON.parse(JSON.stringify(merged));
-            delta.merge(nextMerged, nextCopy);
+            merge(nextMerged, nextCopy);
 
             let nextUpdated = nextMerged.room.updated;
             let currentUpdated = merged.room.updated;
@@ -255,7 +256,7 @@ export function replayJumpToIndex(room_slug: string, startIndex: number) {
             merged.action = [];
         }
 
-        delta.merge(merged, copy);
+        merge(merged, copy);
 
         if (gamepanel.room.updated != merged?.room?.updated) {
             // gamepanel.room.timerSequence = merged?.timer?.sequence || 0;
@@ -269,7 +270,7 @@ export function replayJumpToIndex(room_slug: string, startIndex: number) {
         let nextHistory = history[startIndex + 1];
         let nextCopy = JSON.parse(JSON.stringify(nextHistory.payload));
         let nextMerged = JSON.parse(JSON.stringify(merged));
-        delta.merge(nextMerged, nextCopy);
+        merge(nextMerged, nextCopy);
 
         let nextUpdated = nextMerged.room.updated;
         let currentUpdated = merged.room.updated;

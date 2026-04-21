@@ -42,9 +42,9 @@ export function IntroPlayerCard({
       ? "text-xs sm:text-sm md:text-base"
       : "text-sm lg:text-md";
   const metaClass = isHero ? "text-[11px] sm:text-[12px] md:text-[13px]" : "text-[10px] lg:text-[12px]";
-  const countrycode = (player.country || "US").toUpperCase();
+  const countrycode = (player?.country || "US").toUpperCase();
   const flagSrc = `${config.https.cdn}images/country/${countrycode}.svg`;
-  const rankLabel = [player.rankLetter, player.rankLevel].filter(Boolean).join(" ");
+  const rankLabel = [player?.rankLetter, player?.rankLevel].filter(Boolean).join(" ");
 
   return (
     <article
@@ -60,14 +60,14 @@ export function IntroPlayerCard({
     >
       <div className="flex items-center gap-0.5">
         <img
-          src={player.avatarUrl}
-          alt={player.name}
+          src={player?.avatarUrl}
+          alt={player?.name}
           className={`rounded-md object-cover border border-white/25 shrink-0 ${portraitClass}`}
         />
 
         <div className={`flex flex-col gap-0.5 overflow-hidden min-w-0 p-0.5 lg:p-1 xl:p-1.5`}>
           <p className={`${nameClass} font-semibold text-white truncate`}>
-            {player.name}
+            {player?.name}
           </p>
 
           <div className="flex items-center gap-1 min-w-0">

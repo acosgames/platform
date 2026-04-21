@@ -87,15 +87,17 @@ function GamePanel({ id, canvasRef, prioritizeWidth }: GamePanelProps) {
 
     return (
         // <Portal containerRef={gamepanel.draggableRef}>
-        <div className="relative w-full h-full">
-            <LoadingBox id={gamepanel.id} />
+        // <div className="relative w-full h-full">
+            <div className="play-surface min-h-full">
+            {/* <LoadingBox id={gamepanel.id} /> */}
             <GameIFrame
                 gamepanel={gamepanel}
                 canvasRef={canvasRef}
                 prioritizeWidth={prioritizeWidth}
             />
-        </div>
+        {/* </div> */}
 
+            </div>
         // </Portal>
     );
 }
@@ -190,9 +192,9 @@ function GameIFrame({ gamepanel, canvasRef, prioritizeWidth, displayMode, isFull
             document.documentElement.clientHeight ||
             document.body.clientHeight;
 
-        let windowWidth = w; //gamewrapperRef.current.offsetWidth;
-        let windowHeight = h; //gamewrapperRef.current.offsetHeight;
-        if (canvasRef) {
+        let windowWidth = gamewrapperRef?.current?.offsetWidth || w;
+        let windowHeight = gamewrapperRef?.current?.offsetHeight || h;
+        if (canvasRef?.current) {
             windowWidth = canvasRef.current.offsetWidth;
             windowHeight = canvasRef.current.offsetHeight;
         }
@@ -230,19 +232,38 @@ function GameIFrame({ gamepanel, canvasRef, prioritizeWidth, displayMode, isFull
             }
         }
 
-        let { bgWidth, bgHeight } = calculateGameSize(
-            windowWidth,
-            windowHeight,
-            resow,
-            resoh,
-            offsetRatio,
-            prioritizeWidth
-        );
-
         let scale = 1;
         let oldHeight = gamescreenRef.current.style.height;
 
-        if (!screentype || screentype == "3") {
+        if (screentype == "1") {
+            // Full screen: container fills allotted space, iframe stretches to fill it
+            gamescreenRef.current.style.width = windowWidth + "px";
+            gamescreenRef.current.style.height = windowHeight + "px";
+            iframeRef.current.setAttribute("style", "width:100%; height:100%;");
+        } else if (screentype == "2") {
+            // Fixed resolution: maximize container to fit canvas maintaining resow x resoh aspect ratio, iframe stretches to fill
+            let { bgWidth, bgHeight } = calculateGameSize(
+                windowWidth,
+                windowHeight,
+                resow,
+                resoh,
+                offsetRatio,
+                prioritizeWidth
+            );
+            gamescreenRef.current.style.width = bgWidth + "px";
+            gamescreenRef.current.style.height = bgHeight + "px";
+            iframeRef.current.setAttribute("style", "width:100%; height:100%;");
+        } else {
+            // screentype == "3" (or unset): Scaled resolution — iframe is fixed pixel size,
+            // container is scaled via CSS transform to fit inside the allotted space
+            let { bgWidth, bgHeight } = calculateGameSize(
+                windowWidth,
+                windowHeight,
+                resow,
+                resoh,
+                offsetRatio,
+                prioritizeWidth
+            );
             gamescreenRef.current.style.width = bgWidth + "px";
             gamescreenRef.current.style.height = bgHeight + "px";
             scale = bgWidth / screenwidth;
@@ -255,14 +276,6 @@ function GameIFrame({ gamepanel, canvasRef, prioritizeWidth, displayMode, isFull
                 }) +
                     `; transform-origin: left top; width:${screenwidth}px; height:${screenheight}px;`
             );
-        } else if (screentype == "2") {
-            gamescreenRef.current.style.width = bgWidth + "px";
-            gamescreenRef.current.style.height = bgHeight + "px";
-            iframeRef.current.setAttribute("style", "width:100%; height:100%;");
-        } else if (screentype == "1") {
-            gamescreenRef.current.style.width = windowWidth + "px";
-            gamescreenRef.current.style.height = windowHeight + "px";
-            iframeRef.current.setAttribute("style", "width:100%; height:100%;");
         }
 
         if (oldHeight !== "" && oldHeight != gamescreenRef.current.style.height)
@@ -318,11 +331,11 @@ function GameIFrame({ gamepanel, canvasRef, prioritizeWidth, displayMode, isFull
         <>
             <div
                 ref={gameResizer}
-                className="gameResizer flex flex-col w-full relative z-10 top-0 left-0 justify-center items-center"
+                className="gameResizer flex flex-col h-full w-full relative z-10 top-0 left-0 justify-center items-center"
             >
                 {/* <LoadingBox isDoneLoading={gamepanel.loaded} /> */}
                 <div
-                    className="screen-wrapper flex flex-col w-full relative justify-start items-center"
+                    className="screen-wrapper flex flex-col h-full w-full relative justify-start items-center"
                     ref={gamewrapperRef}
                     style={{
                         transition: "filter 0.3s ease-in, opacity 0.5s ease-in",
@@ -331,7 +344,7 @@ function GameIFrame({ gamepanel, canvasRef, prioritizeWidth, displayMode, isFull
                 >
                     <div
                         ref={gamescreenRef}
-                        className="gamescreenRef relative self-center"
+                        className="gamescreenRef relative self-center overflow-hidden"
                         key={"gamescreenRef-" + gamepanel.id}
                         style={{ filter: "drop-shadow(5px 5px 10px var(--chakra-colors-primary-1200))" }}
                     >
@@ -361,7 +374,7 @@ function GameIFrame({ gamepanel, canvasRef, prioritizeWidth, displayMode, isFull
                             }}
                             src={iframeURL}
                             // srcDoc={iframeSrc}
-                            allowTransparency={true}
+                            // allowTransparency={true}
                             sandbox="allow-scripts allow-same-origin"
                         />
                         {/* <GameMessageOverlay gamepanel={gamepanel} /> */}

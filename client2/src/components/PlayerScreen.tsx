@@ -98,9 +98,9 @@ export function PlayerScreen({
     return (
       <div
         className={`h-full ${direction === "row"
-            ? `flex w-full items-center mt-1.5 ${align === "end" ? "justify-end" : "justify-start"}`
-            : `flex flex-col items-center ${align === "end" ? "lg:items-end" : "lg:items-start"}`
-        }`}
+          ? `flex w-full items-center mt-1.5 ${align === "end" ? "justify-end" : "justify-start"}`
+          : `flex flex-col items-center ${align === "end" ? "lg:items-end" : "lg:items-start"}`
+          }`}
       >
         {players.map((player, idx) => (
           <div
@@ -139,22 +139,22 @@ export function PlayerScreen({
 
       return (
         <>
-         {renderTimer()}
-        <div className="vs-intro-scale flex-1 min-h-0 flex items-center justify-center overflow-hidden px-1">
-          <div className="w-full flex flex-col lg:flex-row items-center justify-center gap-4 lg:gap-16">
-            <div className="flex min-w-0">
-              <IntroPlayerCard size="hero" player={left} team="blue" emphasize={true} motionPhase={cardMotionPhase} delayMs={200} />
-            </div>
-            <div className="text-center shrink-0">
-              {/* <p className="text-[10px] uppercase tracking-[0.25em] text-white/65">Face Off</p> */}
-              <p className="font-acos-logo z-1 -rotate-3 text-[64px] xl:text-[80px] font-light text-white drop-shadow-violet-700 drop-shadow-[0_0_4px_var(--color-violet-700),0_0_12px_var(--color-violet-700)]">VS</p>
-            </div>
-            <div className="flex min-w-0">
-              <IntroPlayerCard size="hero" player={right} team="red" emphasize={false} motionPhase={cardMotionPhase} delayMs={200} />
+          {renderTimer()}
+          <div className="vs-intro-scale flex-1 min-h-0 flex items-center justify-center overflow-hidden px-1">
+            <div className="w-full flex flex-col lg:flex-row items-center justify-center gap-4 lg:gap-16">
+              <div className="flex min-w-0">
+                <IntroPlayerCard size="hero" player={left} team="blue" emphasize={true} motionPhase={cardMotionPhase} delayMs={200} />
+              </div>
+              <div className="text-center shrink-0">
+                {/* <p className="text-[10px] uppercase tracking-[0.25em] text-white/65">Face Off</p> */}
+                <p className="font-acos-logo z-1 -rotate-3 text-[64px] xl:text-[80px] font-light text-white drop-shadow-violet-700 drop-shadow-[0_0_4px_var(--color-violet-700),0_0_12px_var(--color-violet-700)]">VS</p>
+              </div>
+              <div className="flex min-w-0">
+                <IntroPlayerCard size="hero" player={right} team="red" emphasize={false} motionPhase={cardMotionPhase} delayMs={200} />
+              </div>
             </div>
           </div>
-        </div>
-         </>
+        </>
       );
     }
 
@@ -222,7 +222,7 @@ export function PlayerScreen({
       return (
         <>
           {/* <div className="absolute w-full h-20 top-0 right-0"> */}
-            {renderTimer()}
+          {renderTimer()}
           {/* </div> */}
           <div className="flex-1 w-full h-full flex items-center justify-center gap-4 sm:gap-8">
             <div className="vs-intro-scale flex-1 min-h-0 w-full flex flex-col sm:flex-row items-stretch sm:items-center justify-center overflow-hidden px-1 gap-2 sm:gap-10">
@@ -362,47 +362,50 @@ export function PlayerScreen({
   };
 
   return (
-    <div ref={viewportRef} className="absolute inset-0 z-10 flex items-center justify-center  ">
+    <>
       {showVsScreen ? (
-        <div className={` relative ${vsExiting ? "vs-screen-exit" : "vs-screen-enter"} w-full h-full   bg-black p-3 sm:p-2 flex flex-col justify-start gap-2 lg:gap-5 overflow-hidden`}>
-          <div className="absolute -z-1 inset-0 bg-linear-to-b from-black/30 via-black/55 to-black/80" />
-          <div className="absolute -z-4 inset-0 bg-linear-to-r from-cyan-500/15 via-transparent to-rose-500/15" />
-          <div className="absolute -z-5 inset-0 bg-linear-to-r from-transparent from-45% via-purple-500/20  to-transparent to-55%" />
-          <div className="absolute -z-5 inset-0 bg-linear-to-r from-transparent from-48% via-purple-500/5  to-transparent to-52%" />
-          <div className="absolute -z-2 top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 w-[15vw] h-[15vw] rounded-full bg-radial from-cyan-500/25 via-purple-500/20 to-transparent blur-3xl" />
-          <div className="absolute -z-3 bottom-[50%] right-[50%] transform translate-x-1/2 translate-y-1/2 w-[15vw] h-[15vw] rounded-full bg-radial from-pink-500/25 via-purple-500/20 to-transparent blur-3xl" />
-          <div className="absolute inset-0 w-full h-full bg-slate-950 overflow-hidden -z-10">
-            <svg className="background-svg top" width="calc(100% + 160px)" height="100%">
-              <pattern id="pattern-aztec-top" x="0" y="0" width="160" height="78" patternUnits="userSpaceOnUse">
-                <path stroke="white" opacity="0.3"
-                  stroke-width="4" fill="none" d="m 0 32 h 28 v -20 h -10 v 10 h -10 v -20 h 30 v 30 h 30 v -20 h -10 v 10 h -10 v -20 h 30 v 30 h 30 v -20 h -10 v 10 h -10 v -20 h 30 v 30 h 30 v -20 h -10 v 10 h -10 v -20 h 30 v 32" />
-              </pattern>
-              <rect x="0" y="0" width="100%" height="100%" fill="url(#pattern-aztec-top)"></rect>
-            </svg>
-            <svg className="background-svg bottom" width="calc(100% + 160px)" height="100%">
-              <pattern id="pattern-aztec-bottom" x="0" y="0" width="160" height="78" patternUnits="userSpaceOnUse">
-                <path stroke="white" opacity="0.3"
-                  stroke-width="4" fill="none" d="m 0 71 h 18 v -30 h 30 v 20 h -10 v -10 h -10 v 20 h 30 v -30 h 30 v 20 h -10 v -10 h -10 v 20 h 30 v -30 h 30 v 20 h -10 v -10 h -10 v 20 h 30 v -30 h 30 v 20 h -10 v -10 h -10 v 20 h 30 m -178 -30 h 8 v 20 h -8" />
-              </pattern>
-              <rect x="0" y="0" width="100%" height="100%" fill="url(#pattern-aztec-bottom)"></rect>
-            </svg>
-          </div>
-          <div className="shrink-0 flex items-start gap-3">
-            <div className="flex items-center gap-3 min-w-0">
-              <img src={gameImageUrl} alt={`${gameName} cover`} className="w-14 h-14 rounded-md object-cover border border-white/20" />
-              <div className="min-w-0">
-                <h1 className="text-lg sm:text-xl font-bold text-white truncate">{gameName}</h1>
-                <p className="text-xs text-white/70">Combatants entering arena</p>
+        <div ref={viewportRef} className="absolute inset-0 z-10 flex items-center justify-center  ">
+
+          <div className={` relative ${vsExiting ? "vs-screen-exit" : "vs-screen-enter"} w-full h-full   bg-black p-3 sm:p-2 flex flex-col justify-start gap-2 lg:gap-5 overflow-hidden`}>
+            <div className="absolute -z-1 inset-0 bg-linear-to-b from-black/30 via-black/55 to-black/80" />
+            <div className="absolute -z-4 inset-0 bg-linear-to-r from-cyan-500/15 via-transparent to-rose-500/15" />
+            <div className="absolute -z-5 inset-0 bg-linear-to-r from-transparent from-45% via-purple-500/20  to-transparent to-55%" />
+            <div className="absolute -z-5 inset-0 bg-linear-to-r from-transparent from-48% via-purple-500/5  to-transparent to-52%" />
+            <div className="absolute -z-2 top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 w-[15vw] h-[15vw] rounded-full bg-radial from-cyan-500/25 via-purple-500/20 to-transparent blur-3xl" />
+            <div className="absolute -z-3 bottom-[50%] right-[50%] transform translate-x-1/2 translate-y-1/2 w-[15vw] h-[15vw] rounded-full bg-radial from-pink-500/25 via-purple-500/20 to-transparent blur-3xl" />
+            <div className="absolute inset-0 w-full h-full bg-slate-950 overflow-hidden -z-10">
+              <svg className="background-svg top" width="calc(100% + 160px)" height="100%">
+                <pattern id="pattern-aztec-top" x="0" y="0" width="160" height="78" patternUnits="userSpaceOnUse">
+                  <path stroke="white" opacity="0.3"
+                    strokeWidth="4" fill="none" d="m 0 32 h 28 v -20 h -10 v 10 h -10 v -20 h 30 v 30 h 30 v -20 h -10 v 10 h -10 v -20 h 30 v 30 h 30 v -20 h -10 v 10 h -10 v -20 h 30 v 30 h 30 v -20 h -10 v 10 h -10 v -20 h 30 v 32" />
+                </pattern>
+                <rect x="0" y="0" width="100%" height="100%" fill="url(#pattern-aztec-top)"></rect>
+              </svg>
+              <svg className="background-svg bottom" width="calc(100% + 160px)" height="100%">
+                <pattern id="pattern-aztec-bottom" x="0" y="0" width="160" height="78" patternUnits="userSpaceOnUse">
+                  <path stroke="white" opacity="0.3"
+                    strokeWidth="4" fill="none" d="m 0 71 h 18 v -30 h 30 v 20 h -10 v -10 h -10 v 20 h 30 v -30 h 30 v 20 h -10 v -10 h -10 v 20 h 30 v -30 h 30 v 20 h -10 v -10 h -10 v 20 h 30 v -30 h 30 v 20 h -10 v -10 h -10 v 20 h 30 m -178 -30 h 8 v 20 h -8" />
+                </pattern>
+                <rect x="0" y="0" width="100%" height="100%" fill="url(#pattern-aztec-bottom)"></rect>
+              </svg>
+            </div>
+            <div className="shrink-0 flex items-start gap-3">
+              <div className="flex items-center gap-3 min-w-0">
+                <img src={gameImageUrl} alt={`${gameName} cover`} className="w-14 h-14 rounded-md object-cover border border-white/20" />
+                <div className="min-w-0">
+                  <h1 className="text-lg sm:text-xl font-bold text-white truncate">{gameName}</h1>
+                  <p className="text-xs text-white/70">Combatants entering arena</p>
+                </div>
               </div>
             </div>
+
+
+            {renderMatchIntro()}
+
+
           </div>
-
-
-          {renderMatchIntro()}
-
-
         </div>
       ) : null}
-    </div>
+    </>
   );
 }

@@ -25,7 +25,7 @@ export function PlayScreen() {
   const room = useBucket(btPrimaryRoom) as any;
   const gamestate = useBucket(btPrimaryState) as any;
 
-  const [showVsScreen, setShowVsScreen] = useState(true);
+  const [showVsScreen, setShowVsScreen] = useState(() => gamestate?.room?.status !== "gamestart");
   const [vsExiting, setVsExiting] = useState(false);
   const [isTheaterMode, setIsTheaterMode] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -38,7 +38,7 @@ export function PlayScreen() {
       const timer = window.setTimeout(() => setShowVsScreen(false), 680);
       return () => window.clearTimeout(timer);
     }
-  }, [gameStatus, showVsScreen]);
+  }, [gameStatus]);
 
   // Fallback countdown to hide VS screen
   useEffect(() => {
@@ -83,7 +83,7 @@ export function PlayScreen() {
   const introPlayers = useMemo<IntroPlayer[]>(() => {
     const players = gamestate?.players;
     if (!players) return [];
-    return Object.values(players).map((p: any, idx: number) => ({
+    return players.map((p: any, idx: number) => ({
       id: p.shortid,
       name: p.displayname,
       country: p.countrycode,
@@ -134,10 +134,10 @@ export function PlayScreen() {
   return (
     <div className="space-y-3">
       <section ref={playSurfaceRef} className="relative overflow-hidden min-h-full">
-        <div className="play-surface min-h-full">
+        
           {/* Game iframe — rendered behind VS overlay */}
           <GamePanel id={String(primary)} prioritizeWidth />
-        </div>
+        {/* </div> */}
 
         <PlayerScreen
           gameName={gameName}
