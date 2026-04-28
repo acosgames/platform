@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
-import { ForwardIcon, HeartIcon, PlayIcon, BackwardIcon } from "@heroicons/react/24/solid";
+import type React from "react";
+import { ForwardIcon, HeartIcon, PlayIcon, BackwardIcon, TrophyIcon, ChartBarIcon, DocumentTextIcon, StarIcon, FilmIcon } from "@heroicons/react/24/solid";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { Link, useParams } from "react-router";
-import { currentPlayer, games, leaderboard } from "../data/mockData";
+import { currentPlayer, leaderboard } from "../data/mockData";
 import { type MatchType } from "../components/ScoreboardPane";
 import { DivisionLeaderboardTab } from "../components/gameDetail/DivisionLeaderboardTab";
 import { LeaderboardSubtabNav } from "../components/gameDetail/LeaderboardSubtabNav";
@@ -10,10 +13,9 @@ import { StatsLeaderboardTab } from "../components/gameDetail/StatsLeaderboardTa
 import { LiveMatchSection } from "../components/gameDetail/LiveMatchSection";
 import type { LeaderboardSubtab, SeasonKey, StatsMetric, TimeWindow } from "../components/gameDetail/leaderboardTypes";
 
-import { StatCard } from "@/components/ui/StatCard";
-import { InfoPanel } from "@/components/ui/InfoPanel";
 import { PlayNow } from "@/components/ui/PlayNow";
-import { btGame, btGames } from "@/actions/buckets";
+import { Panel } from "@/components/ui/Panel";
+import { btGame } from "@/actions/buckets";
 import { useLoading } from "@/actions/loading";
 import { findGame } from "@/actions/game";
 import config from "../config";
@@ -70,11 +72,8 @@ export function GameDetail() {
 
     let imgUrl = `${config.https.cdn}g/${game.game_slug}/preview/${game.preview_images}`;
 
-    const gameSeed = Number(game.game_slug);
-    const activePlayers = 0;//
-    const totalGamesPlayed = 0;// game.players * (18 + gameSeed * 3);
-    const yourGamesPlayed = 80 + currentPlayer.level * 3 + gameSeed * 7;
-    const avgGameTimeMinutes = 14 + gameSeed * 3;
+    const gameSeed = Number(Date.now());
+    const avgGameTimeMinutes = 14 * 3;
     
     const topPlayer = leaderboard[gameSeed % leaderboard.length]?.player ?? leaderboard[0]?.player ?? "Unknown";
     const liveMatchType: MatchType = gameSeed % 3 === 0 ? "team-based" : gameSeed % 3 === 1 ? "1v1" : "free-for-all";
@@ -86,11 +85,16 @@ export function GameDetail() {
             elapsed: `${6 + gameSeed}m`,
         }
         : null;
-    const statCards = [
-        { label: "Games Played (Global)", value: totalGamesPlayed.toLocaleString() },
-        { label: "Top Player", value: topPlayer },
-        { label: "Games Played (You)", value: yourGamesPlayed.toLocaleString() },
-        { label: "Average Game Time", value: `${avgGameTimeMinutes} min` },
+    const heroWins = 18 + (gameSeed % 17) + currentPlayer.level;
+    const heroLosses = Math.max(8, Math.round(heroWins * 0.42));
+    const heroPoints = heroWins * 23 + currentPlayer.level * 17;
+    const heroFacts = [
+        { label: "Games Played", value: `${78 + (gameSeed % 12)}` },
+        { label: "Total Time", value: `${71 + (gameSeed % 15)}` },
+        { label: "Players Online", value: `${74 + (gameSeed % 14)}` },
+        { label: "Release", value: game.tsinsert.split(' ')[0] },
+        { label: "Avg Time", value: `${avgGameTimeMinutes} MIN` },
+        { label: "Region", value: leaderboard[gameSeed % leaderboard.length]?.country.toUpperCase() ?? "GLOBAL" },
     ];
 
     const myReplays = [
@@ -172,12 +176,12 @@ export function GameDetail() {
         return new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 }).format(count);
     };
 
-    const tabs: Array<{ key: DetailTab; label: string }> = [
-        { key: "leaderboards", label: "Leaderboards" },
-        { key: "career-stats", label: "Career Stats" },
-        { key: "game-description", label: "Game Description" },
-        { key: "tournaments", label: "Tournaments" },
-        { key: "watch-replay", label: "Watch Replays" },
+    const tabs: Array<{ key: DetailTab; label: string; icon: React.ElementType }> = [
+        { key: "leaderboards", label: "Leaderboards", icon: TrophyIcon },
+        { key: "career-stats", label: "Career Stats", icon: ChartBarIcon },
+        { key: "game-description", label: "Description", icon: DocumentTextIcon },
+        { key: "tournaments", label: "Tournaments", icon: StarIcon },
+        { key: "watch-replay", label: "Replays", icon: FilmIcon },
     ];
 
     const getRecord = (wins: number, idx: number) => {
@@ -222,7 +226,7 @@ export function GameDetail() {
     ];
 
     const ratingHistory = Array.from({ length: 26 }, (_, idx) => {
-        const startRating = 980 + gameSeed * 26;
+        const startRating = 980 + gameSeed * 1;
         const trend = idx * (8 + (gameSeed % 3));
         const volatility = Math.round(Math.sin((idx + 1) * (0.72 + gameSeed * 0.03)) * 42);
         const microSwing = ((idx % 5) - 2) * 6;
@@ -528,11 +532,13 @@ export function GameDetail() {
 
         if (activeTab === "game-description") {
             return (
-                <div className="relative rounded-md overflow-hidden border border-white/10 bg-black/25 p-4">
-                    <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-primary/50 via-secondary/30 to-transparent" />
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                        {game.longdesc} 
-                    </p>
+                <div className="relative rounded-md overflow-hidden border border-slate-200 bg-white p-4 shadow-sm">
+                    <div className="absolute inset-x-0 top-0 h-px " />
+                    <div className="text-sm leading-relaxed text-slate-700 [&_a]:text-blue-600 [&_a]:underline [&_code]:rounded [&_code]:bg-slate-100 [&_code]:px-1 [&_code]:py-0.5 [&_li]:ml-5 [&_ol]:list-decimal [&_ol]:space-y-1 [&_p]:mb-3 [&_pre]:overflow-x-auto [&_pre]:rounded-md [&_pre]:bg-slate-100 [&_pre]:p-3 [&_ul]:list-disc [&_ul]:space-y-1">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {game.longdesc ?? ""}
+                        </ReactMarkdown>
+                    </div>
                 </div>
             );
         }
@@ -556,109 +562,168 @@ export function GameDetail() {
 
     return (
         <div className="space-y-4 py-8">
+            <div className="mb-5 flex items-start justify-between gap-3">
+                        <Link
+                            to="/"
+                            className="inline-flex items-center gap-2 rounded-md bg-slate-900/85 px-3.5 py-2 text-[11px] font-bold uppercase tracking-[0.08em] text-white transition-colors hover:bg-slate-900"
+                        >
+                            ← Back to Games
+                        </Link>
 
+                        
+                    </div>
             {/* Hero */}
-            <section className="relative  ">
-                {/* <div className="relative w-full"> */}
-                <div className="absolute top-4 left-0 sm:top-5 sm:left-0 z-10 ">
-                    <Link
-                        to="/"
-                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md font-bold text-xs uppercase tracking-[0.08em] text-foreground border-0 border-white/15 bg-black/50 hover:bg-black/30 hover:border-primary/40 transition-all duration-200 active:scale-95"
-                    >
-                        ← Back to Games
-                    </Link>
-                </div>
-                <img
-                    src={imgUrl}
-                    alt={game.name}
-                    className="rounded-lg w-full h-64 sm:h-64 lg:h-64 object-cover brightness-75 saturate-110" />
+            <section className="relative overflow-hidden rounded-[20px] bg-emerald-400 text-slate-900 shadow-[0_18px_42px_rgba(15,23,42,0.12)]">
+                {/* <div className="absolute inset-0 bg-linear-to-br from-white via-slate-50 to-slate-100/90" /> */}
+                <div className="absolute inset-0 opacity-30 bg-[repeating-radial-gradient(circle_at_12%_20%,rgba(148,163,184,0.95)_0_2px,transparent_2px_22px)]" />
+                {/* <div className="absolute inset-0 opacity-30 bg-[radial-gradient(ellipse_at_65%_45%,rgba(255,255,255,0.96),transparent_65%)]" /> */}
 
-                {/* <div className="absolute inset-0 bg-linear-to-t from-background via-background/70 to-background/10" /> */}
-                {/* <div className="absolute inset-0 bg-linear-to-r from-primary/25 via-transparent to-secondary/22" /> */}
-                {/* <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_55%_at_50%_100%,rgba(47,109,246,0.2),transparent)]" /> */}
-
-                <div className="absolute top-4 right-5 sm:top-5 sm:right-5 z-10 ">
-                    <button
-                        type="button"
-                        onClick={handleHeartToggle}
-                        className={`shrink-0 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold bg-transparent transition-all duration-200 active:scale-95 ${isHearted
-                            ? "border-rose-300/70 text-rose-100 shadow-[0_0_16px_rgba(244,63,94,0.28)]"
-                            : "border-white/30 text-foreground hover:border-rose-300/55"
-                            }`}
-                        aria-pressed={isHearted}
-                        aria-label={isHearted ? "Remove heart reaction" : "Add heart reaction"}
-                    >
-                        <HeartIcon className={`h-3.5 w-3.5 text-rose-500 ${isHearted ? "animate-pulse" : ""}`} />
-                        <span>{formatReactionCount(heartReactionCount)}</span>
-                    </button>
-                </div>
-
-                <div className="absolute right-5 bottom-4 sm:right-5 sm:bottom-6 z-10 ">
-                    <PlayNow game_slug={game.game_slug} name={game.name} />
-                </div>
-
-                <div className="absolute left-5 right-5 top-4 sm:left-5 sm:right-5 sm:top-auto sm:bottom-6 ">
-                    <div className="flex items-end gap-3 min-w-0 pr-0 sm:pr-44">
-                        {/* Foreground game image card */}
-                        <div className="relative shrink-0">
-                            <div className="absolute -inset-1 rounded-md bg-linear-to-br from-primary/20 to-secondary/20 blur-lg" />
+                <div className="relative px-3 py-3 sm:px-5 sm:py-4 lg:px-7 lg:py-5">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-center sm:gap-5 lg:grid-cols-[auto_minmax(0,1fr)] lg:gap-6 xl:grid-cols-[auto_minmax(0,1fr)_14rem] xl:items-start xl:gap-5">
+                        <div className="relative mx-auto w-36 sm:mx-0 sm:w-40 lg:w-56">
+                            <div className="absolute inset-x-8 bottom-0 h-5 rounded-full bg-slate-900/30 blur-xl" />
                             <img
                                 src={imgUrl}
-                                alt={`${game.name} cover`}
-                                className="relative w-20 h-20 sm:w-32 sm:h-32 rounded-md object-cover border border-white/20 shadow-xl"
+                                alt={game.name}
+                                className="relative h-36 w-full rounded-xl bg-white border-6 border-white object-cover object-center sm:h-40 lg:h-56"
                             />
                         </div>
 
-                        <div className="min-w-0">
-                            <h1 className="text-xl sm:text-2xl font-black uppercase tracking-wide text-white leading-tight drop-shadow-[0_2px_16px_rgba(91,141,255,0.55)] truncate">{game.name}</h1>
-                            <p className="text-xs sm:text-sm text-white/65 font-semibold truncate">by {game.displayname}</p>
+                        <div className="relative z-10 min-w-0 text-center sm:text-left md:pb-18">
+                            <h1 className="truncate text-[1.7rem] font-black uppercase tracking-tight text-slate-900 sm:text-[2.2rem] lg:text-[2.25rem]">
+                                {game.name}
+                            </h1>
+                            <div className="mt-2 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
+                                <p className="inline-flex rounded-full bg-slate-900 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-white">
+                                    {game.displayname} • Level {currentPlayer.level}
+                                </p>
+                                <button
+                                    type="button"
+                                    onClick={handleHeartToggle}
+                                    className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[10px] font-semibold transition-all duration-200 active:scale-95 ${isHearted
+                                        ? "border-rose-400 bg-rose-100 text-rose-800 shadow-[0_0_16px_rgba(244,63,94,0.22)]"
+                                        : "border-slate-300 bg-white/80 text-slate-700 hover:border-rose-300"
+                                        }`}
+                                    aria-pressed={isHearted}
+                                    aria-label={isHearted ? "Remove heart reaction" : "Add heart reaction"}
+                                >
+                                    <HeartIcon className={`h-3.5 w-3.5 text-rose-500 ${isHearted ? "animate-pulse" : ""}`} />
+                                    <span>{formatReactionCount(heartReactionCount)}</span>
+                                </button>
+                            </div>
+                            {game.shortdesc ? (
+                                <blockquote className="mx-auto mt-3 max-w-lg rounded-lg  bg-slate-300/5 px-4 py-2 text-sm italic leading-relaxed text-slate-600 sm:mx-0">
+                                    {/* <span className="mr-1 align-top text-base font-semibold leading-none text-slate-400">"</span> */}
+                                    {game.shortdesc}
+                                    {/* <span className="ml-1 align-bottom text-base font-semibold leading-none text-slate-400">"</span> */}
+                                </blockquote>
+                            ) : null}
+                            <div className="mt-4 flex justify-center sm:justify-start md:absolute md:right-0 md:bottom-2 md:mt-0 md:justify-end xl:hidden">
+                                <PlayNow game_slug={game.game_slug} name={game.name} />
+                            </div>
+
+                        </div>
+
+                        <div className="hidden xl:flex xl:flex-col xl:items-end xl:justify-start">
+                            <Panel
+                                className="w-56 shrink-0 self-start"
+                                header={
+                                    <p className="text-center text-[10px] font-bold uppercase tracking-[0.08em] text-white">
+                                        Your Season Stats
+                                    </p>
+                                }
+                                footer={
+                                    <div className="grid grid-cols-3 divide-x divide-slate-200/90 px-2  py-3 pt-6">
+                                        <div className="text-center">
+                                            <p className="text-xs font-black text-slate-800">{heroWins}</p>
+                                            <p className="text-[9px] font-medium uppercase tracking-wide text-slate-500">Wins</p>
+                                        </div>
+                                        <div className="text-center">
+                                            <p className="text-xs font-black text-slate-800">{heroLosses}</p>
+                                            <p className="text-[9px] font-medium uppercase tracking-wide text-slate-500">Losses</p>
+                                        </div>
+                                        <div className="text-center">
+                                            <p className="text-xs font-black text-slate-800">{heroPoints}</p>
+                                            <p className="text-[9px] font-medium uppercase tracking-wide text-slate-500">Points</p>
+                                        </div>
+                                    </div>
+                                }
+                            >
+                                <div className="grid grid-cols-1 px-2 py-3">
+                                    <div className="text-center">
+                                        <p className="text-base font-black text-slate-800">{currentPlayer.rank}</p>
+                                        <p className="text-[9px] font-medium uppercase tracking-wide text-slate-500">Current Rank</p>
+                                    </div>
+                                </div>
+                            </Panel>
+                            <div className="mt-4">
+                                <PlayNow game_slug={game.game_slug} name={game.name} />
+                            </div>
                         </div>
                     </div>
                 </div>
-                {/* </div> */}
+            </section>
 
+            <section className="grid grid-cols-1 gap-4 lg:grid-cols-[1.15fr_1fr]">
+                <Panel
+                    className="xl:hidden"
+                    header={
+                        <p className="text-center text-[10px] font-bold uppercase tracking-[0.08em] text-white">
+                            Your Season Stats
+                        </p>
+                    }
+                    footer={
+                        <div className="grid grid-cols-3 divide-x divide-slate-200/90 px-2 py-3 sm:px-3">
+                            <div className="text-center">
+                                <p className="text-lg font-black text-slate-800 sm:text-xl">{heroWins}</p>
+                                <p className="text-[9px] font-medium uppercase tracking-wide text-slate-500 sm:text-[10px]">Wins</p>
+                            </div>
+                            <div className="text-center">
+                                <p className="text-lg font-black text-slate-800 sm:text-xl">{heroLosses}</p>
+                                <p className="text-[9px] font-medium uppercase tracking-wide text-slate-500 sm:text-[10px]">Losses</p>
+                            </div>
+                            <div className="text-center">
+                                <p className="text-lg font-black text-slate-800 sm:text-xl">{heroPoints}</p>
+                                <p className="text-[9px] font-medium uppercase tracking-wide text-slate-500 sm:text-[10px]">Points</p>
+                            </div>
+                        </div>
+                    }
+                >
+                    <div className="grid grid-cols-1 px-2 py-3 sm:px-3">
+                        <div className="text-center">
+                            <p className="text-base font-black text-slate-800 sm:text-lg">{currentPlayer.rank}</p>
+                            <p className="text-[9px] font-medium uppercase tracking-wide text-slate-500 sm:text-[10px]">Current Rank</p>
+                        </div>
+                    </div>
+                </Panel>
+
+                <Panel
+                    className="xl:col-span-full"
+                    header={
+                        <p className="text-center text-[10px] font-bold uppercase tracking-[0.08em] text-white">
+                            Game Statistics
+                        </p>
+                    }
+                >
+                    <div className="grid grid-cols-2 gap-2 p-2 sm:grid-cols-3 xl:grid-cols-6">
+                        {heroFacts.map((fact) => (
+                            <div key={fact.label} className="rounded-lg  px-2 py-2 text-center ">
+                                <p className="text-xs font-black uppercase tracking-tight text-slate-800 sm:text-sm">{fact.value}</p>
+                                <p className="mt-0.5 text-[9px] font-medium uppercase tracking-wide text-slate-600 sm:text-[10px]">{fact.label}</p>
+                            </div>
+                        ))}
+                    </div>
+                </Panel>
             </section>
 
             
-            <InfoPanel>
-                <div className="flex flex-col gap-4">
-                    {/* <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-xs px-2.5 py-1 rounded-sm border border-primary/40 bg-primary/12 text-white font-bold uppercase tracking-wide">
-                            {game.category}
-                        </span>
-                        {game.genre.map((tag) => (
-                            <span
-                                key={tag}
-                                className="text-xs px-2.5 py-1 rounded-sm border border-white/12 bg-white/6 text-white/75 font-medium"
-                            >
-                                {tag}
-                            </span>
-                        ))}
-                    </div> */}
-                    <div className="">
-                        <div className="flex items-center flex-wrap gap-3 text-xs text-muted-foreground">
-                            <span className="inline-flex items-center gap-1.5 font-semibold text-emerald-300"><span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.9)]" />{activePlayers.toLocaleString()} online</span>
-                            <span>Release: {game.tsinsert}</span>
-                            <span>Rating: {game.votes.toFixed(1)}</span>
-                        </div>
-
-                    </div>
-                    <div>
-                        <p className="text-sm text-muted-foreground leading-relaxed max-w-3xl">
-                            {game.shortdesc}
-                        </p>
-                    </div>
-
-                </div>
-            </InfoPanel>
-
             {liveMatch ? <LiveMatchSection gameName={game.name} gameImageUrl={imgUrl} liveMatch={liveMatch} liveMatchType={liveMatchType} /> : null}
 
-            <section className="w-full  grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 ">
+            {/* <section className="w-full  grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 ">
                 {statCards.map((stat) => (
                     <StatCard key={stat.label} label={stat.label} value={stat.value} />
                 ))}
-            </section>
+            </section> */}
 
             {/* Bottom tabbed detail section */}
             {/* <section className="rounded-md  border-cyan-400/20 bg-card/95 p-4 sm:p-5 space-y-4"> */}
@@ -669,28 +734,34 @@ export function GameDetail() {
           <span className="text-[11px] px-2 py-1 rounded-full border border-cyan-500/30 bg-cyan-500/10 text-cyan-800 dark:text-cyan-200">Live Data</span>
         </div> */}
 
-            <section className="rounded-md shadow-black/30 shadow-md bg-card">
-                <div className="sticky top-12.5 z-20 overflow-y-hidden overflow-x-auto bg-card border-b border-white/10">
-                    <div className="px-4 min-w-max flex items-end gap-1 pt-2">
-                        {tabs.map((tab) => (
-                            <button
-                                key={tab.key}
-                                type="button"
-                                onClick={() => setActiveTab(tab.key)}
-                                className={`relative px-4 lg:px-6 py-2.5 text-xs font-bold uppercase tracking-wide whitespace-nowrap transition-all -skew-x-12 border border-b-0 rounded-t-sm ${
-                                    activeTab === tab.key
-                                        ? "bg-linear-to-b from-red-600 to-red-800 border-red-700/50 text-white shadow-[0_-3px_14px_rgba(220,38,38,0.35)] translate-y-px"
-                                        : "bg-black/35 border-white/12 text-white/50 hover:text-white/80 hover:bg-black/55 hover:border-white/20"
-                                }`}
-                            >
-                                <span className="inline-block skew-x-12">{tab.label}</span>
-                            </button>
-                        ))}
+            <div className="w-full overflow-x-auto pb-1">
+                <div className="flex w-max min-w-full justify-center">
+                    <div className="inline-flex items-center rounded-full bg-white p-1 shadow-md whitespace-nowrap">
+                        {tabs.map((tab) => {
+                            const Icon = tab.icon;
+                            const isActive = activeTab === tab.key;
+                            return (
+                                <button
+                                    key={tab.key}
+                                    type="button"
+                                    onClick={() => setActiveTab(tab.key)}
+                                    className={`inline-flex h-8 items-center gap-1.5 rounded-full px-4 text-xs font-semibold transition-all ${
+                                        isActive
+                                            ? "bg-blue-600 text-white shadow-sm"
+                                            : "text-slate-600 hover:text-slate-900"
+                                    }`}
+                                >
+                                    <Icon className={`h-3.5 w-3.5 shrink-0 ${isActive ? "text-white" : "text-slate-500"}`} />
+                                    {tab.label}
+                                </button>
+                            );
+                        })}
                     </div>
                 </div>
-                <div className="p-3.5 sm:p-4">
-                    {renderTabPanel()}
-                </div>
+            </div>
+
+            <section>
+                {renderTabPanel()}
             </section>
 
 

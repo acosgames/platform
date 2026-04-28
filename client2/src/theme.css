@@ -1,5 +1,7 @@
 @custom-variant dark (&:is(.dark *));
 
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&family=Varela+Round&display=swap');
+
 @font-face {
   font-family: "AcosDoit";
   src: url("https://assets.acos.games/fonts/DOIT.woff") format("woff");
@@ -13,14 +15,17 @@
 }
 
 :root {
+  --font-display: "Roboto", "Varela Round", sans-serif;
+  --font-body: "Roboto", "Varela Round", sans-serif;
+  --default-font-family: var(--font-body);
   --font-size: 16px;
-  --background: #0b1220;
-  --foreground: #f5f8ff;
-  --card: #1C1D21;
-  --card-foreground: #f5f8ff;
+  --background: #FDFDFD;
+  --foreground: #0c1730;
+  --card: #FDFDFD;
+  --card-foreground: #020202;
   --popover: #121b31;
   --popover-foreground: #f5f8ff;
-  --primary: #2f6df6;
+  --primary: #515053;
   --primary-foreground: #f8fbff;
   --secondary: #d61f3f;
   --secondary-foreground: #ffffff;
@@ -54,7 +59,7 @@
 }
 
 .light {
-  --background: #111214;
+  --background: #FDFDFD;
   --foreground: #0c1730;
   --card: #e1e1e4;
   --card-foreground: #0c1730;
@@ -86,7 +91,7 @@
 }
 
 .dark {
-  --background: var(--color-slate-950);
+  --background: #45456C;
   --foreground: #f6f8ff;
   --card: #071d3a;
   --card-foreground: #f6f8ff;
@@ -168,9 +173,18 @@
     @apply border-border outline-ring/50;
   }
 
+  html,
+  body,
+  #root {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+  }
+
   body {
-    @apply bg-background text-foreground;
-    /* background: linear-gradient(to top, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0)), url('https://assets.acos.games/blue-blur-background.webp') no-repeat center center fixed; */
+    @apply text-foreground;
+    background-color:#0dcfc7;
+    background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.0)) #21223f no-repeat center center fixed;
     /* background-size: cover; */
     /* background-image: 
         linear-gradient(rgba(0, 0, 0, 0.5) 1px, transparent 1px), 
@@ -185,6 +199,7 @@
 
   html {
     font-size: var(--font-size);
+    font-family: var(--font-display);
     /* scrollbar-gutter: stable; */
   }
 
@@ -192,7 +207,7 @@ svg.background-svg{
   position: absolute;
 }
 svg.background-svg path {
-  stroke: rgb(10, 19, 27);
+  stroke: rgb(71, 72, 88);
 }
 svg.background-svg.top{
   /* animation: svgmoveTop 100s linear infinite; */
@@ -328,6 +343,20 @@ svg.background-svg.bottom{
     }
   }
 
+  @keyframes play-now-shine {
+    0% {
+      left: -100px;
+    }
+
+    60% {
+      left: 100%;
+    }
+
+    100% {
+      left: 100%;
+    }
+  }
+
   .vs-card-enter {
     animation: vs-card-enter 1000ms cubic-bezier(0.17, 0.84, 0.44, 1) both;
     will-change: transform, opacity, filter;
@@ -350,6 +379,32 @@ svg.background-svg.bottom{
   .vs-live-enter {
     animation: vs-live-enter 460ms cubic-bezier(0.16, 1, 0.3, 1) both;
     will-change: transform, opacity, filter;
+  }
+
+  .play-now-shine {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .play-now-shine::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100px;
+    width: 100px;
+    height: 100%;
+    opacity: 0.6;
+    background-image: linear-gradient(
+      120deg,
+      rgba(255, 255, 255, 0) 30%,
+      rgba(255, 255, 255, 0.82),
+      rgba(255, 255, 255, 0) 70%
+    );
+    pointer-events: none;
+  }
+
+  .play-now-shine:hover::before {
+    animation: play-now-shine 1.5s ease-out infinite;
   }
 
   .vs-intro-scale {

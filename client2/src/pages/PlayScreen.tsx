@@ -8,6 +8,7 @@ import GamePanel from "../components/gameScreen/GamePanel";
 import { btPrimaryGamePanel, btPrimaryRoom, btPrimaryState } from "@/actions/buckets";
 import { useBucket } from "@/actions/bucket";
 import config from "../config";
+import { GameStatus } from "@acosgames/framework";
 
 type MatchType = "free-for-all" | "1v1" | "team-based";
 
@@ -25,7 +26,7 @@ export function PlayScreen() {
   const room = useBucket(btPrimaryRoom) as any;
   const gamestate = useBucket(btPrimaryState) as any;
 
-  const [showVsScreen, setShowVsScreen] = useState(() => gamestate?.room?.status !== "gamestart");
+  const [showVsScreen, setShowVsScreen] = useState(() => gamestate?.room?.status !== GameStatus.gamestart);
   const [vsExiting, setVsExiting] = useState(false);
   const [isTheaterMode, setIsTheaterMode] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -33,7 +34,7 @@ export function PlayScreen() {
   // Hide VS screen when game actually starts
   const gameStatus = gamestate?.room?.status;
   useEffect(() => {
-    if (gameStatus === "gamestart" && showVsScreen) {
+    if (gameStatus === GameStatus.gamestart && showVsScreen) {
       setVsExiting(true);
       const timer = window.setTimeout(() => setShowVsScreen(false), 680);
       return () => window.clearTimeout(timer);

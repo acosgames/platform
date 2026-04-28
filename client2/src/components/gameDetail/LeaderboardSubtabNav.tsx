@@ -8,25 +8,29 @@ export function LeaderboardSubtabNav({
   onChange: (subtab: LeaderboardSubtab) => void;
 }) {
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      {[
-        { key: "division" as const, label: "Division" },
-        { key: "rank" as const, label: "Rank" },
-        { key: "stats" as const, label: "Stats" },
-      ].map((tab) => (
-        <button
-          key={tab.key}
-          type="button"
-          onClick={() => onChange(tab.key)}
-          className={`h-8 px-3.5 rounded-full text-xs font-semibold transition-colors ${
-            activeSubtab === tab.key
-              ? "bg-cyan-500/20 text-cyan-100"
-              : "bg-white/6 text-foreground/75 hover:text-cyan-100"
-          }`}
-        >
-          {tab.label}
-        </button>
-      ))}
+    <div className="w-full overflow-x-auto pb-1">
+      <div className="flex w-max min-w-full justify-center">
+        <div className="inline-flex items-center rounded-full bg-white p-1 shadow-md backdrop-blur-sm">
+          {[
+            { key: "division" as const, label: "Division" },
+            { key: "rank" as const, label: "Rank" },
+            { key: "stats" as const, label: "Stats" },
+          ].map((tab) => (
+            <button
+              key={tab.key}
+              type="button"
+              onClick={() => onChange(tab.key)}
+              className={`h-7 px-4 rounded-full text-xs font-semibold transition-all ${
+                activeSubtab === tab.key
+                  ? "bg-blue-900 text-white shadow-sm"
+                  : "text-foreground/70 hover:text-foreground"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

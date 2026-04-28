@@ -127,7 +127,7 @@ export function PlayerScreen({
   const renderTimer = () => {
     return (
       <MatchCountdown
-        durationMs={countdownDurationMs}
+        // durationMs={countdownDurationMs}
         className="absolute top-1 right-4 shrink-0 flex items-end justify-end lg:pt-1 pt-2"
       />
     )

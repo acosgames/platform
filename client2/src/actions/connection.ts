@@ -422,8 +422,8 @@ function updateRoomPublicMessage(gamepanel: any, gamestate: any, payload: any) {
 
     if (payload?.action)
         payload.action = {};
-    if (payload?.room?.events)
-        payload.room.events = [];
+    if (gamestate?.room?.events)
+        gamestate.room.events = [];
 
     let payloadStr = JSON.stringify(payload);
     let deltaState = JSON.parse(payloadStr);

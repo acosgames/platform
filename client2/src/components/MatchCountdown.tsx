@@ -1,12 +1,12 @@
 import { useBucket, useBucketSelector } from "@/actions/bucket";
-import { btGame, btPrimaryGamePanel, btTimeleft, btTimeleftUpdated } from "@/actions/buckets";
+import { btGame, btPrimaryGamePanel, btPrimaryState, btTimeleft, btTimeleftUpdated } from "@/actions/buckets";
 import { GameStatus } from "@acosgames/framework";
 
 export function MatchCountdown({ className }: { className?: string }) {
   useBucket(btTimeleftUpdated); // subscribe to timeleft updates
 
   const primaryId = useBucket(btPrimaryGamePanel) as string | number | null;
-  const gamestate = useBucket(btGame) as any;
+  const gamestate = useBucket(btPrimaryState) as any;
   const timeleft = useBucketSelector(btTimeleft, (bucket) => (bucket as Record<string, any>)[primaryId as any]) as number | undefined;
   const timeupdated = useBucket(btTimeleftUpdated) as number | undefined;
   const status = gamestate?.room?.status;

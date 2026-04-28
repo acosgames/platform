@@ -25,7 +25,7 @@ export function RankLeaderboardTab({
           <select
             value={rankCountryFilter}
             onChange={(e) => onRankCountryChange(e.target.value)}
-            className="h-9 w-full rounded-md border border-white/10 bg-black/20 px-2.5 text-xs text-foreground outline-none"
+            className="h-9 w-full rounded-md border border-slate-200 bg-white px-2.5 text-xs text-slate-800 outline-none"
           >
             <option value="all">All Countries</option>
             {leaderboardCountries.map((country) => (
@@ -39,7 +39,7 @@ export function RankLeaderboardTab({
           <select
             value={rankSeasonFilter}
             onChange={(e) => onRankSeasonChange(e.target.value as TimeWindow)}
-            className="h-9 w-full rounded-md border border-white/10 bg-black/20 px-2.5 text-xs text-foreground outline-none"
+            className="h-9 w-full rounded-md border border-slate-200 bg-white px-2.5 text-xs text-slate-800 outline-none"
           >
             <option value="season">Current Season</option>
             <option value="monthly">Monthly Snapshot</option>

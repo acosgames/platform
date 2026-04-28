@@ -83,18 +83,18 @@ export function Layout() {
     return (
         <>
             <SignInPane onSignIn={() => false} />
-            <div className="absolute inset-0 w-full h-full bg-slate-950 overflow-hidden -z-2">
+            <div className="absolute inset-0 w-full h-full  overflow-hidden -z-2">
                 <svg className="background-svg top" width="calc(100% + 160px)" height="100%">
                     <pattern id="pattern-aztec-top" x="0" y="0" width="160" height="78" patternUnits="userSpaceOnUse">
-                        <path stroke="white" opacity="0.3"
-                            strokeWidth="4" fill="none" d="m 0 32 h 28 v -20 h -10 v 10 h -10 v -20 h 30 v 30 h 30 v -20 h -10 v 10 h -10 v -20 h 30 v 30 h 30 v -20 h -10 v 10 h -10 v -20 h 30 v 30 h 30 v -20 h -10 v 10 h -10 v -20 h 30 v 32" />
+                        <path stroke="white" opacity="1"
+                            strokeWidth="1" fill="none" d="m 0 32 h 28 v -20 h -10 v 10 h -10 v -20 h 30 v 30 h 30 v -20 h -10 v 10 h -10 v -20 h 30 v 30 h 30 v -20 h -10 v 10 h -10 v -20 h 30 v 30 h 30 v -20 h -10 v 10 h -10 v -20 h 30 v 32" />
                     </pattern>
                     <rect x="0" y="0" width="100%" height="100%" fill="url(#pattern-aztec-top)"></rect>
                 </svg>
                 <svg className="background-svg bottom" width="calc(100% + 160px)" height="100%">
                     <pattern id="pattern-aztec-bottom" x="0" y="0" width="160" height="78" patternUnits="userSpaceOnUse">
-                        <path stroke="white" opacity="0.3"
-                            strokeWidth="4" fill="none" d="m 0 71 h 18 v -30 h 30 v 20 h -10 v -10 h -10 v 20 h 30 v -30 h 30 v 20 h -10 v -10 h -10 v 20 h 30 v -30 h 30 v 20 h -10 v -10 h -10 v 20 h 30 v -30 h 30 v 20 h -10 v -10 h -10 v 20 h 30 m -178 -30 h 8 v 20 h -8" />
+                        <path stroke="white" opacity="1"
+                            strokeWidth="1" fill="none" d="m 0 71 h 18 v -30 h 30 v 20 h -10 v -10 h -10 v 20 h 30 v -30 h 30 v 20 h -10 v -10 h -10 v 20 h 30 v -30 h 30 v 20 h -10 v -10 h -10 v 20 h 30 v -30 h 30 v 20 h -10 v -10 h -10 v 20 h 30 m -178 -30 h 8 v 20 h -8" />
                     </pattern>
                     <rect x="0" y="0" width="100%" height="100%" fill="url(#pattern-aztec-bottom)"></rect>
                 </svg>
@@ -133,9 +133,9 @@ export function Layout() {
                     </div>
                 ) : null}
 
-                <div className="relative flex flex-row w-full h-screen panel-scrollbar overflow-y-auto">
+                <div className="relative flex flex-row w-full h-screen panel-scrollbar overflow-y-auto overflow-x-hidden">
 
-                    <div className="play-layout-main-shell flex-1 flex flex-col h-full pt-12.5">
+                    <div className="play-layout-main-shell flex-1 min-w-0 flex flex-col h-full pt-12.5">
                         {/* Header */}
                         <header className="play-layout-header fixed top-0 left-0 right-0 z-50 w-full h-12.5 min-h-12.5 max-h-12.5 box-border bg-black border-b border-cyan-500/20 backdrop-blur-xl">
                             <div className="absolute w-full inset-0 bg-linear-to-r from-cyan-500/5 via-purple-500/5 to-pink-500/5" />
@@ -148,7 +148,7 @@ export function Layout() {
                                                 alt="ACOS"
                                                 className="h-8 w-auto object-contain"
                                             />
-                                            <span className="font-acos-logo text-2xl font-semibold text-foreground leading-none">ACOS</span>
+                                            <span className="font-acos-logo text-2xl font-semibold text-white leading-none">ACOS</span>
                                         </Link>
                                     </div>
 
@@ -171,12 +171,12 @@ export function Layout() {
 
                         {/* Main content + footer — shift right when panel is docked */}
                         <div
-                            className="flex-1 flex flex-col min-h-0 transition-[padding-right] duration-200"
+                            className="flex-1 flex flex-col min-h-0 min-w-0 transition-[padding-right] duration-200"
                             style={{ paddingRight: isDockedOpenWide ? "23rem" : undefined }}
                         >
 
                         {/* Main content */}
-                        <div className="flex-1 play-layout-content relative container mx-auto px-2 lg:px-20">
+                        <div className="flex-1 min-w-0 play-layout-content relative container mx-auto px-2 lg:px-20 ">
                             <div className="flex flex-col gap-4 lg:gap-6">
                                 {/* Main content area */}
                                 <div className="flex-1 min-w-0">
