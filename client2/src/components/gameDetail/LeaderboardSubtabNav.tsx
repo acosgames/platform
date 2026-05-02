@@ -8,9 +8,9 @@ export function LeaderboardSubtabNav({
   onChange: (subtab: LeaderboardSubtab) => void;
 }) {
   return (
-    <div className="w-full overflow-x-auto pb-1">
-      <div className="flex w-max min-w-full justify-center">
-        <div className="inline-flex items-center rounded-full bg-white p-1 shadow-md backdrop-blur-sm">
+    <div className="w-full ">
+      <div className="flex w-max min-w-full justify-center ">
+        <div className="inline-flex items-center rounded-full bg-white p-1 shadow-md">
           {[
             { key: "division" as const, label: "Division" },
             { key: "rank" as const, label: "Rank" },

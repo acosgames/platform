@@ -357,7 +357,11 @@ export function addRooms(roomList: any[]) {
 }
 
 export function addRoom(msg: any) {
-    let gamepanel = findGamePanelByRoom(msg.payload?.room?.room_slug);
+
+    let history = msg.payload;
+    let room = msg.room;
+
+    let gamepanel = findGamePanelByRoom(room?.room_slug);
 
     if (gamepanel) {
         return gamepanel;
@@ -371,23 +375,23 @@ export function addRoom(msg: any) {
 
     //reserve and update gamepanel
     gamepanel = reserveGamePanel();
-    gamepanel.room = msg.payload?.room;
-    if (msg.payload?.room?.isReplay) {
-        gamepanel.gamestate = msg.payload[1]?.payload;
-        gamepanel.room.history = msg.payload;
+    gamepanel.room = room;
+    if (room?.isReplay) {
+        gamepanel.gamestate = history[1]?.payload;
+        gamepanel.room.history = history;
     } else {
-        gamepanel.gamestate = msg.payload?.gamestate;
+        gamepanel.gamestate = history?.gamestate;
     }
 
     btShowLoadingBox.assign({ [gamepanel.id]: true });
     updateGamePanel(gamepanel);
 
-    if (!msg.payload?.room?.isReplay) {
+    if (!room?.isReplay) {
         //should we make it primary immediately? might need to change this
         setPrimaryGamePanel(gamepanel);
     }
 
-    rooms[msg.payload?.room?.room_slug] = { room: msg.payload?.room, gamestate: msg.payload?.gamestate };
+    rooms[room?.room_slug] = { room: room, gamestate: history?.gamestate };
     btRooms.set(rooms);
     setWithExpiry("rooms", JSON.stringify(rooms), 120);
 

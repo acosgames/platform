@@ -64,7 +64,7 @@ export interface LeaderboardEntry {
   player: string;
   score: number;
   wins: number;
-  country: string;
+  countrycode: string;
 }
 
 export interface Achievement {
@@ -159,7 +159,7 @@ export const currentPlayer: Player = {
   maxXp: 10000,
   country: 'US',
   avatarUrl: 'https://images.unsplash.com/photo-1628501899963-43bb8e2423e1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxnYW1lciUyMHBvcnRyYWl0JTIwaGVhZHBob25lc3xlbnwxfHx8fDE3NzM4MTQ3Njh8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-  rank: 'Diamond III'
+  rank: '!'
 };
 
 export const friends: Friend[] = [

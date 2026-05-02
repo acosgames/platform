@@ -1,5 +1,5 @@
 export type LeaderboardSubtab = "division" | "rank" | "stats";
-export type StatsMetric = "score" | "wins" | "win-rate";
+export type StatsMetric = "score" | "wins" | "win-rate" | (string & {});
 export type TimeWindow = "season" | "monthly" | "weekly";
 export type SeasonKey = "s12" | "s11" | "s10";
 

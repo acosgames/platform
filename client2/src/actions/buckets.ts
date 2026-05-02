@@ -49,6 +49,11 @@ export type QueueEntry = {
   game_slug: string;
   rating?: number;
 };
+
+export type PlayerStatHistoryEntry = {
+  tsupdate: string;
+  value: number;
+};
 export const btQueues = bucket<QueueEntry[] | null>([]);
 export const btRooms = bucket<{ [key: string]: any }>({});
 
@@ -66,6 +71,7 @@ export const btDuplicateTabs = bucket(false);
 export const btServerOffset = bucket(0);
 export const btOffsetTime = bucket(0);
 export const btPlayerStats = bucket({});
+export const btPlayerStatHistory = bucket<PlayerStatHistoryEntry[] | null>(null);
 
 export const btDevGameImages = bucket<any[]>([]);
 export const btDevGame = bucket({});
@@ -91,7 +97,7 @@ export const btExperimentalList = bucket([]);
 export const btGameLists = bucket({});
 
 export const btGameFound = bucket(false);
-export const btReplay = bucket({});
+export const btReplay = bucket<any>({});
 export const btLoadingHightscores = bucket(null);
 export const btLocalPlayerHighscores = bucket(null);
 export const btLeaderboardHighscoreChange = bucket(null);
@@ -174,7 +180,7 @@ export const btGameScreenSize = bucket(null);
 export const btGameStatusUpdated = bucket(Date.now());
 export const btFullScreenElem = bucket(null);
 export const btPrimaryRoom = bucket(null);
-export const btReplays = bucket({});
+export const btReplays = bucket<Record<string, any>>({});
 
 export const btPortraitBottomRef = bucket(null);
 
@@ -205,3 +211,4 @@ export type PowerTabKey = "profile" | "queue" | "friends" | "chat" | "settings";
 export const btActivePowerTab = bucket<PowerTabKey | null>(null);
 export const btIsDockedWide = bucket(false);
 export const btIsLargeScreen = bucket(false);
+

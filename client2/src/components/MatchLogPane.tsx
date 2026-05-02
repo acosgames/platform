@@ -24,7 +24,7 @@ export function MatchLogPane() {
   };
 
   return (
-    <section className=" space-y-2.5 shrink-0 overflow-hidden ">
+    <section className="min-w-0 w-full shrink-0 space-y-2.5 overflow-hidden text-slate-800">
       {/* <div className="flex items-center cursor-n-resize justify-between" onClick={() => setIsExpanded((prev) => !prev)}>
         <h3 className="text-sm font-semibold text-foreground">Match Logs</h3>
         <div className="flex items-center gap-2">
@@ -42,10 +42,10 @@ export function MatchLogPane() {
       {isExpanded ? (
         <div className="h-full overflow-y-auto panel-scrollbar pr-1 space-y-1">
           {entries.map((entry, idx) => (
-            <div key={`${entry.text}-${idx}`} className="rounded-md border border-white/10 bg-black/15 px-2.5 py-1.5">
+            <div key={`${entry.text}-${idx}`} className="rounded-lg border border-slate-200 bg-white px-2.5 py-2 shadow-sm">
               <div className="flex items-start justify-between gap-2">
-                <p className="text-[11px] text-foreground/90 flex-1">{entry.text}</p>
-                <span className="text-[10px] text-muted-foreground whitespace-nowrap shrink-0">{formatTimeAgo(entry.timestamp)}</span>
+                <p className="flex-1 text-[11px] text-slate-700">{entry.text}</p>
+                <span className="shrink-0 whitespace-nowrap text-[10px] text-slate-400">{formatTimeAgo(entry.timestamp)}</span>
               </div>
             </div>
           ))}

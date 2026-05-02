@@ -17,7 +17,6 @@ const QUICK_CHATS = [
 
 export function ChatPane() {
   const [draft, setDraft] = useState("");
-  const [isCollapsed, setIsCollapsed] = useState(false);
   const [quickChatOpen, setQuickChatOpen] = useState(false);
   const [localMessages, setLocalMessages] = useState(chatMessages);
   const quickChatRef = useRef<HTMLDivElement>(null);
@@ -89,32 +88,54 @@ export function ChatPane() {
   }, [quickChatOpen]);
 
   return (
-    <section className={`flex-1 bg-card  p-3.5 ${isCollapsed ? "shrink-0" : "flex-1 min-h-0 flex flex-col"}`}>
-      <div className={`cursor-n-resize flex items-center justify-between ${isCollapsed ? "" : "mb-2.5"}`} onClick={() => {
-              setIsCollapsed((v) => !v);
-              setQuickChatOpen(false);
-            }} >
-        <h3 className="text-sm font-semibold text-foreground">Game Chat</h3>
-        {/* <div className="flex items-center gap-2">
-          <span className="text-[11px] text-cyan-700 dark:text-cyan-300">Live</span>
+    <section className="flex h-full min-h-0 flex-col-reverse relative overflow-hidden p-2 sm:p-2">
+      <div className="min-h-10 shrink-0 flex items-center gap-2  pt-2.5">
+        <input
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") sendMessage();
+          }}
+          placeholder="Message squad..."
+          className="h-8 flex-1 rounded-md border border-slate-300 bg-white px-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-cyan-400 focus:outline-none"
+        />
+        <div className="relative" ref={quickChatRef}>
           <button
             type="button"
-            // onClick={() => {
-            //   setIsCollapsed((v) => !v);
-            //   setQuickChatOpen(false);
-            // }}
-            aria-expanded={!isCollapsed}
-            aria-label={isCollapsed ? "Expand chat pane" : "Collapse chat pane"}
-            className="h-6 w-6 rounded-md border border-white/15 bg-white/5 text-foreground/80 hover:text-foreground hover:border-cyan-400/40 transition-colors"
+            onClick={() => setQuickChatOpen((v) => !v)}
+            className="h-8 w-8 rounded-md border border-slate-300 bg-slate-50 text-sm text-slate-700 transition-colors hover:border-cyan-300 hover:bg-cyan-50"
+            aria-label="Open quick chat menu"
+            aria-expanded={quickChatOpen}
           >
-            {isCollapsed ? "▸" : "▾"}
+            ⚡
           </button>
-        </div> */}
-      </div>
 
-      {!isCollapsed && (
-      <>
-      <div className="flex-1 min-h-0 overflow-y-auto pr-1 space-y-1 panel-scrollbar">
+          {quickChatOpen && (
+            <div className="absolute bottom-9 right-0 z-30 w-36 overflow-hidden rounded-md border border-slate-200 bg-white py-1.5 shadow-lg">
+              {QUICK_CHATS.map((msg) => (
+                <button
+                  key={msg}
+                  type="button"
+                  onClick={() => sendQuickChat(msg)}
+                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-slate-700 hover:bg-slate-100"
+                >
+                  <span className="text-[11px] text-cyan-700">⚡</span>
+                  {msg}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+        <button
+          type="button"
+          onClick={sendMessage}
+          className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-linear-to-r from-cyan-500 to-blue-600 text-white transition-colors hover:from-cyan-400 hover:to-blue-500"
+          aria-label="Send message"
+        >
+          <PaperAirplaneIcon className="h-4 w-4" />
+        </button>
+      </div>
+      <div className="flex-1 min-h-0 max-h-50 md:max-h-full overflow-y-auto pr-1 panel-scrollbar">
         {messages.map((msg) => {
           const isMe = msg.sender === currentPlayer.name || msg.sender === "You";
           const sender = senderProfiles.get(msg.sender) ?? {
@@ -127,22 +148,22 @@ export function ChatPane() {
           return (
             <div
               key={msg.id}
-              className="px-1 py-0.5 border-b border-white/8 last:border-b-0"
+              className="rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 mb-1.5 last:mb-0"
             >
-              <div className="flex gap-0.5 min-w-0">
-                <img src={sender.avatarUrl} alt={msg.sender} className="w-6 h-6 rounded-md object-cover border border-white/20 shrink-0" />
+              <div className="flex gap-1.5 min-w-0">
+                <img src={sender.avatarUrl} alt={msg.sender} className="h-6 w-6 shrink-0 rounded-md border border-slate-300 object-cover" />
                 <div className="inline leading-none">
                   <img
                     src={flagSrc}
                     alt={`${countrycode} flag`}
-                    className="w-4 h-3 mr-0.5 inline-block rounded-[2px] object-cover border border-white/20 wrap-anywhere"
+                    className="mr-1 inline-block h-3 w-4 rounded-[2px] border border-slate-300 object-cover wrap-anywhere"
                     title={countrycode}
                   />
-                  <span className={`text-sm  wrap-anywhere font-medium ${isMe ? "text-cyan-400 dark:text-cyan-200" : "text-foreground"}`}>
+                  <span className={`text-xs wrap-anywhere font-semibold ${isMe ? "text-cyan-700" : "text-slate-900"}`}>
                     {msg.sender}
                   </span>
-                  <span className={`text-sm mr-1`}>:</span>
-                  <span className="text-xs text-white/85  wrap-anywhere">{msg.message}</span>
+                  <span className="mr-1 text-xs text-slate-500">:</span>
+                  <span className="text-xs text-slate-700 wrap-anywhere">{msg.message}</span>
                 </div>
               </div>
             </div>
@@ -150,54 +171,7 @@ export function ChatPane() {
         })}
       </div>
 
-      <div className="mt-2.5 pt-2.5 border-t border-white/10 flex items-center gap-2">
-        <input
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") sendMessage();
-          }}
-          placeholder="Message squad..."
-          className="flex-1 h-8 rounded-md border border-white/15 bg-black/20 px-2.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-cyan-400/40"
-        />
-        <div className="relative" ref={quickChatRef}>
-          <button
-            type="button"
-            onClick={() => setQuickChatOpen((v) => !v)}
-            className="h-8 w-8 rounded-md border border-cyan-400/30 bg-black/25 text-sm hover:bg-cyan-500/20 hover:border-cyan-300/55 transition-colors"
-            aria-label="Open quick chat menu"
-            aria-expanded={quickChatOpen}
-          >
-            ⚡
-          </button>
-
-          {quickChatOpen && (
-            <div className="absolute bottom-9 right-0 z-30 w-36 rounded-md bg-popover border border-white/10 shadow-2xl shadow-black/50 py-1.5 overflow-hidden">
-              {QUICK_CHATS.map((msg) => (
-                <button
-                  key={msg}
-                  type="button"
-                  onClick={() => sendQuickChat(msg)}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-white/5 text-left"
-                >
-                  <span className="text-[11px] text-cyan-800 dark:text-cyan-200">⚡</span>
-                  {msg}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-        <button
-          type="button"
-          onClick={sendMessage}
-          className="h-8 w-8 rounded-md text-background bg-linear-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 transition-colors inline-flex items-center justify-center"
-          aria-label="Send message"
-        >
-          <PaperAirplaneIcon className="h-4 w-4" />
-        </button>
-      </div>
-      </>
-      )}
+      
     </section>
   );
 }

@@ -1,6 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import type React from "react";
 import { Link, Outlet, useLocation } from "react-router";
 import { XMarkIcon } from "@heroicons/react/24/solid";
+import { ChatBubbleLeftRightIcon, Cog6ToothIcon, QueueListIcon, UsersIcon } from "@heroicons/react/24/solid";
 import { QueueList } from "./QueueList";
 import { FriendsList } from "./FriendsList";
 import { ChatPane } from "./ChatPane";
@@ -8,6 +10,9 @@ import { CompressedGamerCard } from "./CompressedGamerCard";
 import { MatchmakingQueueIndicator } from "./MatchmakingQueueIndicator";
 import { PowerBar } from "./PowerBar";
 import { SettingsPane } from "./SettingsPane";
+import { ScoreboardPane } from "./ScoreboardPane";
+// Placeholder import for Scoreboard
+// Replace with actual import if exists
 // import { btToast } from "../actions/buckets";
 import { hideToast } from "../actions/toast";
 import { SignInPane } from "./SignInPane";
@@ -83,7 +88,7 @@ export function Layout() {
     return (
         <>
             <SignInPane onSignIn={() => false} />
-            <div className="absolute inset-0 w-full h-full  overflow-hidden -z-2">
+            {/* <div className="absolute inset-0 w-full h-full  overflow-hidden -z-2">
                 <svg className="background-svg top" width="calc(100% + 160px)" height="100%">
                     <pattern id="pattern-aztec-top" x="0" y="0" width="160" height="78" patternUnits="userSpaceOnUse">
                         <path stroke="white" opacity="1"
@@ -98,7 +103,7 @@ export function Layout() {
                     </pattern>
                     <rect x="0" y="0" width="100%" height="100%" fill="url(#pattern-aztec-bottom)"></rect>
                 </svg>
-            </div>
+            </div> */}
             <div className="w-full h-screen overflow-hidden flex flex-col play-layout-root">
                 {toast?.open ? (
                     <div className="fixed top-4 right-4 z-90 w-[min(92vw,22rem)] rounded-md border border-white/15 bg-background/95 backdrop-blur-xl p-3 shadow-[0_10px_35px_rgba(0,0,0,0.35)]">
@@ -133,13 +138,31 @@ export function Layout() {
                     </div>
                 ) : null}
 
-                <div className="relative flex flex-row w-full h-screen panel-scrollbar overflow-y-auto overflow-x-hidden">
+                <div 
+                    className="relative flex flex-row w-full h-screen  panel-scrollbar  overflow-y-auto overflow-x-hidden transition-[padding-right] transition-duration-200"
+                    style={{ 
+                        paddingRight: isLargeScreen && isPowerPanelOpen ? "20rem" : undefined, 
+                        // width: isPowerPanelOpen ? "calc(100% - 20rem)" : undefined 
+                    }}
+                    >
 
-                    <div className="play-layout-main-shell flex-1 min-w-0 flex flex-col h-full pt-12.5">
+                    <div className="play-layout-main-shell flex-1 min-w-0 flex flex-col h-full pt-4">
                         {/* Header */}
-                        <header className="play-layout-header fixed top-0 left-0 right-0 z-50 w-full h-12.5 min-h-12.5 max-h-12.5 box-border bg-black border-b border-cyan-500/20 backdrop-blur-xl">
-                            <div className="absolute w-full inset-0 bg-linear-to-r from-cyan-500/5 via-purple-500/5 to-pink-500/5" />
-                            <div className="w-full h-full mx-auto px-2 lg:px-4 relative">
+                        <header 
+                            className="play-layout-header fixed top-0 left-0 transition-[padding-right] transition-duration-200 z-50 w-full h-12.5 min-h-12.5 max-h-12.5 box-border  bg-slate-950"
+                            style={{  
+                                paddingRight: isLargeScreen && isPowerPanelOpen ? "20rem" : undefined, 
+                                left: isLargeScreen && isPowerPanelOpen ? '-4px' : undefined,
+                                // width: isPowerPanelOpen ? "calc(100% - 20rem)" : undefined
+                            }}
+                            >
+                            <div className="absolute w-full inset-0  bg-linear-to-r transition-[padding-right] transition-duration-200 "
+                            style={{  
+                                paddingRight: isLargeScreen && isPowerPanelOpen ? "20rem" : undefined, 
+                                // width: isPowerPanelOpen ? "calc(100% - 20rem)" : undefined
+                            }}
+                             />
+                            <div className="w-full h-full container mx-auto px-2 sm:px-2 lg:px-24 relative">
                                 <div className="w-full h-full flex items-center justify-between gap-3">
                                     <div className="flex items-center gap-3 min-w-0">
                                         <Link to="/" className="flex items-center gap-2.5">
@@ -171,8 +194,8 @@ export function Layout() {
 
                         {/* Main content + footer — shift right when panel is docked */}
                         <div
-                            className="flex-1 flex flex-col min-h-0 min-w-0 transition-[padding-right] duration-200"
-                            style={{ paddingRight: isDockedOpenWide ? "23rem" : undefined }}
+                            className="flex-1 flex flex-col min-h-0 mt-12 min-w-0 transition-[padding-right] duration-200"
+                            // style={{ paddingRight: isDockedOpenWide ? "20rem" : undefined }}
                         >
 
                         {/* Main content */}
@@ -188,7 +211,7 @@ export function Layout() {
                         </div>
 
                         {/* Footer */}
-                        <footer className="border-t border-cyan-500/20 bg-linear-to-r from-background via-card to-background backdrop-blur-xl">
+                        <footer className="border-t border-cyan-500/20 bg-slate-950">
                             <div className="container mx-auto px-2  lg:px-20 py-3.5">
                                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs">
                                     <p className="text-muted-foreground">© {new Date().getFullYear()} ACOS Platform. All rights reserved.</p>
@@ -207,33 +230,22 @@ export function Layout() {
                 {isPowerPanelOpen && !isDockedOpenWide ? (
                     <button
                         type="button"
-                        className="fixed inset-0 z-40 bg-black/35"
+                        className="fixed inset-0 z-50 bg-black/80"
                         onClick={() => btActivePowerTab.set(null)}
                         aria-label="Close power panel"
                     />
                 ) : null}
 
                 <aside
-                    className={`power-panel ${isPowerPanelOpen ? "power-panel-open" : ""} ${isDockedOpenWide ? "docked " : ""}`}
-                    aria-hidden={!isPowerPanelOpen}
+                    className={`power-panel fixed py-1 transition-[right] duration-200 ${isPowerPanelOpen ? "power-panel-open right-1" : "-right-100"} ${isDockedOpenWide ? "docked bg-slate-950 bg-pink-500/5" : ""}`}
+                    // aria-hidden={!isPowerPanelOpen}
                 >
                     {isDockedOpenWide ? (
                         <div className="power-panel-sidebar-bar">
                             <PowerBar className="flex h-12.5 items-center justify-center gap-1.5 px-2" />
                         </div>
                     ) : null}
-                    <div className="power-panel-content panel-scrollbar flex flex-col">
-                        {activePowerTab === "profile" ? (<>
-                            <ShowLoginOrGamerCard />
-                            <QueueList />
-                            <ChatPane />
-                        </>) : null}
-
-                        {/* {activePowerTab === "queue" ? <QueueList /> : null} */}
-                        {/* {activePowerTab === "chat" ? <ChatPane /> : null} */}
-                        {activePowerTab === "friends" ? <FriendsList /> : null}
-                        {activePowerTab === "settings" ? <SettingsPane isPlayRoute={isPlayRoute} /> : null}
-                    </div>
+                    <PanelContent isPlayRoute={isPlayRoute} />
                 </aside>
 
                 <MatchmakingQueueIndicator />
@@ -243,19 +255,89 @@ export function Layout() {
     );
 }
 
-function ShowLoginOrGamerCard() {
-    // const [isLoggedIn, setIsLoggedIn] = useState(false);
-    let loggedIn = useBucket(btLoggedIn);
-    // let [loggedIn, player, latency, wsConnected, duplicatetabs] = useBuckets([btLoggedIn, btUser, btLatency, btWebsocketConnected, btDuplicateTabs]);
 
-    // console.log("Render Count:", ++renderCount, { loggedIn, player, latency, wsConnected, duplicatetabs });
-    if( (!loggedIn || loggedIn == "LURKER" || loggedIn == "CHECKING") ) {
-      return <SignInPane onSignIn={() => false} />
+type PanelSubTab = "chat" | "queue" | "friends" | "settings" | "scoreboard";
+
+const BASE_PANEL_TABS: Array<{ key: PanelSubTab; label: string; Icon: React.ElementType }> = [
+    { key: "chat",     label: "Chat",     Icon: ChatBubbleLeftRightIcon },
+    { key: "queue",    label: "Queue",    Icon: QueueListIcon },
+    { key: "friends",  label: "Friends",  Icon: UsersIcon },
+    { key: "settings", label: "Settings", Icon: Cog6ToothIcon },
+];
+
+function PanelContent({ isPlayRoute }: { isPlayRoute: boolean }) {
+    const loggedIn = useBucket(btLoggedIn);
+    const [activeSubTab, setActiveSubTab] = useState<PanelSubTab>("chat");
+
+    const isLoggedIn = !!loggedIn && loggedIn !== "LURKER" && loggedIn !== "CHECKING";
+
+    // Detect if player is in game (use your own logic or state)
+    // For now, use isPlayRoute as the indicator
+    const inGame = isPlayRoute;
+
+    // If inGame changes from false to true, auto-focus scoreboard
+    useEffect(() => {
+        if (inGame) setActiveSubTab("scoreboard");
+    }, [inGame]);
+
+   
+    // Dynamically add scoreboard tab if in game
+    const PANEL_TABS: Array<{ key: PanelSubTab; label: string; Icon: React.ElementType }> = inGame
+        ? [
+            { key: "scoreboard", label: "Scoreboard", Icon: QueueListIcon },
+            ...BASE_PANEL_TABS.filter(tab => tab.key !== "scoreboard")
+        ]
+        : BASE_PANEL_TABS;
+
+    if (!isLoggedIn) {
+        return (
+            <div className="power-panel-content panel-scrollbar flex flex-col p-2 sm:p-3">
+                <SignInPane onSignIn={() => false} />
+            </div>
+        );
     }
 
-    // if( player ) {
-      return <CompressedGamerCard  />;
-    // }
-    
-    // return <></>
+    return (
+        <div className="flex flex-1 min-h-0 flex-col gap-2  relative pl-2 pr-1 py-0 sm:gap-3 ">
+            {/* Player card — shrink-0 ensures it never loses height */}
+            <div className="shrink-0">
+                <CompressedGamerCard />
+            </div>
+
+            {/* Compact sub-tab nav */}
+            <div className="shrink-0 rounded-xl border border-slate-200/90 bg-slate-100 p-1 shadow-md">
+                <div className="flex items-center gap-1">
+                {PANEL_TABS.map(({ key, label, Icon }: { key: PanelSubTab; label: string; Icon: React.ElementType }) => {
+                    const isActive = activeSubTab === key;
+                    return (
+                        <button
+                            key={key}
+                            type="button"
+                            onClick={() => setActiveSubTab(key)}
+                            className={`flex h-8 flex-1 items-center justify-center rounded-lg transition-colors ${
+                                isActive
+                                    ? "bg-slate-900 text-white shadow-sm"
+                                    : "text-slate-500 hover:bg-slate-100 hover:text-slate-800"
+                            }`}
+                            aria-pressed={isActive}
+                            aria-label={label}
+                            title={label}
+                        >
+                            <Icon className="h-6 w-6 shrink-0" />
+                        </button>
+                    );
+                })}
+                </div>
+            </div>
+
+            {/* Sub-tab content — overflow-hidden: each tab owns its own internal scroll */}
+            <div className="flex-1 min-h-0 overflow-hidden rounded-xl p-1 pr-0 bg-slate-100 shadow-md">
+                {activeSubTab === "scoreboard" ? <ScoreboardPane matchType="team-based" /> : null}
+                {activeSubTab === "chat"     ? <ChatPane /> : null}
+                {activeSubTab === "queue"    ? <QueueList /> : null}
+                {activeSubTab === "friends"  ? <FriendsList /> : null}
+                {activeSubTab === "settings" ? <SettingsPane isPlayRoute={isPlayRoute} /> : null}
+            </div>
+        </div>
+    );
 }

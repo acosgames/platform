@@ -15,17 +15,17 @@ export function LiveMatchPaneTabs({
   onChange: (tab: LivePaneTab) => void;
 }) {
   return (
-    <section className="flex flex-col rounded-md  bg-card  h-full">
+    <section className="flex h-full min-w-0 w-full flex-col overflow-hidden ">
       {/* <div className="flex items-center justify-between gap-3"> */}
         {/* <h3 className="text-sm font-semibold text-foreground">{title}</h3> */}
-        <div className="inline-flex rounded-full border border-white/12 bg-black/20 p-1">
+        <div className="inline-flex w-fit rounded-full bg-white p-1 mb-2">
           <button
             type="button"
             onClick={() => onChange("scoreboard")}
             className={`h-7 px-3 rounded-full text-[11px] font-semibold transition-colors ${
               activeTab === "scoreboard"
-                ? "bg-cyan-500/20 text-cyan-100 border border-cyan-400/35"
-                : "text-foreground/70 hover:text-cyan-100"
+                ? "bg-black text-white shadow-sm"
+                : "text-slate-600 hover:text-slate-900"
             }`}
           >
             Scoreboard
@@ -35,8 +35,8 @@ export function LiveMatchPaneTabs({
             onClick={() => onChange("match-logs")}
             className={`h-7 px-3 rounded-full text-[11px] font-semibold transition-colors ${
               activeTab === "match-logs"
-                ? "bg-cyan-500/20 text-cyan-100 border border-cyan-400/35"
-                : "text-foreground/70 hover:text-cyan-100"
+                ? "bg-black text-white shadow-sm"
+                : "text-slate-600 hover:text-slate-900"
             }`}
           >
             Match Logs

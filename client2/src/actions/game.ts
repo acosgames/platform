@@ -86,6 +86,7 @@ export async function findGame(game_slug:string) {
 
 export async function findGamePerson(game_slug: string) {
     try {
+        LOADING('game/' + game_slug);
         let response = await GET("/api/v1/game/person/" + game_slug);
         let result = response.data;
         if (result.ecode) {
@@ -107,10 +108,12 @@ export async function findGamePerson(game_slug: string) {
 
         btGame.set(result.game);
         btGames.assign({ [game_slug]: result.game });
-
+        LOADED('game/' + game_slug);
         // btGameFound.set(true);
     } catch (e) {
         console.error(e);
+    } finally {
+        LOADED('game/' + game_slug);
     }
 }
 

@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { currentPlayer, leaderboard } from "../data/mockData";
 import config from "../config";
+import { RoundedHexPortrait } from "./ui/RoundedHexPortrait";
+import { Panel } from "./ui/Panel";
 
 export type MatchType = "free-for-all" | "1v1" | "team-based";
 
@@ -24,7 +26,8 @@ type DecoratedScoreboardRow = ScoreboardRow & {
   };
 };
 
-export function ScoreboardPane({ matchType }: { matchType: MatchType }) {
+
+export function ScoreboardPane({ matchType, gamestate }: { matchType: MatchType, gamestate?: any }) {
   const [isExpanded] = useState(true);
   const letterRank = (idx: number) => String.fromCharCode(65 + (idx % 26));
   const buildStats = (score: number, idx: number, wins?: number) => {
@@ -35,24 +38,39 @@ export function ScoreboardPane({ matchType }: { matchType: MatchType }) {
     return { kills, assists, objectives, pingMs };
   };
 
-  const baseRows = [
-    {
-      name: currentPlayer.name,
-      score: 1240,
-      status: "You" as const,
-      country: currentPlayer.country,
-      avatarUrl: currentPlayer.avatarUrl,
-      wins: 112,
-    },
-    ...leaderboard.slice(0, 5).map((entry, idx) => ({
-      name: entry.player,
-      score: entry.score,
-      status: entry.player === currentPlayer.name ? ("You" as const) : ("Live" as const),
-      country: entry.country,
-      avatarUrl: `https://i.pravatar.cc/80?img=${idx + 11}`,
-      wins: entry.wins,
-    })),
-  ].filter((row, idx, arr) => arr.findIndex((candidate) => candidate.name === row.name) === idx);
+  // If gamestate is provided, use live data
+  let baseRows: ScoreboardRow[] = [];
+  if (gamestate && gamestate.players) {
+    baseRows = Object.values(gamestate.players).map((player: any, idx: number) => ({
+      name: player.displayname || player.name || `Player${idx+1}`,
+      score: player.score || 0,
+      status: player.isLocal ? "You" : "Live",
+      country: player.country || "US",
+      avatarUrl: player.avatarUrl || player.portrait || `https://i.pravatar.cc/80?img=${idx + 11}`,
+      wins: player.wins || 0,
+      team: player.team || undefined,
+    }));
+  } else {
+    // fallback to mock data
+    baseRows = [
+      {
+        name: currentPlayer.name,
+        score: 1240,
+        status: "You" as const,
+        country: currentPlayer.country,
+        avatarUrl: currentPlayer.avatarUrl,
+        wins: 112,
+      },
+      ...leaderboard.slice(0, 5).map((entry, idx) => ({
+        name: entry.player,
+        score: entry.score,
+        status: entry.player === currentPlayer.name ? ("You" as const) : ("Live" as const),
+        country: entry.country || "US",
+        avatarUrl: `https://i.pravatar.cc/80?img=${idx + 11}`,
+        wins: entry.wins,
+      })),
+    ].filter((row, idx, arr) => arr.findIndex((candidate) => candidate.name === row.name) === idx);
+  }
 
   const buildDecoratedRows = (rows: ScoreboardRow[]) =>
     rows.map((row, idx) => ({
@@ -62,70 +80,74 @@ export function ScoreboardPane({ matchType }: { matchType: MatchType }) {
     }));
 
   const oneVOneRows = buildDecoratedRows(baseRows.slice(0, 2));
-
   const freeForAllRows = buildDecoratedRows(
     [...baseRows]
       .sort((a, b) => b.score - a.score)
       .slice(0, 6)
   );
-
   const teamAlphaRows = buildDecoratedRows([
-    { ...baseRows[0], team: "Team Alpha" as const },
-    ...baseRows.slice(1, 3).map((row) => ({ ...row, team: "Team Alpha" as const })),
+    ...baseRows.filter((row) => row.team === "Team Alpha"),
   ]);
-
-  const teamOmegaRows = buildDecoratedRows(
-    baseRows.slice(3, 6).map((row) => ({ ...row, team: "Team Omega" as const }))
-  );
+  const teamOmegaRows = buildDecoratedRows([
+    ...baseRows.filter((row) => row.team === "Team Omega"),
+  ]);
 
   const renderTableRow = (row: DecoratedScoreboardRow, idx: number) => {
     const countrycode = (row.country || "US").toUpperCase();
     const flagSrc = `${config.https.cdn}images/country/${countrycode}.svg`;
+    const rowClassName = row.status === "You"
+      ? "bg-blue-50"
+      : idx % 2 === 0
+        ? "bg-white"
+        : "bg-slate-50";
 
     return (
       <tr
         key={`${row.name}-${idx}`}
-        className={`${row.status === "You" ? "bg-cyan-500/10" : "bg-black/15"} border-t border-white/10 first:border-t-0`}
+        className={`${rowClassName} border-t border-slate-200 first:border-t-0`}
       >
-        <td className="align-top px-1.5 py-1.5 text-right">
-          <img
+        <td className="align-top py-1 pl-1">
+          <RoundedHexPortrait
             src={row.avatarUrl}
             alt={row.name}
-            className="h-10 w-10 min-h-10 min-w-10 inline rounded-xl object-cover border border-white/60"
+            className="h-11 w-11 rounded-lg overflow-hidden"
+            imageInset={5}
           />
         </td>
 
-        <td className="align-top px-1 py-1.5 min-w-0">
-          <p className="w-full text-xs font-semibold text-foreground truncate">{row.name}</p>
-          <div className="mt-1 min-w-0 flex items-center gap-1.5">
-            <img
-              src={flagSrc}
-              alt={`${countrycode} flag`}
-              className="w-5 h-3 rounded-[2px] object-cover border border-white/20 shrink-0"
-              title={countrycode}
-            />
-            <p className="text-[11px] text-white/75 shrink-0">{countrycode}</p>
-
-            <div className="flex-1 min-w-0 flex items-center gap-1.5">
-              <span className="text-[10px] font-bold px-1.5 py-px rounded border border-cyan-400/45 bg-cyan-500/15 text-cyan-400 dark:text-cyan-200 shrink-0">
+        <td className="align-top px-1  py-1 min-w-0">
+          <p className="w-full truncate text-xs font-semibold text-slate-800">{row.name}</p>
+          
+          <div className="mt-1 min-w-0 flex items-center gap-1">
+            <div className=" min-w-0 flex items-center gap-0">
+              <span className="shrink-0 rounded  bg-slate-200 px-1.5 py-px text-[10px] font-bold text-slate-900">
                 {row.gameRank}
               </span>
-              {row.status === "You" ? (
-                <span className="text-[10px] font-semibold px-1.5 py-px rounded border border-emerald-400/45 bg-emerald-500/15 text-emerald-400 dark:text-emerald-200 shrink-0">
+              {/* {row.status === "You" ? (
+                <span className="shrink-0 rounded border border-emerald-200 bg-emerald-50 px-1.5 py-px text-[10px] font-semibold text-emerald-700">
                   YOU
                 </span>
-              ) : null}
+              ) : null} */}
               {/* Reserved space for additional user badges */}
               <div className="flex-1 min-w-0" />
             </div>
+            <img
+              src={flagSrc}
+              alt={`${countrycode} flag`}
+              className="h-4 w-[22px] shrink-0 rounded object-cover"
+              title={countrycode}
+            />
+            {/* <p className="shrink-0 text-xs text-slate-600">{countrycode}</p> */}
+
+            
           </div>
         </td>
 
-        <td className="align-top px-1 py-1.5 text-right text-[11px] leading-4 text-white/90">{row.stats.kills}</td>
-        <td className="align-top px-1 py-1.5 text-right text-[11px] leading-4 text-white/90">{row.stats.assists}</td>
-        <td className="align-top px-1 py-1.5 text-right text-[11px] leading-4 text-white/90">{row.stats.objectives}</td>
-        <td className="align-top px-1 py-1.5 text-right text-[11px] leading-4 text-white/90">{row.stats.pingMs}</td>
-        <td className="align-top px-1 py-1.5 text-right text-[11px] leading-4 font-semibold text-cyan-400 dark:text-cyan-200">
+        <td className="align-top px-1 py-1 text-right text-[11px] leading-4 text-slate-700">{row.stats.kills}</td>
+        <td className="align-top px-1 py-1 text-right text-[11px] leading-4 text-slate-700">{row.stats.assists}</td>
+        <td className="align-top px-1 py-1 text-right text-[11px] leading-4 text-slate-700">{row.stats.objectives}</td>
+        <td className="align-top px-1 py-1 text-right text-[11px] leading-4 text-slate-700">{row.stats.pingMs}</td>
+        <td className="align-top px-1 py-1 text-right text-[11px] leading-4 font-semibold text-blue-700">
           {row.score.toLocaleString()}
         </td>
       </tr>
@@ -135,11 +157,11 @@ export function ScoreboardPane({ matchType }: { matchType: MatchType }) {
   const hasTeams = teamAlphaRows.length > 0 && teamOmegaRows.length > 0;
 
   const renderList = (rows: DecoratedScoreboardRow[], keyOffset = 0) => (
-    <div className="overflow-hidden ">
+    <div className="w-full min-w-0 overflow-x-auto rounded-lg  bg-white ">
       <table className="w-full table-fixed border-collapse">
         <colgroup>
           <col className="w-10" />
-          <col className="w-28"/>
+          <col className="w-26"/>
           <col className="w-7" />
           <col className="w-7" />
           <col className="w-7" />
@@ -147,14 +169,14 @@ export function ScoreboardPane({ matchType }: { matchType: MatchType }) {
           <col className="w-10" />
         </colgroup>
         <thead>
-          <tr className="">
+          <tr className="bg-slate-50">
             <th aria-hidden="true" className="px-1.5 py-1 text-left" />
-            <th className="px-1 py-1 text-left text-[10px] uppercase tracking-wide text-white/50 font-semibold">Player</th>
-            <th className="px-1 py-1 text-right text-[10px] uppercase tracking-wide text-white/50 font-semibold">K</th>
-            <th className="px-1 py-1 text-right text-[10px] uppercase tracking-wide text-white/50 font-semibold">A</th>
-            <th className="px-1 py-1 text-right text-[10px] uppercase tracking-wide text-white/50 font-semibold">Obj</th>
-            <th className="px-1 py-1 text-right text-[10px] uppercase tracking-wide text-white/50 font-semibold">MS</th>
-            <th className="px-1 py-1 text-right text-[10px] uppercase tracking-wide text-white/50 font-semibold">SCORE</th>
+            <th className="px-1 py-1 text-left text-[10px] font-semibold uppercase tracking-wide text-slate-500">Player</th>
+            <th className="px-1 py-1 text-right text-[10px] font-semibold uppercase tracking-wide text-slate-500">K</th>
+            <th className="px-1 py-1 text-right text-[10px] font-semibold uppercase tracking-wide text-slate-500">A</th>
+            <th className="px-1 py-1 text-right text-[10px] font-semibold uppercase tracking-wide text-slate-500">Obj</th>
+            <th className="px-1 py-1 text-right text-[10px] font-semibold uppercase tracking-wide text-slate-500">MS</th>
+            <th className="px-1 py-1 text-right text-[10px] font-semibold uppercase tracking-wide text-slate-500">Score</th>
           </tr>
         </thead>
         <tbody>
@@ -165,7 +187,7 @@ export function ScoreboardPane({ matchType }: { matchType: MatchType }) {
   );
 
   return (
-    <section className="flex-1 min-h-0 flex flex-col  space-y-2.5 overflow-hidden ">
+    <section className="flex min-h-0 min-w-0 w-full flex-1 flex-col space-y-2.5 overflow-hidden text-slate-800 drop-shadow-md">
       {/* <div className="cursor-n-resize flex items-center justify-between" onClick={() => setIsExpanded((prev) => !prev)}>
         <h3 className="text-sm font-semibold text-foreground">Scoreboard</h3>
         <div className="flex items-center gap-2">
@@ -194,15 +216,33 @@ export function ScoreboardPane({ matchType }: { matchType: MatchType }) {
 
           {matchType === "team-based" && hasTeams ? (
             <div className="space-y-2">
-              <div className="space-y-0">
-                <p className="text-[10px] uppercase tracking-wide text-cyan-200 font-semibold px-2">Team Alpha</p>
+              <Panel
+                header={(
+                  <div className="flex items-center justify-between gap-2">
+                    {/* <p className="text-[10px] font-semibold uppercase tracking-wide text-blue-200">Team</p> */}
+                    <p className="text-xs font-black text-white">Team Alpha</p>
+                    <span className="rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-semibold text-white">
+                      {teamAlphaRows.length}
+                    </span>
+                  </div>
+                )}
+              >
                 {renderList(teamAlphaRows)}
-              </div>
+              </Panel>
 
-              <div className="space-y-0 pt-1 border-t border-white/10">
-                <p className="text-[10px] uppercase tracking-wide text-rose-200 font-semibold px-2">Team Omega</p>
+              <Panel
+                header={(
+                  <div className="flex items-center justify-between gap-2">
+                    {/* <p className="text-[10px] font-semibold uppercase tracking-wide text-rose-200">Team</p> */}
+                    <p className="text-xs font-black text-white">Team Omega</p>
+                    <span className="rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-semibold text-white">
+                      {teamOmegaRows.length}
+                    </span>
+                  </div>
+                )}
+              >
                 {renderList(teamOmegaRows, 100)}
-              </div>
+              </Panel>
             </div>
           ) : null}
         </div>

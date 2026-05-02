@@ -5,6 +5,9 @@ import { GameDetail } from "./pages/GameDetail";
 import { PlayScreen } from "./pages/PlayScreen";
 import { BlogIndex } from "./pages/BlogIndex";
 import { BlogPost } from "./pages/BlogPost";
+import { DevManager } from "./pages/Developer/DevManager";
+import { DevLogin } from "./pages/Developer/DevLogin";
+import { DevGamePage } from "./pages/Developer/DevGamePage/index";
 
 export const router = createBrowserRouter([
   {
@@ -30,6 +33,18 @@ export const router = createBrowserRouter([
       {
         path: "blog/:id",
         Component: BlogPost,
+      },
+      {
+        path: "dev",
+        Component: DevManager,
+      },
+      {
+        path: "dev/login",
+        Component: DevLogin,
+      },
+      {
+        path: "dev/game/:game_slug/*",
+        Component: DevGamePage,
       },
     ],
   },

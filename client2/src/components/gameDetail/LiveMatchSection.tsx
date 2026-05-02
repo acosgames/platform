@@ -19,6 +19,7 @@ export function LiveMatchSection({
   liveMatchType,
   mode = "live",
   description,
+  mediaHeightClassName,
 //   actionBar,
   // paneTitle,
 }: {
@@ -28,6 +29,7 @@ export function LiveMatchSection({
   liveMatchType: MatchType;
   mode?: LiveMatchSectionMode;
   description?: string;
+  mediaHeightClassName?: string;
   actionBar?: ReactNode;
   // paneTitle?: string;
 }) {
@@ -49,10 +51,10 @@ export function LiveMatchSection({
   }, [isReplay, liveMatch]);
 
   return (
-    <section className="grid grid-cols-1 xl:grid-cols-[5fr_3fr] gap-2 w-7/9 mx-auto">
-      <section className="relative overflow-hidden rounded-md shadow-black/40 shadow-md ">
+    <section className="grid grid-cols-1 gap-2 sm:grid-cols-[5fr_4fr] w-full mx-auto">
+      <section className={`relative overflow-hidden rounded-md  ${mediaHeightClassName ?? ""}`}>
         <div
-          className="relative  overflow-hidden "
+          className="relative  overflow-hidden  max-w-[30vw] "
           onMouseEnter={() => setShowLiveFeedHud(true)}
           onMouseLeave={() => {
             if (!isReplay) {
@@ -60,7 +62,11 @@ export function LiveMatchSection({
             }
           }}
         >
-          <img src={gameImageUrl} alt={`${gameName} live feed`} className="relative  w-full h-full object-cover" />
+          <img
+            src={gameImageUrl}
+            alt={`${gameName} live feed`}
+            className={`relative w-full h-full ${isReplay ? "object-contain bg-slate-900" : "object-cover"}`}
+          />
           <div className="absolute inset-0 bg-linear-to-b from-black/30 via-black/60 to-black/88" />
           <div className={`absolute inset-0 bg-linear-to-r ${isReplay ? "from-amber-500/12 via-transparent to-cyan-500/12" : "from-rose-500/12 via-transparent to-cyan-500/12"}`} />
 

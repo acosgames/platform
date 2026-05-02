@@ -1,5 +1,3 @@
-import { ArrowsRightLeftIcon } from "@heroicons/react/24/solid";
-import { Settings2, UserRound, Users } from "lucide-react";
 import { useBucket } from "@/actions/bucket";
 import { btActivePowerTab, btIsDockedWide, btIsLargeScreen, btUser, type PowerTabKey } from "@/actions/buckets";
 import config from "../config";
@@ -10,60 +8,48 @@ type PowerBarProps = {
     className?: string;
 };
 
-const powerItems = [
-    { key: "profile", label: "Profile", Icon: UserRound },
-    // { key: "queue", label: "Game Queue", Icon: Waypoints },
-    { key: "friends", label: "Friends", Icon: Users },
-    // { key: "chat", label: "Chat", Icon: MessageSquare },
-    { key: "settings", label: "Settings", Icon: Settings2 },
-] as const;
-
 export function PowerBar({ className }: PowerBarProps) {
     const activePowerTab = useBucket(btActivePowerTab);
-    const isDockedWide = useBucket(btIsDockedWide);
     const isLargeScreen = useBucket(btIsLargeScreen);
     const user = useBucket(btUser);
 
     const avatarUrl = `${config.https.cdn}images/portraits/assorted-${user?.portraitid || 1}-medium.webp`;
+    const isPanelOpen = activePowerTab !== null;
+
+    const handleAvatarClick = () => {
+        if (isPanelOpen) {
+            btActivePowerTab.set(null);
+            btIsDockedWide.set(false);
+        } else {
+            btActivePowerTab.set("profile");
+            if (isLargeScreen) {
+                btIsDockedWide.set(true);
+            }
+        }
+    };
 
     return (
-        <div className={className ?? "flex h-full items-center gap-1.5 shrink-0"}>
-            {isLargeScreen ? (
-                <button
-                    type="button"
-                    onClick={() => btIsDockedWide.set((prev) => !prev)}
-                    className={`power-bar-btn ${isDockedWide ? "power-bar-btn-active" : ""}`}
-                    aria-label={isDockedWide ? "Undock sidebar" : "Dock sidebar"}
-                    title={isDockedWide ? "Undock sidebar" : "Dock sidebar"}
-                    aria-pressed={isDockedWide}
-                >
-                    <ArrowsRightLeftIcon className="h-4 w-4" />
-                </button>
+        <div className={className ?? "flex h-full items-center gap-3 shrink-0"}>
+            {user?.level != null ? (
+                <span className="text-[11px] font-bold text-white/70 tabular-nums tracking-wide select-none">
+                    LVL <span className="text-white">{user.level}</span>
+                </span>
             ) : null}
-            {powerItems.map(({ key, label, Icon }) => {
-                const isActive = activePowerTab === key;
-                return (
-                    <button
-                        key={`powerbar-${key}`}
-                        type="button"
-                        onClick={() => btActivePowerTab.set((prev) => (prev === key ? null : (key as PowerTabKey)))}
-                        className={`power-bar-btn ${isActive ? "power-bar-btn-active" : ""}`}
-                        aria-label={label}
-                        title={label}
-                        aria-pressed={isActive}
-                    >
-                        {key === "profile" ? (
-                            <img
-                                src={avatarUrl}
-                                alt={user?.displayname ?? "Profile"}
-                                className={`h-10 w-10 rounded-full object-cover border ${isActive ? "border-cyan-300" : "border-white/30"}`}
-                            />
-                        ) : (
-                            <Icon className="h-4 w-4" />
-                        )}
-                    </button>
-                );
-            })}
+            <button
+                type="button"
+                onClick={handleAvatarClick}
+                className="shrink-0 rounded-full p-0 border-0 bg-transparent focus:outline-none"
+                aria-label={isPanelOpen ? "Close panel" : "Open panel"}
+                aria-pressed={isPanelOpen}
+            >
+                <img
+                    src={avatarUrl}
+                    alt={user?.displayname ?? "Profile"}
+                    className={`h-9 w-9 rounded-full object-cover border-2 transition-all duration-200 ${
+                        isPanelOpen ? "border-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.5)]" : "border-white/30 hover:border-white/60"
+                    }`}
+                />
+            </button>
         </div>
     );
 }

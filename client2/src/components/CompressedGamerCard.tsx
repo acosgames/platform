@@ -1,148 +1,135 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
+import { useNavigate } from "react-router";
 import config from "../config";
-import { logout } from "@/actions/person";
 import { btDuplicateTabs, btLatency, btLoggedIn, btUser, btWebsocketConnected } from "@/actions/buckets";
 import { useBuckets } from "@/actions/bucket";
-
-
-const MENU_OPTIONS = [
-    { label: "Edit Profile", icon: "✏️" },
-    { label: "View Stats", icon: "📊" },
-    { label: "Achievements", icon: "🏆" },
-    { label: "Settings", icon: "⚙️" },
-    { label: "Sign Out", icon: "🚪", danger: true, onClick: () => logout() },
-];
+import { logout } from "@/actions/person";
 
 export function CompressedGamerCard() {
-
-
     let [loggedIn, player, latency, wsConnected, duplicatetabs] = useBuckets([btLoggedIn, btUser, btLatency, btWebsocketConnected, btDuplicateTabs]);
-    
     const [menuOpen, setMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
+    const navigate = useNavigate();
 
-    useEffect(() => {
-        function onOutsideClick(e: MouseEvent) {
-            if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-                setMenuOpen(false);
-            }
+    if (!loggedIn || !player) return <></>;
+
+    const handleMenuBlur = (e: React.FocusEvent<HTMLDivElement>) => {
+        if (!menuRef.current?.contains(e.relatedTarget as Node)) {
+            setMenuOpen(false);
         }
-        if (menuOpen) document.addEventListener("mousedown", onOutsideClick);
-        return () => document.removeEventListener("mousedown", onOutsideClick);
-    }, [menuOpen]);
+    };
 
-    
-    if(!loggedIn || !player) return <></>
-    
-    
     let isOnline = wsConnected && !duplicatetabs;
-
-    let level = 1.3;//player.level || 1;
-    let xpPercent = Math.max(0, Math.min(100, (level - Math.trunc(level)) * 100));
+    const rawLevel = Number(player.level ?? 1);
+    const level = Number.isFinite(rawLevel) ? Math.max(1, rawLevel) : 1;
+    const levelInt = Math.trunc(level);
+    const xpPercent = 80;//Math.max(0, Math.min(100, Math.round((level - levelInt) * 100)));
 
     const countrycode = (player.countrycode || "US").toUpperCase();
     const flagSrc = `${config.https.cdn}images/country/${countrycode}.svg`;
     const avatarUrl = `${config.https.cdn}images/portraits/assorted-${player.portraitid || 1}-medium.webp`;
     const latencyValue = Number(latency || 0);
-    // const tierLabel = player.rank || player.tier || player.division || "Contender";
-    // const statusLabel = duplicatetabs ? "Duplicate" : isOnline ? "Live" : "Offline";
-    // const latencyLabel = !wsConnected ? "Link Down" : duplicatetabs ? "Conflict" : `${latencyValue}ms`;
-    // const latencyTone = !wsConnected || duplicatetabs
-    //     ? "border-red-500/35 bg-red-500/12 text-red-200"
-    //     : latencyValue > 400
-    //         ? "border-orange-400/35 bg-orange-500/12 text-orange-200"
-    //         : latencyValue > 200
-    //             ? "border-yellow-400/35 bg-yellow-500/12 text-yellow-100"
-    //             : "border-green-400/35 bg-green-500/12 text-green-100";
-
-    
+    const statusLabel = duplicatetabs ? "Duplicate" : isOnline ? "Online" : "Offline";
 
     return (
-        <div className="relative z-10 overflow-visible    bg-card px-3 py-3  ">
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-[60%]  bg-[linear-gradient(130deg,rgba(20,98,255,0.82),rgba(0,0,0,0.0)_50%,rgba(240,36,72,0.9))]" />
-            <div className="pointer-events-none absolute inset-x-0 top-[60%] h-8 bg-[linear-gradient(180deg,rgba(0,0,0,0.22),transparent)]" />
-            <div className="flex items-center gap-3">
+        <section className="relative  rounded-xl  bg-slate-950 p-0.5 shadow-md">
+            {/* <div className="pointer-events-none absolute inset-x-0 top-0 h-14 bg-[linear-gradient(120deg,rgba(15,23,42,0.05),rgba(6,182,212,0.12)_45%,rgba(59,130,246,0.1))]" /> */}
+            <div className="relative flex items-center gap-3 bg-slate-950 rounded-xl px-3 py-2">
+                {/* 3-dot menu */}
+                <div ref={menuRef} className="absolute top-1.5 right-1.5 z-10" onBlur={handleMenuBlur}>
+                    <button
+                        onClick={() => setMenuOpen((v) => !v)}
+                        className="flex h-6 w-6 items-center justify-center rounded-md text-slate-400 hover:bg-slate-800 hover:text-slate-100 focus:outline-none"
+                        aria-label="Menu"
+                    >
+                        <svg viewBox="0 0 4 16" width="4" height="16" fill="currentColor">
+                            <circle cx="2" cy="2" r="1.5" />
+                            <circle cx="2" cy="8" r="1.5" />
+                            <circle cx="2" cy="14" r="1.5" />
+                        </svg>
+                    </button>
+                    {menuOpen && (
+                        <div className="absolute right-0 top-7 w-44 rounded-lg border border-slate-700 bg-slate-900 py-1 shadow-xl">
+                            <button
+                                onClick={() => { setMenuOpen(false); navigate("/profile"); }}
+                                className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-semibold text-slate-200 hover:bg-slate-800"
+                            >
+                                <svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor" className="shrink-0 text-slate-400"><path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" /></svg>
+                                Profile
+                            </button>
+                            <button
+                                disabled
+                                className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-semibold text-slate-500 cursor-not-allowed"
+                            >
+                                <svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor" className="shrink-0"><path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" /></svg>
+                                Settings
+                                <span className="ml-auto text-[9px] text-slate-600">soon</span>
+                            </button>
+                            <button
+                                disabled
+                                className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-semibold text-slate-500 cursor-not-allowed"
+                            >
+                                <svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor" className="shrink-0"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" /></svg>
+                                Stats
+                                <span className="ml-auto text-[9px] text-slate-600">soon</span>
+                            </button>
+                            <div className="my-1 border-t border-slate-700" />
+                            <button
+                                onClick={() => { setMenuOpen(false); logout(); }}
+                                className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-semibold text-rose-400 hover:bg-slate-800"
+                            >
+                                <svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor" className="shrink-0"><path fillRule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clipRule="evenodd" /></svg>
+                                Logout
+                            </button>
+                        </div>
+                    )}
+                </div>
                 <div className="relative shrink-0">
-                    <div className="absolute -inset-0.5  bg-linear-to-br from-blue-500/60 via-white/15 to-red-500/60 opacity-80" />
-                    <div className="relative  bg-slate-950/85 p-0.5">
-                        <img src={avatarUrl} alt={player.displayname} className="h-16 w-16 rounded-md object-cover" />
-                    </div>
+                    <div className="absolute -inset-0.75 rounded-lg bg-linear-to-br from-cyan-500/60 via-sky-500/35 to-blue-700/65" />
+                    <img src={avatarUrl} alt={player.displayname || "Player"} className="relative h-16 w-16 rounded-lg  bg-slate-900 object-cover" />
                     <span
-                        className={`absolute -bottom-1 -right-1 h-3.5 w-3.5 rounded-full border-2 border-card ${isOnline ? "bg-green-400 shadow-[0_0_10px_rgba(96,165,250,0.85)]" : "bg-slate-500"}`}
-                        title={`${!wsConnected ? "Disconnected" : `${latencyValue}ms`}`}
+                        className={`absolute -bottom-1 -right-1 h-3 w-3 rounded-full border-2 border-white ${isOnline ? "bg-emerald-400" : "bg-slate-400"}`}
+                        title={statusLabel}
                     />
                 </div>
 
                 <div className="min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0 flex-1">
-                            <div className="flex items-center gap-1.5">
-                              
-                                
-                            </div>
-                            <h3 className="mt-1 truncate text-sm font-black uppercase tracking-[0.08em] text-white">
-                                {player.displayname}
-                                <img src={flagSrc} alt={`${countrycode} flag`} className="h-3 w-4.5 rounded-[2px] object-cover border border-white/20" title={countrycode} />
-                            </h3>
-                            {/* <div className="mt-1 flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.16em]">
-                                <span className={`inline-flex items-center rounded-sm border px-1.5 py-0.5 ${isOnline ? "border-blue-400/35 bg-blue-500/12 text-blue-100" : "border-white/12 bg-white/8 text-slate-300"}`}>
+                        <div className="min-w-0">
+                            {/* <div className="flex items-center gap-1.5">
+                                <span className="rounded-full border border-slate-300 bg-slate-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-600">
                                     {statusLabel}
                                 </span>
-                                <span className={`inline-flex items-center rounded-sm border px-1.5 py-0.5 ${latencyTone}`}>
-                                    {latencyLabel}
+                                <span className="rounded-full border border-cyan-200 bg-cyan-50 px-2 py-0.5 text-[10px] font-semibold text-cyan-700">
+                                    {latencyValue}ms
                                 </span>
                             </div> */}
+                            <h3 className="mt-1.5 truncate text-sm font-black uppercase tracking-[0.08em] text-slate-100">
+                                {player.displayname || "Player"}
+                            </h3>
+                            <div className="mt-1 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-100">
+                                <img src={flagSrc} alt={`${countrycode} flag`} className="h-[20px] w-[27px] rounded-[2px] border border-slate-600 object-cover" title={countrycode} />
+                                <span>{countrycode}</span>
+                            </div>
                         </div>
 
-                        <div className="flex items-start gap-2 shrink-0">
-                            {/* <div className="min-w-[2.8rem] rounded-md border border-white/10 bg-white/6 px-2 py-1 text-center leading-none">
-                                <div className="text-[8px] font-black uppercase tracking-[0.22em] text-white/60">LVL</div>
-                                <div className="mt-1 text-sm font-black text-white">{player.level}</div>
-                            </div> */}
-
-                            <div className="relative" ref={menuRef}>
-                                <button
-                                    onClick={() => setMenuOpen((v) => !v)}
-                                    className="h-7 w-7 rounded-md border border-white/12 bg-black/25 hover:border-blue-300/40 hover:bg-black/40 transition-colors flex flex-col items-center justify-center gap-0.5"
-                                    aria-label="Player options"
-                                >
-                                    <span className="h-0.75 w-0.75 rounded-full bg-white/80" />
-                                    <span className="h-0.75 w-0.75 rounded-full bg-white/80" />
-                                    <span className="h-0.75 w-0.75 rounded-full bg-white/80" />
-                                </button>
-
-                                {menuOpen && (
-                                    <div className="absolute right-0 top-10 z-20 w-44 overflow-hidden rounded-md border border-white/10 bg-popover shadow-2xl shadow-black/50 py-1.5">
-                                        {MENU_OPTIONS.map((opt) => (
-                                            <button
-                                                key={opt.label}
-                                                onClick={() => { setMenuOpen(false); opt.onClick?.(); }}
-                                                className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm transition-colors hover:bg-white/10 text-left ${opt.danger ? "text-destructive hover:bg-destructive/20" : "text-foreground"}`}
-                                            >
-                                                <span className="text-base leading-none">{opt.icon}</span>
-                                                {opt.label}
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
+                        <div className="shrink-0 rounded-lg  mt-2 text-center leading-none">
+                            <div className="text-[9px] font-bold uppercase tracking-[0.2em] text-slate-400">Level</div>
+                            <div className="mt-0.5 text-sm font-black text-slate-50">{levelInt}</div>
                         </div>
                     </div>
 
                     <div className="mt-2.5">
-                        <div className="mb-1 flex items-center justify-between text-[9px] font-bold uppercase tracking-[0.18em] text-white/65">
-                            <span>Level {player.level}</span>
-                            <span>{Math.round(xpPercent)}%</span>
+                        <div className="mb-1 flex items-center justify-between text-[10px] font-semibold uppercase tracking-wide text-slate-200">
+                            <span>Progress</span>
+                            <span>{xpPercent}%</span>
                         </div>
-                        <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
-                            <div
-                                className="h-full rounded-full bg-linear-to-r from-blue-500 via-white to-red-500"
-                                style={{ width: `${xpPercent}%` }}
-                            />
+                        <div className="h-1.5 overflow-hidden rounded-full bg-slate-200">
+                            <div className="h-full rounded-full bg-linear-to-r from-cyan-500 via-sky-500 to-blue-600" style={{ width: `${xpPercent}%` }} />
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
     );
 }

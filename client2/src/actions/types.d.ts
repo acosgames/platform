@@ -1,5 +1,5 @@
 type CacheConfig = {
-    type?: string;
+    type?: "divisionmulti" | "divisionsolo" | "rank" | "score" | "stat";
     game_slug?: string;
     countrycode?: string;
     season?: number;
@@ -8,7 +8,6 @@ type CacheConfig = {
     monthly?: boolean;
     redisKey?: string;
 }
-
 
 type RoomInfo = {
     room_slug: string;

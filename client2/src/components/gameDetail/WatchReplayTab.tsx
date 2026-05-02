@@ -1,0 +1,220 @@
+
+import { useEffect, useRef, useState } from "react";
+import { useBucket, useBucketSelector } from "@/actions/bucket";
+import { btReplay, btReplays, btRooms } from "@/actions/buckets";
+import { downloadGameReplay, findGameReplays, replayNextIndex, replayPrevIndex } from "@/actions/replay";
+import { findGamePanelByRoom } from "@/actions/room";
+import { BackwardIcon, ForwardIcon, PauseIcon, PlayIcon } from "@heroicons/react/24/solid";
+import { ScoreboardPane } from "../ScoreboardPane";
+import GamePanel from "../gameScreen/GamePanel";
+
+interface WatchReplayTabProps {
+    gameSlug: string;
+}
+
+
+export function WatchReplayTab({ gameSlug }: WatchReplayTabProps) {
+    const [activeReplayIndex, setActiveReplayIndex] = useState(0);
+    const [playing, setPlaying] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const timerRef = useRef<number | null>(null);
+    const replays = useBucketSelector(btReplays, (replays) => replays[gameSlug]) || [];
+
+    const gamepanel = useBucketSelector(btReplay, (replays) => replays[gameSlug]);
+    
+    // const replayId = useBucket(btReplay);
+    // const gamepanel = findGamePanelByRoom(room_slug as string);
+
+    // Load replays on mount
+    useEffect(() => {
+        if (!replays || replays.length === 0) {
+            setLoading(true);
+            findGameReplays(gameSlug).finally(() => setLoading(false));
+        }
+    }, [gameSlug]);
+
+    // Download replay file and spawn GamePanel when replay changes
+    useEffect(() => {
+        if (replays && replays.length > 0 && replays[activeReplayIndex]) {
+            downloadGameReplay(replays[activeReplayIndex]);
+        }
+        // Stop timer when switching replays
+        setPlaying(false);
+        if (timerRef.current) {
+            clearInterval(timerRef.current);
+            timerRef.current = null;
+        }
+    }, [activeReplayIndex, replays]);
+
+    // Timer loop for auto-advancing replay state
+    useEffect(() => {
+        if (!playing) {
+            if (timerRef.current) {
+                clearInterval(timerRef.current);
+                timerRef.current = null;
+            }
+            return;
+        }
+        timerRef.current = setInterval(() => {
+            const activeReplay = replays[activeReplayIndex];
+            if (!activeReplay) return;
+            // Use the replay room_slug as used in downloadGameReplay
+            // const roomSlug = "REPLAY/" + activeReplay.room_slug + "/" + activeReplay.game_slug;
+            replayNextIndex(activeReplay.room_slug);
+        }, 1200); // Advance every 1.2s (adjust as needed)
+        return () => {
+            if (timerRef.current) {
+                clearInterval(timerRef.current);
+                timerRef.current = null;
+            }
+        };
+    }, [playing, activeReplayIndex, replays]);
+
+    if (loading) {
+        return <div className="py-8 text-center text-slate-500">Loading replays...</div>;
+    }
+
+    if (!replays || replays.length === 0) {
+        return <div className="py-8 text-center text-slate-500">No replays found for this game.</div>;
+    }
+
+    if(!gamepanel) {
+        return <div className="py-8 text-center text-slate-500">Loading replay...</div>;
+    }
+
+    let room_slug = gamepanel?.room?.room_slug;
+    const activeReplay = gamepanel?.room;//replays[activeReplayIndex];
+    const roomSlug = activeReplay.room_slug; //"REPLAY/" + activeReplay.room_slug + "/" + activeReplay.game_slug;
+    // const gamepanel = findGamePanelByRoom(activeReplay.replayId);
+    const gamestate = gamepanel?.gamestate;
+    // Determine matchType for ScoreboardPane
+    let matchType: "free-for-all" | "1v1" | "team-based" = "free-for-all";
+    if (gamestate?.room?.mode === "1v1" || gamestate?.room?.mode === "duel") matchType = "1v1";
+    if (gamestate?.room?.mode === "team" || gamestate?.room?.mode === "team-based") matchType = "team-based";
+
+    // UI handlers
+    const handlePrevReplay = () => setActiveReplayIndex((i) => Math.max(0, i - 1));
+    const handleNextReplay = () => setActiveReplayIndex((i) => Math.min(replays.length - 1, i + 1));
+    const handlePrevState = () => replayPrevIndex(roomSlug);
+    const handleNextState = () => replayNextIndex(roomSlug);
+    const handlePlayPause = () => setPlaying((p) => !p);
+    const handleReplay = () => {
+        // Re-trigger current state (jump to start)
+        if (gamepanel && gamestate) {
+            // Find gamestart index and jump
+            // This is a simplified version; you may want to use replaySendGameStart
+            if (typeof window !== "undefined" && window.replaySendGameStart) {
+                window.replaySendGameStart(roomSlug);
+            }
+        }
+    };
+
+    return (
+        <div className="space-y-4">
+                <div className="bg-white p-2 rounded-lg shadow-sm container">
+            <div className="flex flex-col sm:flex-row gap-2 items-center justify-between bg-slate-200 p-2 rounded-lg">
+                <div className="flex-1 min-w-0">
+                    <div className="truncate text-[11px] font-semibold text-slate-700">
+                        Room: <span className="text-slate-900">{activeReplay.room_slug}</span>
+                    </div>
+                    <div className="text-[10px] text-slate-500">
+                        Version: {activeReplay.version} • Mode: {activeReplay.mode} • Rating: {activeReplay.rating}
+                    </div>
+                </div>
+                <div className="flex items-center gap-2">
+                    <button
+                        type="button"
+                        onClick={handlePrevReplay}
+                        className="inline-flex h-7 w-7 items-center justify-center rounded-full text-slate-600 transition-colors hover:bg-blue-50 hover:text-blue-700 border border-slate-200"
+                        aria-label="Previous replay"
+                        disabled={activeReplayIndex === 0}
+                    >
+                        <BackwardIcon className="h-4 w-4" />
+                    </button>
+                    <span className="text-xs text-slate-700">
+                        {activeReplayIndex + 1} / {replays.length}
+                    </span>
+                    <button
+                        type="button"
+                        onClick={handleNextReplay}
+                        className="inline-flex h-7 w-7 items-center justify-center rounded-full text-slate-600 transition-colors hover:bg-blue-50 hover:text-blue-700 border border-slate-200"
+                        aria-label="Next replay"
+                        disabled={activeReplayIndex === replays.length - 1}
+                    >
+                        <ForwardIcon className="h-4 w-4" />
+                    </button>
+                </div>
+                
+                </div>
+            </div>
+
+            <div className="grid grid-cols-12  gap-4">
+                <div className="col-span-7 flex justify-end items-end">
+                <GamePanel id={String(gamepanel.id)} prioritizeWidth={true} />
+
+                </div>
+                 {/* Scoreboard rendered from live gamestate */}
+            <div className=" min-w-1/2 col-span-5">
+
+            {/* State controls */}
+            <div className="flex items-center justify-center gap-3 mb-2">
+                <button
+                    type="button"
+                    onClick={handlePrevState}
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 text-slate-600 hover:bg-blue-50 hover:text-blue-700"
+                    aria-label="Previous state"
+                >
+                    <BackwardIcon className="h-5 w-5" />
+                </button>
+                <button
+                    type="button"
+                    onClick={handlePlayPause}
+                    className={`inline-flex h-10 w-10 items-center justify-center rounded-full border-2 border-blue-500 bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors ${playing ? "ring-2 ring-blue-400" : ""}`}
+                    aria-label={playing ? "Pause" : "Play"}
+                >
+                    {playing ? <PauseIcon className="h-6 w-6" /> : <PlayIcon className="h-6 w-6" />}
+                </button>
+                <button
+                    type="button"
+                    onClick={handleNextState}
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 text-slate-600 hover:bg-blue-50 hover:text-blue-700"
+                    aria-label="Next state"
+                >
+                    <ForwardIcon className="h-5 w-5" />
+                </button>
+                <button
+                    type="button"
+                    onClick={handleReplay}
+                    className="ml-4 inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 text-slate-600 hover:bg-blue-50 hover:text-blue-700"
+                    aria-label="Restart replay"
+                >
+                    <PlayIcon className="h-5 w-5" />
+                </button>
+            </div>
+
+
+                {gamestate ? (
+                    <ScoreboardPane matchType={matchType} gamestate={gamestate} />
+                ) : (
+                    <div className="text-center text-slate-400 text-xs">No game state loaded yet.</div>
+                )}
+            </div>
+            </div>
+            
+
+            <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm mt-2">
+                <div className="font-bold text-slate-900 mb-1">Replay Info</div>
+                <div className="text-xs text-slate-700">
+                    <div>Room Slug: <span className="font-mono">{activeReplay.room_slug}</span></div>
+                    <div>Version: {activeReplay.version}</div>
+                    <div>Mode: {activeReplay.mode}</div>
+                    <div>Rating: {activeReplay.rating}</div>
+                    <div>Screen: {activeReplay.screentype} ({activeReplay.resow}x{activeReplay.resoh}) width: {activeReplay.screenwidth}</div>
+                    <div>CSS: <span className="font-mono">{activeReplay.css}</span></div>
+                </div>
+            </div>
+
+           
+        </div>
+    );
+}

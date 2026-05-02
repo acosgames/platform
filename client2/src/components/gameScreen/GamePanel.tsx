@@ -88,7 +88,7 @@ function GamePanel({ id, canvasRef, prioritizeWidth }: GamePanelProps) {
     return (
         // <Portal containerRef={gamepanel.draggableRef}>
         // <div className="relative w-full h-full">
-            <div className="play-surface min-h-full">
+            <div className="play-surface min-h-full drop-shadow-md">
             {/* <LoadingBox id={gamepanel.id} /> */}
             <GameIFrame
                 gamepanel={gamepanel}
@@ -331,11 +331,11 @@ function GameIFrame({ gamepanel, canvasRef, prioritizeWidth, displayMode, isFull
         <>
             <div
                 ref={gameResizer}
-                className="gameResizer flex flex-col h-full w-full relative z-10 top-0 left-0 justify-center items-center"
+                className="gameResizer flex flex-col h-full w-full relative z-10 top-0 left-0 justify-center items-center drop-shadow-md"
             >
                 {/* <LoadingBox isDoneLoading={gamepanel.loaded} /> */}
                 <div
-                    className="screen-wrapper flex flex-col h-full w-full relative justify-start items-center"
+                    className="screen-wrapper flex flex-col h-full w-full relative justify-start items-center "
                     ref={gamewrapperRef}
                     style={{
                         transition: "filter 0.3s ease-in, opacity 0.5s ease-in",
@@ -344,7 +344,7 @@ function GameIFrame({ gamepanel, canvasRef, prioritizeWidth, displayMode, isFull
                 >
                     <div
                         ref={gamescreenRef}
-                        className="gamescreenRef relative self-center overflow-hidden"
+                        className="gamescreenRef relative self-center overflow-hidden rounded-lg "
                         key={"gamescreenRef-" + gamepanel.id}
                         style={{ filter: "drop-shadow(5px 5px 10px var(--chakra-colors-primary-1200))" }}
                     >

@@ -8,10 +8,11 @@ import Connection from './components/Connection';
 function App() {
   return (
     <>
-      <ActivateUserProfile />
       <VersionControl />
       <Connection />
-      <RouterProvider router={router} />
+      <ActivateUserProfile>
+        <RouterProvider router={router} />
+      </ActivateUserProfile>
     </>
   );
 }

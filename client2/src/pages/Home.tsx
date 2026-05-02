@@ -7,7 +7,7 @@ import { findGames } from "@/actions/game";
 import { btGames } from "@/actions/buckets";
 import { useLoading } from "@/actions/loading";
 
-const panelClassName = "relative overflow-hidden rounded-[28px] border border-slate-200/90 bg-[#FDFDFD] shadow-[0_20px_55px_rgba(15,23,42,0.12)]";
+const panelClassName = "relative overflow-hidden rounded-[28px] shadow-md";
 
 export function Home() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -25,30 +25,32 @@ export function Home() {
   }, []);
 
   return (
-    <div className="space-y-12 py-10 flex-1 relative">
+    <div className="space-y-12 pb-10 flex-1 relative">
       {/* Radial gradient background */}
       <div className="pointer-events-none fixed inset-0 -z-1">
         {/* <div className="absolute top-[-20%] left-[-10%] w-[60vw] h-[60vw] rounded-full bg-radial from-cyan-500/20 via-blue-400/10 to-transparent blur-3xl" /> */}
         {/* <div className="absolute bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-radial from-orange-300/25 via-pink-300/10 to-transparent blur-3xl" /> */}
         {/* <div className="absolute inset-0 opacity-35 bg-[radial-gradient(circle_at_1px_1px,rgba(15,23,42,0.18)_1px,transparent_0)] bg-size-[22px_22px]" /> */}
       </div>
-      <section className={`${panelClassName} space-y-10 p-5 sm:p-7 lg:p-9 text-slate-900`}>
+      <section className={`${panelClassName} space-y-10 p-2 sm:p-7 lg:p-9 pt-0 sm:pt-0 lg:pt-0 text-slate-50`}>
       {/* <div className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-linear-to-b from-cyan-100/60 via-blue-50/30 to-transparent" /> */}
       {/* <div className="pointer-events-none absolute right-6 top-6 h-20 w-20 rounded-full bg-cyan-200/35 blur-2xl" /> */}
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <span className="inline-flex items-center rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1 text-[11px] font-semibold tracking-wide text-cyan-700 uppercase">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-0">
+        <div className="flex flex-col gap-0">
+          <div className="mb-2">
+          <span className="inline h-auto items-center rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1 text-[12px] font-semibold tracking-wide text-cyan-700 uppercase">
             Curated Arena Picks
           </span>
-          <h1 className="text-2xl font-bold text-slate-900">
+          </div>
+          <h1 className="text-2xl font-bold text-slate-50">
             Featured Games
           </h1>
-          <p className="text-slate-700 text-sm mt-1">Discover and play amazing multiplayer games</p>
-          <div className="mt-3 flex flex-wrap gap-2 text-[11px]">
-            <span className="rounded-full bg-slate-100 px-2.5 py-1 font-semibold text-slate-700">{game_slugs.length} live titles</span>
-            <span className="rounded-full bg-slate-100 px-2.5 py-1 font-semibold text-slate-700">ranked matchmaking</span>
-            <span className="rounded-full bg-slate-100 px-2.5 py-1 font-semibold text-slate-700">active community</span>
+          <p className="text-slate-100 text-sm mt-1">Discover and play amazing multiplayer games</p>
+          <div className="mt-3 flex flex-wrap gap-2 text-xs">
+            <span className="rounded-full bg-slate-100 px-2.5 py-1 font-semibold text-slate-950">{game_slugs.length} live titles</span>
+            <span className="rounded-full bg-slate-100 px-2.5 py-1 font-semibold text-slate-950">ranked matchmaking</span>
+            <span className="rounded-full bg-slate-100 px-2.5 py-1 font-semibold text-slate-950">active community</span>
           </div>
         </div>
 
@@ -62,17 +64,17 @@ export function Home() {
             placeholder="Search games..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 pr-4 py-2.5 w-64 rounded-xl bg-white border border-slate-300 text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:border-slate-500 focus:ring-2 focus:ring-cyan-100 transition-colors shadow-[0_8px_20px_rgba(15,23,42,0.08)]"
+            className="pl-10 pr-4 py-2.5 w-64 rounded-xl bg-white border border-slate-300 text-sm text-slate-50 placeholder:text-slate-500 focus:outline-none focus:border-slate-500 focus:ring-2 focus:ring-cyan-100 transition-colors shadow-[0_8px_20px_rgba(15,23,42,0.08)]"
           />
         </div>
       </div>
 
       {/* Game grid */}
       {game_slugs.length > 0 ? ( 
-        <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-8">
+        <div className="grid grid-cols-2 gap-4 sm:gap-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 ">
           {game_slugs.map((game_slug:string) => {
             return (
-              <div key={game_slug} className="rounded-2xl border border-slate-200 bg-white p-2 shadow-[0_10px_24px_rgba(15,23,42,0.07)] transition-transform duration-300 hover:-translate-y-1">
+              <div key={game_slug} className="rounded-2xl border border-slate-200 bg-white p-2 shadow-md transition-transform duration-300 hover:-translate-y-1">
                 <GameCard game_slug={game_slug} />
               </div>
             );
@@ -81,7 +83,7 @@ export function Home() {
       ) : (
         <div className="flex flex-col items-center justify-center py-20 text-center space-y-3">
           <span className="text-4xl">🔍</span>
-          <p className="text-slate-700">No games found for &ldquo;{searchQuery}&rdquo;</p>
+          <p className="text-slate-100">No games found for &ldquo;{searchQuery}&rdquo;</p>
         </div>
       )}
     </section>
@@ -96,12 +98,12 @@ export function Home() {
 
 function Blog() {
   return (
-    <div className={`${panelClassName} mt-2 p-5 sm:p-7 lg:p-9 text-slate-900`}>
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-linear-to-b from-blue-100/55 via-sky-50/35 to-transparent" />
-      <div className="pointer-events-none absolute left-1/2 top-0 h-px w-28 -translate-x-1/2 bg-blue-100/60 blur-sm" />
+    <div className={`${panelClassName} mt-2 p-5 sm:p-7 lg:p-9 text-slate-50`}>
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-20 " />
+      <div className="pointer-events-none absolute left-1/2 top-0 h-px w-28 -translate-x-1/2  blur-sm" />
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-lg font-semibold text-slate-900">Latest News</h2>
-        <Link to="/blog" className="text-xs text-slate-700 hover:text-slate-900 transition-colors">View all →</Link>
+        <h2 className="text-lg font-semibold text-slate-50">Latest News</h2>
+        <Link to="/blog" className="text-xs text-slate-100 hover:text-slate-50 transition-colors">View all →</Link>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
         {blogPosts.map((post) => (
@@ -118,8 +120,8 @@ function Blog() {
               <span className="text-[10px] text-slate-600">{post.date}</span>
               <span className="text-[10px] text-slate-600">· {post.readTime}</span>
             </div>
-            <p className="text-sm font-medium text-slate-900 leading-snug group-hover:text-slate-700 transition-colors">{post.title}</p>
-            <p className="text-xs text-slate-700 mt-1 leading-relaxed line-clamp-2">{post.excerpt}</p>
+            <p className="text-sm font-medium text-slate-950 leading-snug group-hover:text-slate-900 transition-colors">{post.title}</p>
+            <p className="text-xs text-slate-900 mt-1 leading-relaxed line-clamp-2">{post.excerpt}</p>
           </Link>
         ))}
       </div>
@@ -164,20 +166,20 @@ const faqs = [
 
 function FAQ() {
   return (
-    <div className={`${panelClassName} mt-2 p-5 sm:p-7 lg:p-9 text-slate-900`}>
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-linear-to-b from-cyan-100/55 via-teal-50/35 to-transparent" />
+    <div className={`${panelClassName} mt-2 p-5 sm:p-7 lg:p-9 text-slate-50`}>
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-20 " />
       <div className="pointer-events-none absolute left-1/2 top-0 h-px w-28 -translate-x-1/2 bg-cyan-100/60 blur-sm" />
-      <h2 className="text-lg font-semibold text-slate-900 mb-6">Frequently Asked Questions</h2>
+      <h2 className="text-lg font-semibold text-slate-50 mb-6">Frequently Asked Questions</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-7">
         {faqs.map(({ q, a }, index) => (
           <div key={q} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_8px_20px_rgba(15,23,42,0.06)]">
             <div className="mb-2 flex items-center gap-2">
-              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-slate-800 text-[11px] font-semibold text-white">
+              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-slate-800 text-xs font-semibold text-white">
                 {index + 1}
               </span>
-              <p className="text-sm font-medium text-slate-900">{q}</p>
+              <p className="text-sm font-medium text-slate-950">{q}</p>
             </div>
-            <p className="text-sm text-slate-700 leading-relaxed">{a}</p>
+            <p className="text-sm text-slate-900 leading-relaxed">{a}</p>
           </div>
         ))}
       </div>

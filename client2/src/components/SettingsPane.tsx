@@ -20,18 +20,32 @@ export function SettingsPane({ isPlayRoute }: SettingsPaneProps) {
     }, [theme]);
 
     return (
-        <section className="rounded-md border border-white/12 bg-card p-3.5 space-y-3 h-full">
-            <p className="text-sm font-semibold text-foreground">Interface Settings</p>
-            <button
-                type="button"
-                onClick={() => setTheme((prev) => (prev === "dark" ? "light" : "dark"))}
-                className="w-full h-10 rounded-md border border-white/15 bg-black/20 text-sm font-semibold text-foreground hover:border-cyan-300/45 transition-colors"
-            >
-                Toggle {theme === "dark" ? "Light" : "Dark"} Theme
-            </button>
-            <p className="text-xs text-muted-foreground">
-                {isPlayRoute ? "Play mode is active. Use controls here while staying in-match." : "General account and interface tools are available here."}
-            </p>
+        <section className="flex h-full min-h-0 flex-col p-3 sm:p-3.5">
+            <div className="mb-2.5 flex items-center justify-between">
+                <p className="text-sm font-semibold text-slate-900">Interface Settings</p>
+                <span className="rounded-full border border-slate-200 bg-slate-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-600">
+                    Profile
+                </span>
+            </div>
+
+            <div className="flex-1 min-h-0 overflow-y-auto panel-scrollbar pr-1 space-y-2.5">
+                <div className="rounded-lg border border-slate-200 bg-slate-50 p-2.5">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Theme Mode</p>
+                    <button
+                        type="button"
+                        onClick={() => setTheme((prev) => (prev === "dark" ? "light" : "dark"))}
+                        className="mt-2 h-9 w-full rounded-md border border-slate-300 bg-white text-sm font-semibold text-slate-700 transition-colors hover:border-cyan-300 hover:bg-cyan-50"
+                    >
+                        Toggle {theme === "dark" ? "Light" : "Dark"} Theme
+                    </button>
+                </div>
+
+                <div className="rounded-lg border border-slate-200 bg-slate-50 p-2.5">
+                    <p className="text-xs text-slate-600 leading-relaxed">
+                        {isPlayRoute ? "Play mode is active. Use controls here while staying in-match." : "General account and interface tools are available here."}
+                    </p>
+                </div>
+            </div>
         </section>
     );
 }

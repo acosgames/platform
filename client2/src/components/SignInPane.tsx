@@ -9,7 +9,8 @@ import {
 import config from "../config";
 import { createTempUser } from "@/actions/person";
 import { useBucket, useBucketSelector } from "@/actions/bucket";
-import { btModalShow } from "@/actions/buckets";
+import { btModalShow, btPortraitId } from "@/actions/buckets";
+import { removeWithExpiry } from "@/actions/cache";
 
 interface SignInPaneProps {
   onSignIn: () => void;
@@ -129,12 +130,21 @@ export function SignInPane({ onSignIn }: SignInPaneProps) {
   };
 
   const socialProviders = [
-    { label: "Google", Component: GoogleLoginButton },
-    { label: "Facebook", Component: FacebookLoginButton },
-    { label: "Microsoft", Component: MicrosoftLoginButton },
-    { label: "GitHub", Component: GithubLoginButton },
+    { label: "Google", Component: GoogleLoginButton, path: "/login/google" },
+    { label: "Facebook", Component: FacebookLoginButton, path: "/login/facebook" },
+    { label: "Microsoft", Component: MicrosoftLoginButton, path: "/login/microsoft" },
+    { label: "GitHub", Component: GithubLoginButton, path: "/login/github" },
   ];
 
+  const updateRefPath = (pathname: string) => {
+      localStorage.setItem("refPath", pathname);
+      // btRefPath.set(pathname);
+      removeWithExpiry("user");
+  
+      localStorage.setItem("portraitid", btPortraitId.get());
+  }
+  
+            
   const signInModal = showSignIn ? (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 ">
       <button
@@ -259,7 +269,10 @@ export function SignInPane({ onSignIn }: SignInPaneProps) {
                   key={provider.label}
                   text={`Let's Go with ${provider.label}`}
                   type="button"
-                  onClick={() => { }}
+                  onClick={() => {
+                    updateRefPath(window.location.pathname);
+                    window.location.href = provider.path;
+                   }}
                   size="36px"
                   iconSize="16px"
                   align="center"
