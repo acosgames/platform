@@ -35,7 +35,7 @@ export function ChatPane() {
       if (!map.has(entry.player)) {
         map.set(entry.player, {
           avatarUrl: `https://i.pravatar.cc/80?img=${idx + 21}`,
-          country: entry.country,
+          country: entry.countrycode,
         });
       }
     });

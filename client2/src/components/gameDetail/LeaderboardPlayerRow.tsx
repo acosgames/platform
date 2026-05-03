@@ -52,7 +52,7 @@ export function LeaderboardPlayerRow({
   tieWithPrev?: boolean;
   isCurrentUser?: boolean;
 }) {
-  const { ties, losses } = getRecord(entry.wins, idx);
+  // const { ties, losses } = getRecord(entry.wins, idx);
   const countryCode = entry.countrycode.toUpperCase();
   const flagSrc = `${config.https.cdn}images/country/${countryCode}.svg`;
   const portraitUrl = getPortraitUrl(entry.player, idx);

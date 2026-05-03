@@ -5,8 +5,9 @@ import config from "../config";
 
 // import delta from "acos-json-delta";
 import { merge } from "acos-json-encoder";
+import { GameStatus } from "@acosgames/framework";
 
-export async function findGameReplays(game_slug:string) {
+export async function findGameReplays(game_slug: string) {
     try {
         let response = await GET("/api/v1/game/replays/" + game_slug);
         let replays = response.data;
@@ -106,8 +107,11 @@ export async function downloadGameReplay(replay: any) {
     console.log(history);
 
     let msg = {
-        room: replay,
-        payload: history,
+        type: "replay",
+        payload: {
+            gamestate: history,
+            room: replay,
+        }
     };
 
     let gamepanel = addRoom(msg);
@@ -135,192 +139,166 @@ export async function downloadGameReplay(replay: any) {
 
 
 
-export function replayPrevIndex(room_slug:string) {
+export function replayPrevIndex(room_slug: string) {
     let gamepanel = findGamePanelByRoom(room_slug);
     if (!gamepanel?.room) return;
 
     let jumpIndex = gamepanel.room.replayIndex - 1;
 
+    gamepanel.gamestate = structuredClone(gamepanel.room.history[1].payload);
+    gamepanel.room.replayIndex = gamepanel.room.replayStartIndex;
+
     //if we are currently in gameover state, jump back 2 times
     // if (gamepanel.room.replayIndex == gamepanel.gamestate.length - 1)
     //     jumpIndex -= 1;
 
-    replayJumpToIndex(room_slug, jumpIndex);
+    jumpToState(room_slug, jumpIndex, true);
 }
 
-export function replayTimerTriggerNext(room_slug:string, delay:number) {
+export function replayNextIndex(room_slug: string) {
+    let gamepanel = findGamePanelByRoom(room_slug);
+    if (!gamepanel?.room) return;
+    let jumpIndex = gamepanel.room.replayIndex+1;
+
+    jumpToState(room_slug, jumpIndex, true);
+}
+
+export function replayTimerTriggerNext(room_slug: string, delay: number) {
     let gamepanel = findGamePanelByRoom(room_slug);
     if (!gamepanel?.room) return;
 
     if (gamepanel.room.replayTimerHandle) {
         clearTimeout(gamepanel.room.replayTimerHandle);
+        gamepanel.room.replayTimerHandle = null;
     }
 
     gamepanel.room.replayTimerHandle = setTimeout(() => {
-        replayNextIndex(room_slug);
+        let jumpIndex = gamepanel.room.replayIndex+1;
+
+        jumpToState(room_slug, jumpIndex, false);
     }, delay);
 }
 
-export function replayNextIndex(room_slug: string) {
-    let gamepanel = findGamePanelByRoom(room_slug);
-    let iframe = gamepanel.iframe;
 
-    if (!iframe) return false;
+export function mergeToState(room_slug: string, index: number): { current: GameStateLocal; prev: GameStateLocal; next: GameStateLocal } {
+    const gamepanel = findGamePanelByRoom(room_slug);
+    if (!gamepanel?.room || !gamepanel.room.isReplay) return { current: {} as GameStateLocal, prev: {} as GameStateLocal, next: {} as GameStateLocal };
 
+    let currentIndex = gamepanel?.room?.replayIndex ?? gamepanel.room.replayStartIndex ?? 0;
+    
     let history = gamepanel.room.history;
-    if (!(history || history.length == 0)) {
-        //    iframe.resize();
-        return false;
+    let current: GameStateLocal = structuredClone(gamepanel.gamestate) as GameStateLocal;
+    let prev: GameStateLocal = {} as GameStateLocal;
+    if (index < currentIndex) {
+        currentIndex = 1;
+        current = structuredClone(history[1].payload) as GameStateLocal;
+        // index = gamepanel.room.replayStartIndex ?? 0;
     }
 
-    let nextId = gamepanel.room.replayIndex + 1;
-    if (nextId >= history.length) return false;
-
-    let merged = gamepanel.gamestate;
-    let copy = JSON.parse(JSON.stringify(history[nextId].payload));
-
-    if (merged?.room?.events) {
-        merged.room.events = [];
+    let cur: GameStateLocal = {} as GameStateLocal;
+    for (let i = currentIndex; i <= index; i++) {
+        cur = structuredClone(history[i].payload);
+        if( current?.room?.events ) {
+            current.room.events = []
+        }
+        prev = structuredClone(cur);
+        current = merge(current, cur);
     }
-    merge(merged, copy);
 
-    merged.room_slug = history[0].room_slug;
+    cur = structuredClone(current);
 
-    // merged = { room_slug: history[nextId].room_slug, ...merged };
+    let next = {} as GameStateLocal;
+    if (history.length > index + 1) {
+        next = structuredClone(history[index + 1].payload);
+        if( cur?.room?.events ) {
+            cur.room.events = []
+        }
+        next = merge(cur, next);
+    }
+    return { current, prev, next };
+}
 
-    if (merged?.room?.timesec) {
-        if (history.length > nextId + 1) {
-            let nextHistory = history[nextId + 1];
-            let nextCopy = JSON.parse(JSON.stringify(nextHistory.payload));
-            let nextMerged = JSON.parse(JSON.stringify(merged));
-            merge(nextMerged, nextCopy);
 
-            let nextUpdated = nextMerged.room.updated;
-            let currentUpdated = merged.room.updated;
+export interface GameStateLocal extends GameState {
+    local?: Player;
+    action?: any;
+}
 
-            if (gamepanel.room.updated != merged?.room?.updated) {
-                let now = Date.now();
-                // gamepanel.room.timerSequence = merged?.timer?.sequence || 0;
-                gamepanel.room.starttime = merged?.room?.starttime || 0;
-                gamepanel.room.endtime = now + merged?.room?.timesec * 1000;
-            }
+const emptyGamestate = { current: {} as GameStateLocal, prev: {} as GameStateLocal, next: {} as GameStateLocal };
 
-            replayTimerTriggerNext(room_slug, nextUpdated - currentUpdated);
+export function jumpToState(room_slug: string, index: number, paused: boolean): { current: GameStateLocal; prev: GameStateLocal; next: GameStateLocal } {
+    const gamepanel = findGamePanelByRoom(room_slug);
+    if (!gamepanel?.room)
+        return gamepanel.replayState ?? emptyGamestate;
+
+    if (index >= gamepanel.room.history.length || index < gamepanel.room.replayStartIndex)
+        return gamepanel.replayState ?? emptyGamestate;
+    let { current, prev, next } = mergeToState(room_slug, index);
+
+    const now = Date.now();
+    // if (current?.room?.updated) {
+    //     if (current.room.timeend)
+    //         current.room.timeend = 0;
+    //     // current.room.updated = now - (current.room.starttime ?? 0);
+    // }
+
+    // if (prev?.room?.updated) {
+    //     if (prev.room.timeend)
+    //         prev.room.timeend = 0;
+    //     // prev.room.updated = now - (prev.room.starttime ?? 0);
+    // }
+
+    let players = current?.players;
+    if (players) {
+        current.local = players[gamepanel.room.replayFollow ?? 0];
+
+        for (let player of players) {
+            player.portrait = `${config.https.cdn}images/portraits/assorted-${player.portraitid || 1
+                }-medium.webp`;
         }
     }
-
-    merged.room.timeend = gamepanel.room.endtime;
-
-    let players = merged?.players;
-    merged.local = players[gamepanel.room.replayFollow];
-
-    gamepanel.room.replayIndex = gamepanel.room.replayIndex + 1;
-    gamepanel.gamestate = structuredClone(merged);
+    
+    if( current?.room ) {
+        current.room.starttime = Date.now() - (current.room.updated ?? 0); 
+    }
+    gamepanel.room.replayIndex = index;
+    gamepanel.gamestate = current;
+    gamepanel.replayState = { current, prev, next };
     updateGamePanel(gamepanel);
     updateRoomStatus(room_slug);
 
-    if (iframe?.current?.contentWindow) iframe.current.contentWindow.postMessage(merged, "*");
-}
-
-export function replayJumpToIndex(room_slug: string, startIndex: number) {
-    let gamepanel = findGamePanelByRoom(room_slug);
     let iframe = gamepanel.iframe;
+    if (iframe?.current?.contentWindow)
+        iframe.current.contentWindow.postMessage(current, "*");
 
-    if (!iframe || !iframe.current || !iframe.current.contentWindow) return false;
-
-    let history = gamepanel.room.history;
-    if (!(history || history.length == 0)) {
-        //    iframe.resize();
-        return false;
-    }
-
-    if (startIndex < gamepanel.room.replayStartIndex || startIndex >= history.length) {
-        return false;
-    }
-
-    if (gamepanel.room.replayIndex == history.length - 1) {
-    }
-
-    
-    gamepanel.room.replayIndex = startIndex;
-
-    let merged:any = {};
-    // gamepanel.room.timerSequence = -1;
-    // gamepanel.room.timeend = 0;
-    for (let i = 1; i <= startIndex; i++) {
-        //skip first one if it has room metadata
-        if (history[i].payload.gameid) {
-            continue;
-        }
-
-        let copy = JSON.parse(JSON.stringify(history[i].payload));
-        if ("events" in merged) merged.room.events = [];
-        if ("action" in merged) {
-            merged.action = [];
-        }
-
-        merged = merge(merged, copy);
-
-        if (gamepanel.room.updated != merged?.room?.updated) {
-            // gamepanel.room.timerSequence = merged?.timer?.sequence || 0;
-            gamepanel.room.endtime = Date.now() + (merged?.room?.timesec * 1000 || 0);
-        }
-    }
-
-    // merged.room_slug = history[0].room_slug;
-
-    if (history.length > startIndex + 1) {
-        let nextHistory = history[startIndex + 1];
-        let nextCopy = JSON.parse(JSON.stringify(nextHistory.payload));
-        let nextMerged = JSON.parse(JSON.stringify(merged));
-        nextMerged = merge(nextMerged, nextCopy);
-
-        let nextUpdated = nextMerged.room.updated;
-        let currentUpdated = nextMerged.room.updated;
-
-        if (gamepanel.room.updated != nextMerged?.room?.updated) {
-            let now = Date.now();
-            // gamepanel.room.timerSequence = merged?.timer?.sequence || 0;
-            gamepanel.room.starttime = nextMerged?.room?.starttime || 0;
-            gamepanel.room.endtime = now + nextMerged?.room?.timesec * 1000;
-        }
-
+    if (!paused && next?.room?.updated && current?.room?.updated) {
+        let nextUpdated = next.room.updated;
+        let currentUpdated = current.room.updated;
         replayTimerTriggerNext(room_slug, nextUpdated - currentUpdated);
     }
 
-    if( !merged?.room )
-        return;
-
-    merged.room.timeend = gamepanel.room.timeend;
-
-    let players = merged?.players;
-    if (!gamepanel.room.replayFollow) {
-        let playerIds = Object.keys(players);
-        let randomPlayerId = playerIds[Math.floor(Math.random() * playerIds.length)];
-
-        merged.local = players[randomPlayerId];
-
-        gamepanel.room.replayFollow = randomPlayerId;
-    } else {
-        merged.local = players[gamepanel.room.replayFollow];
-    }
-
-    for (let shortid in players) {
-        let player = players[shortid];
-        player.portrait = `${config.https.cdn}images/portraits/assorted-${
-            player.portraitid || 1
-        }-medium.webp`;
-    }
-
-    merged.room.timeend = gamepanel.room.endtime;
-
-    gamepanel.gamestate = structuredClone(merged);
-    updateGamePanel(gamepanel);
-    updateRoomStatus(room_slug);
-    if (iframe?.current?.contentWindow) iframe.current.contentWindow.postMessage(merged, "*");
+    return { current, prev, next };
 }
 
-export function replaySendGameStart(room_slug:string) {
+export function pauseReplay(room_slug: string) {
+    let gamepanel = findGamePanelByRoom(room_slug);
+    if (!gamepanel?.room) return;
+    if (gamepanel.room.replayTimerHandle) {
+        clearTimeout(gamepanel.room.replayTimerHandle);
+        gamepanel.room.replayTimerHandle = null;
+    }
+}
+
+export function resumeReplay(room_slug: string) {
+    let gamepanel = findGamePanelByRoom(room_slug);
+    if (!gamepanel?.room) return;
+    let replayIndex = gamepanel.room.replayIndex ?? gamepanel.room.replayStartIndex ?? 0;
+    let history = gamepanel.room.history;
+    if (replayIndex >= history.length - 1) return;
+    jumpToState(room_slug, replayIndex, false);
+}
+
+export function replaySendGameStart(room_slug: string) {
     let gamepanel = findGamePanelByRoom(room_slug);
     let iframe = gamepanel.iframe;
 
@@ -334,19 +312,22 @@ export function replaySendGameStart(room_slug:string) {
 
     //find gamestart index
     let replayStartIndex = 0;
-    for (let i = 0; i < history.length; i++) {
-        let gamestate = history[i];
-        if (gamestate?.payload?.room?.status == "gamestart") {
+    for (let i = 1; i < history.length; i++) {
+        let gamestate = history[i].payload;
+        if (gamestate?.room?.status == GameStatus.gamestart) {
             replayStartIndex = i;
             break;
         }
     }
 
+    gamepanel.gamestate = structuredClone(history[1].payload);
+    gamepanel.room.replayIndex = replayStartIndex;
+
     gamepanel.room.replayStarted = true;
     gamepanel.room.replayStartIndex = replayStartIndex;
-    gamepanel.room.timeend = Date.now() + (gamepanel.room.timesec || 0);
+    // gamepanel.room.timeend = (gamepanel.room.timesec || 0) * 1000;
     //gamepanel.gamestate = merged;
     //updateGamePanel(gamepanel);
 
-    replayJumpToIndex(room_slug, replayStartIndex);
+    jumpToState(room_slug, replayStartIndex, false);
 }

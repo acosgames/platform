@@ -46,6 +46,12 @@ export function Layout() {
         if (!isLoggedIn) {
             btActivePowerTab.set(null);
             btIsDockedWide.set(false);
+        } else {
+            // Start panel docked open when user logs in
+            btIsDockedWide.set(true);
+            if (btActivePowerTab.get() === null) {
+                btActivePowerTab.set("chat");
+            }
         }
     }, [isLoggedIn]);
 
@@ -138,31 +144,32 @@ export function Layout() {
                     </div>
                 ) : null}
 
-                <div 
+                <div
                     className="relative flex flex-row w-full h-screen  panel-scrollbar  overflow-y-auto overflow-x-hidden transition-[padding-right] transition-duration-200"
-                    style={{ 
-                        paddingRight: isLargeScreen && isPowerPanelOpen ? "20rem" : undefined, 
+                    style={{
+                        paddingRight: isLargeScreen && isPowerPanelOpen ? "calc(20rem - 6px)" : undefined,
                         // width: isPowerPanelOpen ? "calc(100% - 20rem)" : undefined 
                     }}
-                    >
+                >
 
                     <div className="play-layout-main-shell flex-1 min-w-0 flex flex-col h-full pt-4">
                         {/* Header */}
-                        <header 
-                            className="play-layout-header fixed top-0 left-0 transition-[padding-right] transition-duration-200 z-50 w-full h-12.5 min-h-12.5 max-h-12.5 box-border  bg-slate-950"
-                            style={{  
-                                paddingRight: isLargeScreen && isPowerPanelOpen ? "20rem" : undefined, 
+
+                        <header
+                            className="play-layout-header fixed top-0 left-0 z-50 transition-[padding-right] transition-duration-200  w-full h-12.5 min-h-12.5 max-h-12.5 box-border  bg-slate-950"
+                            style={{
+                                paddingRight: isLargeScreen && isPowerPanelOpen ? "calc(20rem - 6px)" : undefined,
                                 left: isLargeScreen && isPowerPanelOpen ? '-4px' : undefined,
                                 // width: isPowerPanelOpen ? "calc(100% - 20rem)" : undefined
                             }}
-                            >
-                            <div className="absolute w-full inset-0  bg-linear-to-r transition-[padding-right] transition-duration-200 "
-                            style={{  
-                                paddingRight: isLargeScreen && isPowerPanelOpen ? "20rem" : undefined, 
-                                // width: isPowerPanelOpen ? "calc(100% - 20rem)" : undefined
-                            }}
-                             />
-                            <div className="w-full h-full container mx-auto px-2 sm:px-2 lg:px-24 relative">
+                        >
+                            <div className="absolute w-full -z-50 inset-0  bg-linear-to-r transition-[padding-right] transition-duration-200 "
+                                style={{
+                                    paddingRight: isLargeScreen && isPowerPanelOpen ? "calc(20rem - 6px)" : undefined,
+                                    // width: isPowerPanelOpen ? "calc(100% - 20rem)" : undefined
+                                }}
+                            />
+                            <div className="w-full h-full container mx-auto px-2 lg:px-8 xl:px-20 relative">
                                 <div className="w-full h-full flex items-center justify-between gap-3">
                                     <div className="flex items-center gap-3 min-w-0">
                                         <Link to="/" className="flex items-center gap-2.5">
@@ -181,47 +188,49 @@ export function Layout() {
                                         <button
                                             type="button"
                                             onClick={openSignIn}
-                                            className="power-bar-btn"
+                                            className="button bg-blue-500 hover:bg-blue-700 cursor-pointer text-white px-3 py-1.5 rounded-md text-sm font-medium transition-colors"
                                             aria-label="Sign in"
                                             title="Sign in"
                                         >
-                                            Sign In
+                                            Create Account
                                         </button>
                                     )}
                                 </div>
                             </div>
+
                         </header>
 
                         {/* Main content + footer — shift right when panel is docked */}
                         <div
-                            className="flex-1 flex flex-col min-h-0 mt-12 min-w-0 transition-[padding-right] duration-200"
-                            // style={{ paddingRight: isDockedOpenWide ? "20rem" : undefined }}
+                            className="flex-1 flex flex-col min-h-0 mt-12 min-w-0 transition-[padding-right] duration-200 relative"
+                        // style={{ paddingRight: isDockedOpenWide ? "20rem" : undefined }}
                         >
+                            {/* Persistent rounded-corner overlay at top right */}
 
-                        {/* Main content */}
-                        <div className="flex-1 min-w-0 play-layout-content relative container mx-auto px-2 lg:px-20 ">
-                            <div className="flex flex-col gap-4 lg:gap-6">
-                                {/* Main content area */}
-                                <div className="flex-1 min-w-0">
-                                    <Outlet />
-                                </div>
-                            </div>
-
-
-                        </div>
-
-                        {/* Footer */}
-                        <footer className="border-t border-cyan-500/20 bg-slate-950">
-                            <div className="container mx-auto px-2  lg:px-20 py-3.5">
-                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs">
-                                    <p className="text-muted-foreground">© {new Date().getFullYear()} ACOS Platform. All rights reserved.</p>
-                                    <div className="flex items-center gap-3 text-muted-foreground">
-                                        <span className="text-cyan-400/80">Status: Online</span>
-                                        <span>Build: Beta</span>
+                            {/* Main content */}
+                            <div className="flex-1 min-w-0 play-layout-content relative container mx-auto px-2 lg:px-8 xl:px-20 ">
+                                <div className="flex flex-col gap-4 lg:gap-6">
+                                    {/* Main content area */}
+                                    <div className="flex-1 min-w-0">
+                                        <Outlet />
                                     </div>
                                 </div>
+
+
                             </div>
-                        </footer>
+
+                            {/* Footer */}
+                            <footer className="border-t border-cyan-500/20 bg-slate-950">
+                                <div className="container mx-auto px-2  lg:px-20 py-3.5">
+                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs">
+                                        <p className="text-muted-foreground">© {new Date().getFullYear()} ACOS Platform. All rights reserved.</p>
+                                        <div className="flex items-center gap-3 text-muted-foreground">
+                                            <span className="text-cyan-400/80">Status: Online</span>
+                                            <span>Build: Beta</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </footer>
                         </div>{/* end padding wrapper */}
                     </div>
 
@@ -237,8 +246,8 @@ export function Layout() {
                 ) : null}
 
                 <aside
-                    className={`power-panel fixed py-1 transition-[right] duration-200 ${isPowerPanelOpen ? "power-panel-open right-1" : "-right-100"} ${isDockedOpenWide ? "docked bg-slate-950 bg-pink-500/5" : ""}`}
-                    // aria-hidden={!isPowerPanelOpen}
+                    className={`power-panel fixed z-55 py-1 transition-[right] duration-200 ${isPowerPanelOpen ? "power-panel-open right-1" : "-right-100"} ${isDockedOpenWide ? "docked bg-slate-950 bg-pink-500/5" : ""}`}
+                // aria-hidden={!isPowerPanelOpen}
                 >
                     {isDockedOpenWide ? (
                         <div className="power-panel-sidebar-bar">
@@ -247,6 +256,19 @@ export function Layout() {
                     ) : null}
                     <PanelContent isPlayRoute={isPlayRoute} />
                 </aside>
+
+                {/* Rounded concave corner — fixed sibling so it escapes the aside's stacking context */}
+                <div
+                    className="pointer-events-none fixed -z-10 bg-slate-950 transition-[right] duration-200"
+                    style={{
+                        top: '50px',
+                        right: isLargeScreen && isPowerPanelOpen ? 'calc(20rem + 0.25rem)' : '-100rem',
+                        width: '2rem',
+                        height: '2rem',
+                    }}
+                >
+                    <div className="w-full h-full bg-slate-300 rounded-tr-lg" />
+                </div>
 
                 <MatchmakingQueueIndicator />
             </div>
@@ -259,9 +281,9 @@ export function Layout() {
 type PanelSubTab = "chat" | "queue" | "friends" | "settings" | "scoreboard";
 
 const BASE_PANEL_TABS: Array<{ key: PanelSubTab; label: string; Icon: React.ElementType }> = [
-    { key: "chat",     label: "Chat",     Icon: ChatBubbleLeftRightIcon },
-    { key: "queue",    label: "Queue",    Icon: QueueListIcon },
-    { key: "friends",  label: "Friends",  Icon: UsersIcon },
+    { key: "chat", label: "Chat", Icon: ChatBubbleLeftRightIcon },
+    { key: "queue", label: "Queue", Icon: QueueListIcon },
+    { key: "friends", label: "Friends", Icon: UsersIcon },
     { key: "settings", label: "Settings", Icon: Cog6ToothIcon },
 ];
 
@@ -280,7 +302,7 @@ function PanelContent({ isPlayRoute }: { isPlayRoute: boolean }) {
         if (inGame) setActiveSubTab("scoreboard");
     }, [inGame]);
 
-   
+
     // Dynamically add scoreboard tab if in game
     const PANEL_TABS: Array<{ key: PanelSubTab; label: string; Icon: React.ElementType }> = inGame
         ? [
@@ -298,7 +320,7 @@ function PanelContent({ isPlayRoute }: { isPlayRoute: boolean }) {
     }
 
     return (
-        <div className="flex flex-1 min-h-0 flex-col gap-2  relative pl-2 pr-1 py-0 sm:gap-3 ">
+        <div className="flex flex-1 z-10 min-h-0 flex-col gap-2  relative pl-2 pr-1 py-0 sm:gap-3 ">
             {/* Player card — shrink-0 ensures it never loses height */}
             <div className="shrink-0">
                 <CompressedGamerCard />
@@ -307,35 +329,34 @@ function PanelContent({ isPlayRoute }: { isPlayRoute: boolean }) {
             {/* Compact sub-tab nav */}
             <div className="shrink-0 rounded-xl border border-slate-200/90 bg-slate-100 p-1 shadow-md">
                 <div className="flex items-center gap-1">
-                {PANEL_TABS.map(({ key, label, Icon }: { key: PanelSubTab; label: string; Icon: React.ElementType }) => {
-                    const isActive = activeSubTab === key;
-                    return (
-                        <button
-                            key={key}
-                            type="button"
-                            onClick={() => setActiveSubTab(key)}
-                            className={`flex h-8 flex-1 items-center justify-center rounded-lg transition-colors ${
-                                isActive
-                                    ? "bg-slate-900 text-white shadow-sm"
-                                    : "text-slate-500 hover:bg-slate-100 hover:text-slate-800"
-                            }`}
-                            aria-pressed={isActive}
-                            aria-label={label}
-                            title={label}
-                        >
-                            <Icon className="h-6 w-6 shrink-0" />
-                        </button>
-                    );
-                })}
+                    {PANEL_TABS.map(({ key, label, Icon }: { key: PanelSubTab; label: string; Icon: React.ElementType }) => {
+                        const isActive = activeSubTab === key;
+                        return (
+                            <button
+                                key={key}
+                                type="button"
+                                onClick={() => setActiveSubTab(key)}
+                                className={`flex h-8 flex-1 items-center justify-center rounded-lg transition-colors ${isActive
+                                        ? "bg-slate-900 text-white shadow-sm"
+                                        : "text-slate-500 hover:bg-slate-100 hover:text-slate-800"
+                                    }`}
+                                aria-pressed={isActive}
+                                aria-label={label}
+                                title={label}
+                            >
+                                <Icon className="h-6 w-6 shrink-0" />
+                            </button>
+                        );
+                    })}
                 </div>
             </div>
 
             {/* Sub-tab content — overflow-hidden: each tab owns its own internal scroll */}
             <div className="flex-1 min-h-0 overflow-hidden rounded-xl p-1 pr-0 bg-slate-100 shadow-md">
                 {activeSubTab === "scoreboard" ? <ScoreboardPane matchType="team-based" /> : null}
-                {activeSubTab === "chat"     ? <ChatPane /> : null}
-                {activeSubTab === "queue"    ? <QueueList /> : null}
-                {activeSubTab === "friends"  ? <FriendsList /> : null}
+                {activeSubTab === "chat" ? <ChatPane /> : null}
+                {activeSubTab === "queue" ? <QueueList /> : null}
+                {activeSubTab === "friends" ? <FriendsList /> : null}
                 {activeSubTab === "settings" ? <SettingsPane isPlayRoute={isPlayRoute} /> : null}
             </div>
         </div>

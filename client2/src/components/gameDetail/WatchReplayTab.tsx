@@ -2,9 +2,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useBucket, useBucketSelector } from "@/actions/bucket";
 import { btReplay, btReplays, btRooms } from "@/actions/buckets";
-import { downloadGameReplay, findGameReplays, replayNextIndex, replayPrevIndex } from "@/actions/replay";
+import { downloadGameReplay, findGameReplays, pauseReplay, replayNextIndex, replayPrevIndex, replaySendGameStart, resumeReplay } from "@/actions/replay";
 import { findGamePanelByRoom } from "@/actions/room";
-import { BackwardIcon, ForwardIcon, PauseIcon, PlayIcon } from "@heroicons/react/24/solid";
+import { ArrowPathIcon, BackwardIcon, ForwardIcon, PauseIcon, PlayIcon } from "@heroicons/react/24/solid";
 import { ScoreboardPane } from "../ScoreboardPane";
 import GamePanel from "../gameScreen/GamePanel";
 
@@ -15,7 +15,7 @@ interface WatchReplayTabProps {
 
 export function WatchReplayTab({ gameSlug }: WatchReplayTabProps) {
     const [activeReplayIndex, setActiveReplayIndex] = useState(0);
-    const [playing, setPlaying] = useState(false);
+    const [playing, setPlaying] = useState(true);
     const [loading, setLoading] = useState(false);
     const timerRef = useRef<number | null>(null);
     const replays = useBucketSelector(btReplays, (replays) => replays[gameSlug]) || [];
@@ -35,11 +35,11 @@ export function WatchReplayTab({ gameSlug }: WatchReplayTabProps) {
 
     // Download replay file and spawn GamePanel when replay changes
     useEffect(() => {
-        if (replays && replays.length > 0 && replays[activeReplayIndex]) {
-            downloadGameReplay(replays[activeReplayIndex]);
-        }
+        // if (replays && replays.length > 0 && replays[activeReplayIndex]) {
+        //     downloadGameReplay(replays[activeReplayIndex]);
+        // }
         // Stop timer when switching replays
-        setPlaying(false);
+        setPlaying(true);
         if (timerRef.current) {
             clearInterval(timerRef.current);
             timerRef.current = null;
@@ -55,13 +55,13 @@ export function WatchReplayTab({ gameSlug }: WatchReplayTabProps) {
             }
             return;
         }
-        timerRef.current = setInterval(() => {
-            const activeReplay = replays[activeReplayIndex];
-            if (!activeReplay) return;
-            // Use the replay room_slug as used in downloadGameReplay
-            // const roomSlug = "REPLAY/" + activeReplay.room_slug + "/" + activeReplay.game_slug;
-            replayNextIndex(activeReplay.room_slug);
-        }, 1200); // Advance every 1.2s (adjust as needed)
+        // timerRef.current = setInterval(() => {
+        //     const activeReplay = replays[activeReplayIndex];
+        //     if (!activeReplay) return;
+        //     // Use the replay room_slug as used in downloadGameReplay
+        //     // const roomSlug = "REPLAY/" + activeReplay.room_slug + "/" + activeReplay.game_slug;
+        //     replayNextIndex(activeReplay.room_slug);
+        // }, 1200); // Advance every 1.2s (adjust as needed)
         return () => {
             if (timerRef.current) {
                 clearInterval(timerRef.current);
@@ -95,17 +95,41 @@ export function WatchReplayTab({ gameSlug }: WatchReplayTabProps) {
     // UI handlers
     const handlePrevReplay = () => setActiveReplayIndex((i) => Math.max(0, i - 1));
     const handleNextReplay = () => setActiveReplayIndex((i) => Math.min(replays.length - 1, i + 1));
-    const handlePrevState = () => replayPrevIndex(roomSlug);
-    const handleNextState = () => replayNextIndex(roomSlug);
-    const handlePlayPause = () => setPlaying((p) => !p);
+    const handlePrevState = () => {
+        replayPrevIndex(roomSlug);
+
+        if( playing ) {
+            pauseReplay(roomSlug);
+            
+            setPlaying(false)
+        }
+        
+    };
+    const handleNextState = () => {
+        replayNextIndex(roomSlug);
+        if( playing ) {
+            pauseReplay(roomSlug);
+            
+            setPlaying(false)
+        }
+    }
+    const handlePlayPause = () => {
+        if( playing ) {
+            pauseReplay(roomSlug);
+        }
+        else {
+            resumeReplay(roomSlug);
+        }
+        setPlaying((p) => !p)
+    };
     const handleReplay = () => {
         // Re-trigger current state (jump to start)
         if (gamepanel && gamestate) {
             // Find gamestart index and jump
             // This is a simplified version; you may want to use replaySendGameStart
-            if (typeof window !== "undefined" && window.replaySendGameStart) {
-                window.replaySendGameStart(roomSlug);
-            }
+             setPlaying(true)
+                replaySendGameStart(roomSlug);
+            
         }
     };
 
@@ -188,7 +212,7 @@ export function WatchReplayTab({ gameSlug }: WatchReplayTabProps) {
                     className="ml-4 inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 text-slate-600 hover:bg-blue-50 hover:text-blue-700"
                     aria-label="Restart replay"
                 >
-                    <PlayIcon className="h-5 w-5" />
+                    <ArrowPathIcon className="h-5 w-5" />
                 </button>
             </div>
 

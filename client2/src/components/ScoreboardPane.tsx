@@ -3,6 +3,8 @@ import { currentPlayer, leaderboard } from "../data/mockData";
 import config from "../config";
 import { RoundedHexPortrait } from "./ui/RoundedHexPortrait";
 import { Panel } from "./ui/Panel";
+import { btGame } from "@/actions/buckets";
+import { useBucket, useBucketSelector } from "@/actions/bucket";
 
 export type MatchType = "free-for-all" | "1v1" | "team-based";
 
@@ -14,34 +16,30 @@ type ScoreboardRow = {
   avatarUrl: string;
   wins: number;
   team?: "Team Alpha" | "Team Omega";
+  stats: Record<string, number>;
 };
 
 type DecoratedScoreboardRow = ScoreboardRow & {
   gameRank: string;
-  stats: {
-    kills: number;
-    assists: number;
-    objectives: number;
-    pingMs: number;
-  };
 };
 
 
 export function ScoreboardPane({ matchType, gamestate }: { matchType: MatchType, gamestate?: any }) {
   const [isExpanded] = useState(true);
+  const updated = useBucketSelector(btGame, (game) => game?.room?.updated);
+  const game = useBucket(btGame) as GameInfoFull | null;
+  const scoreboardStats = (game?.stats ?? [])
+    .filter((s) => s.isactive && s.scoreboard === 1)
+    .sort((a, b) => (a.stat_order ?? 999) - (b.stat_order ?? 999))
+    .slice(0, 4);
   const letterRank = (idx: number) => String.fromCharCode(65 + (idx % 26));
-  const buildStats = (score: number, idx: number, wins?: number) => {
-    const kills = Math.max(2, Math.round(score / 520) + idx);
-    const assists = Math.max(1, Math.round((wins ?? score / 160) / 22) + (idx % 4));
-    const objectives = 1 + ((idx + Math.round(score / 1000)) % 5);
-    const pingMs = 18 + ((idx * 9) % 37);
-    return { kills, assists, objectives, pingMs };
-  };
 
   // If gamestate is provided, use live data
   let baseRows: ScoreboardRow[] = [];
+  const emptyStats = () => Object.fromEntries(scoreboardStats.map((s) => [s.stat_slug, 0]));
+
   if (gamestate && gamestate.players) {
-    baseRows = Object.values(gamestate.players).map((player: any, idx: number) => ({
+    baseRows = gamestate.players.map((player: any, idx: number) => ({
       name: player.displayname || player.name || `Player${idx+1}`,
       score: player.score || 0,
       status: player.isLocal ? "You" : "Live",
@@ -49,6 +47,7 @@ export function ScoreboardPane({ matchType, gamestate }: { matchType: MatchType,
       avatarUrl: player.avatarUrl || player.portrait || `https://i.pravatar.cc/80?img=${idx + 11}`,
       wins: player.wins || 0,
       team: player.team || undefined,
+      stats: Object.fromEntries(scoreboardStats.map((s) => [s.stat_slug, Number(player.stats[s.stat_abbreviation] ?? 0)])),
     }));
   } else {
     // fallback to mock data
@@ -60,14 +59,16 @@ export function ScoreboardPane({ matchType, gamestate }: { matchType: MatchType,
         country: currentPlayer.country,
         avatarUrl: currentPlayer.avatarUrl,
         wins: 112,
+        stats: emptyStats(),
       },
       ...leaderboard.slice(0, 5).map((entry, idx) => ({
         name: entry.player,
         score: entry.score,
         status: entry.player === currentPlayer.name ? ("You" as const) : ("Live" as const),
-        country: entry.country || "US",
+        country: entry.countrycode || "US",
         avatarUrl: `https://i.pravatar.cc/80?img=${idx + 11}`,
         wins: entry.wins,
+        stats: emptyStats(),
       })),
     ].filter((row, idx, arr) => arr.findIndex((candidate) => candidate.name === row.name) === idx);
   }
@@ -76,7 +77,6 @@ export function ScoreboardPane({ matchType, gamestate }: { matchType: MatchType,
     rows.map((row, idx) => ({
       ...row,
       gameRank: letterRank(idx),
-      stats: buildStats(row.score, idx, row.wins),
     }));
 
   const oneVOneRows = buildDecoratedRows(baseRows.slice(0, 2));
@@ -110,7 +110,7 @@ export function ScoreboardPane({ matchType, gamestate }: { matchType: MatchType,
           <RoundedHexPortrait
             src={row.avatarUrl}
             alt={row.name}
-            className="h-11 w-11 rounded-lg overflow-hidden"
+            className="h-8 w-8  rounded-lg overflow-hidden"
             imageInset={5}
           />
         </td>
@@ -143,10 +143,9 @@ export function ScoreboardPane({ matchType, gamestate }: { matchType: MatchType,
           </div>
         </td>
 
-        <td className="align-top px-1 py-1 text-right text-[11px] leading-4 text-slate-700">{row.stats.kills}</td>
-        <td className="align-top px-1 py-1 text-right text-[11px] leading-4 text-slate-700">{row.stats.assists}</td>
-        <td className="align-top px-1 py-1 text-right text-[11px] leading-4 text-slate-700">{row.stats.objectives}</td>
-        <td className="align-top px-1 py-1 text-right text-[11px] leading-4 text-slate-700">{row.stats.pingMs}</td>
+        {scoreboardStats.map((s) => (
+          <td key={s.stat_slug} className="align-top px-1 py-1 text-right text-[11px] leading-4 text-slate-700">{row.stats[s.stat_slug] ?? 0}</td>
+        ))}
         <td className="align-top px-1 py-1 text-right text-[11px] leading-4 font-semibold text-blue-700">
           {row.score.toLocaleString()}
         </td>
@@ -162,20 +161,16 @@ export function ScoreboardPane({ matchType, gamestate }: { matchType: MatchType,
         <colgroup>
           <col className="w-10" />
           <col className="w-26"/>
-          <col className="w-7" />
-          <col className="w-7" />
-          <col className="w-7" />
-          <col className="w-7" />
+          {scoreboardStats.map((s) => <col key={s.stat_slug} className="w-7" />)}
           <col className="w-10" />
         </colgroup>
         <thead>
           <tr className="bg-slate-50">
             <th aria-hidden="true" className="px-1.5 py-1 text-left" />
             <th className="px-1 py-1 text-left text-[10px] font-semibold uppercase tracking-wide text-slate-500">Player</th>
-            <th className="px-1 py-1 text-right text-[10px] font-semibold uppercase tracking-wide text-slate-500">K</th>
-            <th className="px-1 py-1 text-right text-[10px] font-semibold uppercase tracking-wide text-slate-500">A</th>
-            <th className="px-1 py-1 text-right text-[10px] font-semibold uppercase tracking-wide text-slate-500">Obj</th>
-            <th className="px-1 py-1 text-right text-[10px] font-semibold uppercase tracking-wide text-slate-500">MS</th>
+            {scoreboardStats.map((s) => (
+              <th key={s.stat_slug} className="px-1 py-1 text-right text-[10px] font-semibold uppercase tracking-wide text-slate-500" title={s.stat_name}>{s.stat_abbreviation}</th>
+            ))}
             <th className="px-1 py-1 text-right text-[10px] font-semibold uppercase tracking-wide text-slate-500">Score</th>
           </tr>
         </thead>

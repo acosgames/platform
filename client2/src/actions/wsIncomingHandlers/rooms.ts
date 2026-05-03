@@ -42,8 +42,10 @@ export const handleInRooms: WSIncomingHandler = (context) => {
                 wsLeaveGame(roomInfo.room.room_slug);
             });
 
+            
             context.msg.payload = multiplayerRoom.gamestate;
             context.msg.room_slug = multiplayerRoom.room?.room_slug;
+            router.navigate(`/game/${multiplayerRoom?.room?.game_slug}/play`);
             clearGameQueues();
         } else {
             addRooms(payload);

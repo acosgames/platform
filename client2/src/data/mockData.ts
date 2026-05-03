@@ -60,11 +60,16 @@ export interface Replay {
 }
 
 export interface LeaderboardEntry {
+  displayname?: string;
   rank: number;
   player: string;
   score: number;
   wins: number;
   countrycode: string;
+  rating?: number;
+  win?: number;
+  loss?: number;
+  tie?: number;
 }
 
 export interface Achievement {
@@ -200,18 +205,18 @@ export const replays: Replay[] = [
 ];
 
 export const leaderboard: LeaderboardEntry[] = [
-  { rank: 1, player: 'ProGamer2023', score: 15420, wins: 342, country: 'KR' },
-  { rank: 2, player: 'EliteMaster', score: 14890, wins: 318, country: 'US' },
-  { rank: 3, player: 'ChampionX', score: 14235, wins: 295, country: 'JP' },
-  { rank: 4, player: 'ShadowKnight', score: 13780, wins: 276, country: 'US' },
-  { rank: 5, player: 'LegendKiller', score: 13120, wins: 254, country: 'DE' },
-  { rank: 6, player: 'LegendKillerASDF', score: 13120, wins: 254, country: 'DE' },
-  { rank: 7, player: 'WarriorKing', score: 12650, wins: 241, country: 'BR' },
-  { rank: 8, player: 'WarriorKingASDF', score: 12650, wins: 241, country: 'BR' },
-  { rank: 9, player: 'NightRider', score: 12340, wins: 228, country: 'GB' },
-  { rank: 10, player: 'NightRiderASDF', score: 12340, wins: 228, country: 'GB' },
-  { rank: 11, player: 'StormBreaker', score: 11890, wins: 215, country: 'FR' },
-  { rank: 12, player: 'StormBreakerASDF', score: 11890, wins: 215, country: 'FR' }
+  { rank: 1, player: 'ProGamer2023', score: 15420, wins: 342, countrycode: 'KR' },
+  { rank: 2, player: 'EliteMaster', score: 14890, wins: 318, countrycode: 'US' },
+  { rank: 3, player: 'ChampionX', score: 14235, wins: 295, countrycode: 'JP' },
+  { rank: 4, player: 'ShadowKnight', score: 13780, wins: 276, countrycode: 'US' },
+  { rank: 5, player: 'LegendKiller', score: 13120, wins: 254, countrycode: 'DE' },
+  { rank: 6, player: 'LegendKillerASDF', score: 13120, wins: 254, countrycode: 'DE' },
+  { rank: 7, player: 'WarriorKing', score: 12650, wins: 241, countrycode: 'BR' },
+  { rank: 8, player: 'WarriorKingASDF', score: 12650, wins: 241, countrycode: 'BR' },
+  { rank: 9, player: 'NightRider', score: 12340, wins: 228, countrycode: 'GB' },
+  { rank: 10, player: 'NightRiderASDF', score: 12340, wins: 228, countrycode: 'GB' },
+  { rank: 11, player: 'StormBreaker', score: 11890, wins: 215, countrycode: 'FR' },
+  { rank: 12, player: 'StormBreakerASDF', score: 11890, wins: 215, countrycode: 'FR' }
 ];
 
 export const achievements: Achievement[] = [

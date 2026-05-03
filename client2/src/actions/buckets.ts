@@ -124,7 +124,7 @@ export const btJustCreatedName = bucket(false);
 export const btCheckingUserLogin = bucket(true);
 export const btQueueStats = bucket(null);
 export const btGamePanels = bucket([]);
-export const btLastJoin = bucket<string | null>(null);
+export const btLastJoin = bucket<string | null>(localStorage.getItem("pendingJoin") ?? null);
 
 export const btGamePanelById = bucket({});
 export const btPrimaryState = bucket({});

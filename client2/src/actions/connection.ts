@@ -42,7 +42,7 @@ import {
 import { replaySendGameStart } from "./replay";
 import { wsDecode, wsSend } from "./ws";
 import { wsIncomingHandlers } from "./wsIncomingHandlers";
-import { GameStatus } from "@acosgames/framework";
+import { GameStatus, gs } from "@acosgames/framework";
 import { merge } from "acos-json-encoder";
 
 
@@ -77,20 +77,22 @@ export function timerLoop(cb?: () => void) {
         if (gamepanel.available || !gamepanel.gamestate || !gamepanel.loaded || !gamepanel.active)
             continue;
 
-        let gamestate = gamepanel.gamestate || {};
+        let gamestate = gs(gamepanel.gamestate);
+        if(!gamestate) continue;
 
         // let timer = gamestate.timer;
         // if (!timer) {
         //     continue;
         // }
 
-        let deadline = gamestate?.room?.starttime + gamestate?.room?.timeend;
+        let deadline = gamestate.startTime + gamestate.deadline;
         if (!deadline) continue;
 
+        let eventMap = gamestate.eventsMap();
         if (
-            gamestate?.room?.events?.gameover ||
-            gamestate?.room?.events?.gamecancelled ||
-            gamestate?.room?.events?.gameerror
+            eventMap.gameover ||
+            eventMap.gamecancelled ||
+            eventMap.gameerror
         )
             continue;
 

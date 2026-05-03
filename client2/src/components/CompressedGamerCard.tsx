@@ -4,6 +4,7 @@ import config from "../config";
 import { btDuplicateTabs, btLatency, btLoggedIn, btUser, btWebsocketConnected } from "@/actions/buckets";
 import { useBuckets } from "@/actions/bucket";
 import { logout } from "@/actions/person";
+import { openSaveProfileModal } from "./SignInPane";
 
 export function CompressedGamerCard() {
     let [loggedIn, player, latency, wsConnected, duplicatetabs] = useBuckets([btLoggedIn, btUser, btLatency, btWebsocketConnected, btDuplicateTabs]);
@@ -11,7 +12,10 @@ export function CompressedGamerCard() {
     const menuRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
 
-    if (!loggedIn || !player) return <></>;
+    if (!loggedIn || !player) return <></>
+
+    // Temp accounts have no email and no github
+    const isTempAccount = !player.email && !player.github;
 
     const handleMenuBlur = (e: React.FocusEvent<HTMLDivElement>) => {
         if (!menuRef.current?.contains(e.relatedTarget as Node)) {
@@ -23,7 +27,7 @@ export function CompressedGamerCard() {
     const rawLevel = Number(player.level ?? 1);
     const level = Number.isFinite(rawLevel) ? Math.max(1, rawLevel) : 1;
     const levelInt = Math.trunc(level);
-    const xpPercent = 80;//Math.max(0, Math.min(100, Math.round((level - levelInt) * 100)));
+    const xpPercent = Math.max(0, Math.min(100, Math.round((level - levelInt) * 100)));
 
     const countrycode = (player.countrycode || "US").toUpperCase();
     const flagSrc = `${config.https.cdn}images/country/${countrycode}.svg`;
@@ -32,65 +36,23 @@ export function CompressedGamerCard() {
     const statusLabel = duplicatetabs ? "Duplicate" : isOnline ? "Online" : "Offline";
 
     return (
-        <section className="relative  rounded-xl  bg-slate-950 p-0.5 shadow-md">
+        <section className="relative  rounded-xl  bg-slate-950  shadow-md">
             {/* <div className="pointer-events-none absolute inset-x-0 top-0 h-14 bg-[linear-gradient(120deg,rgba(15,23,42,0.05),rgba(6,182,212,0.12)_45%,rgba(59,130,246,0.1))]" /> */}
-            <div className="relative flex items-center gap-3 bg-slate-950 rounded-xl px-3 py-2">
-                {/* 3-dot menu */}
-                <div ref={menuRef} className="absolute top-1.5 right-1.5 z-10" onBlur={handleMenuBlur}>
-                    <button
-                        onClick={() => setMenuOpen((v) => !v)}
-                        className="flex h-6 w-6 items-center justify-center rounded-md text-slate-400 hover:bg-slate-800 hover:text-slate-100 focus:outline-none"
-                        aria-label="Menu"
-                    >
-                        <svg viewBox="0 0 4 16" width="4" height="16" fill="currentColor">
-                            <circle cx="2" cy="2" r="1.5" />
-                            <circle cx="2" cy="8" r="1.5" />
-                            <circle cx="2" cy="14" r="1.5" />
-                        </svg>
-                    </button>
-                    {menuOpen && (
-                        <div className="absolute right-0 top-7 w-44 rounded-lg border border-slate-700 bg-slate-900 py-1 shadow-xl">
-                            <button
-                                onClick={() => { setMenuOpen(false); navigate("/profile"); }}
-                                className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-semibold text-slate-200 hover:bg-slate-800"
-                            >
-                                <svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor" className="shrink-0 text-slate-400"><path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" /></svg>
-                                Profile
-                            </button>
-                            <button
-                                disabled
-                                className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-semibold text-slate-500 cursor-not-allowed"
-                            >
-                                <svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor" className="shrink-0"><path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" /></svg>
-                                Settings
-                                <span className="ml-auto text-[9px] text-slate-600">soon</span>
-                            </button>
-                            <button
-                                disabled
-                                className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-semibold text-slate-500 cursor-not-allowed"
-                            >
-                                <svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor" className="shrink-0"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" /></svg>
-                                Stats
-                                <span className="ml-auto text-[9px] text-slate-600">soon</span>
-                            </button>
-                            <div className="my-1 border-t border-slate-700" />
-                            <button
-                                onClick={() => { setMenuOpen(false); logout(); }}
-                                className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-semibold text-rose-400 hover:bg-slate-800"
-                            >
-                                <svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor" className="shrink-0"><path fillRule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clipRule="evenodd" /></svg>
-                                Logout
-                            </button>
-                        </div>
-                    )}
-                </div>
+            <div className="relative flex items-start gap-3 bg-slate-950 rounded-xl px-2 pt-1">
+
                 <div className="relative shrink-0">
-                    <div className="absolute -inset-0.75 rounded-lg bg-linear-to-br from-cyan-500/60 via-sky-500/35 to-blue-700/65" />
-                    <img src={avatarUrl} alt={player.displayname || "Player"} className="relative h-16 w-16 rounded-lg  bg-slate-900 object-cover" />
-                    <span
-                        className={`absolute -bottom-1 -right-1 h-3 w-3 rounded-full border-2 border-white ${isOnline ? "bg-emerald-400" : "bg-slate-400"}`}
-                        title={statusLabel}
-                    />
+                    <div className="relative  rounded-lg bg-linear-to-br from-slate-500/60 via-slate-500/35 to-slate-700/65 p-1">
+                        <img src={avatarUrl} alt={player.displayname || "Player"} className="relative h-14 w-14 rounded-lg  bg-slate-900 object-cover" />
+                        <span
+                            className={`absolute -bottom-1 -right-1 h-3 w-3 rounded-full border-2 border-white ${isOnline ? "bg-emerald-400" : "bg-slate-400"}`}
+                            title={statusLabel}
+                        />
+                    </div>
+
+                    <div className="shrink-0 rounded-lg pt-0.5 text-center flex items-center justify-center leading-none gap-1">
+                        <div className="text-[9px] font-bold uppercase tracking-[0.2em] text-slate-400">Lvl</div>
+                        <div className="mt-0.5 text-sm font-black text-slate-50">{levelInt}</div>
+                    </div>
                 </div>
 
                 <div className="min-w-0 flex-1">
@@ -104,19 +66,75 @@ export function CompressedGamerCard() {
                                     {latencyValue}ms
                                 </span>
                             </div> */}
-                            <h3 className="mt-1.5 truncate text-sm font-black uppercase tracking-[0.08em] text-slate-100">
+                            <h3 className="mt-1.5 truncate text-xs font-black uppercase tracking-[0.08em] text-slate-100">
                                 {player.displayname || "Player"}
                             </h3>
                             <div className="mt-1 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-100">
-                                <img src={flagSrc} alt={`${countrycode} flag`} className="h-[20px] w-[27px] rounded-[2px] border border-slate-600 object-cover" title={countrycode} />
+                                <img src={flagSrc} alt={`${countrycode} flag`} className="h-[16px] w-[23px] rounded-[2px] border border-slate-600 object-cover" title={countrycode} />
                                 <span>{countrycode}</span>
                             </div>
                         </div>
 
-                        <div className="shrink-0 rounded-lg  mt-2 text-center leading-none">
-                            <div className="text-[9px] font-bold uppercase tracking-[0.2em] text-slate-400">Level</div>
-                            <div className="mt-0.5 text-sm font-black text-slate-50">{levelInt}</div>
+
+                        {/* 3-dot menu */}
+                        <div ref={menuRef} className="relative top-1 right-0 z-10" onBlur={handleMenuBlur}>
+                            <button
+                                onClick={() => setMenuOpen((v) => !v)}
+                                className="flex h-6 w-6 items-center justify-center rounded-md text-slate-400 hover:bg-slate-800 hover:text-slate-100 focus:outline-none"
+                                aria-label="Menu"
+                            >
+                                <svg viewBox="0 0 4 16" width="4" height="16" fill="currentColor">
+                                    <circle cx="2" cy="2" r="1.5" />
+                                    <circle cx="2" cy="8" r="1.5" />
+                                    <circle cx="2" cy="14" r="1.5" />
+                                </svg>
+                            </button>
+                            {menuOpen && (
+                                <div className="absolute right-0 top-7 w-44 rounded-lg bg-white py-1 shadow-md">
+                                    <button
+                                        onClick={() => { setMenuOpen(false); navigate("/profile"); }}
+                                        className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-semibold text-slate-600 hover:bg-slate-200"
+                                    >
+                                        <svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor" className="shrink-0 "><path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" /></svg>
+                                        Profile
+                                    </button>
+                                    <button
+                                        disabled
+                                        className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-semibold text-slate-300 cursor-not-allowed"
+                                    >
+                                        <svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor" className="shrink-0"><path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" /></svg>
+                                        Settings
+                                        <span className="ml-auto text-[9px] text-slate-600">soon</span>
+                                    </button>
+                                    <button
+                                        disabled
+                                        className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-semibold text-slate-300 cursor-not-allowed"
+                                    >
+                                        <svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor" className="shrink-0"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" /></svg>
+                                        Stats
+                                        <span className="ml-auto text-[9px] text-slate-600">soon</span>
+                                    </button>
+                                    <div className="my-1 border-t border-slate-100" />
+                                    {isTempAccount && (
+                                        <button
+                                            onClick={() => { setMenuOpen(false); openSaveProfileModal(); }}
+                                            className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-semibold text-cyan-600 hover:bg-cyan-50"
+                                        >
+                                            <svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor" className="shrink-0"><path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6h5a2 2 0 012 2v7a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h5v5.586l-1.293-1.293z" /></svg>
+                                            Save Profile
+                                        </button>
+                                    )}
+                                    <button
+                                        onClick={() => { setMenuOpen(false); logout(); }}
+                                        className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-semibold text-slate-600 hover:bg-slate-200"
+                                    >
+                                        <svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor" className="shrink-0"><path fillRule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clipRule="evenodd" /></svg>
+                                        Logout
+                                    </button>
+                                </div>
+                            )}
                         </div>
+
                     </div>
 
                     <div className="mt-2.5">

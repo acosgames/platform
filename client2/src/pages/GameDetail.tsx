@@ -14,7 +14,7 @@ import { PlayerRankLetter } from "../components/gameDetail/PlayerRankLetter";
 import { RankLeaderboardTab } from "../components/gameDetail/RankLeaderboardTab";
 import { StatsLeaderboardTab } from "../components/gameDetail/StatsLeaderboardTab";
 import { LiveMatchSection } from "../components/gameDetail/LiveMatchSection";
-import type { LeaderboardSubtab, SeasonKey } from "../components/gameDetail/leaderboardTypes";
+import type { LeaderboardSubtab, LeaderboardSubtabOption, SeasonKey } from "../components/gameDetail/leaderboardTypes";
 
 import { PlayNow } from "@/components/ui/PlayNow";
 import { Tooltip } from "@/components/ui/Tooltip";
@@ -32,6 +32,7 @@ export function GameDetail() {
 
     const [activeTab, setActiveTab] = useState<DetailTab>("leaderboards");
     const [activeLeaderboardSubtab, setActiveLeaderboardSubtab] = useState<LeaderboardSubtab>("division");
+
     const [divisionSeasonFilter, setDivisionSeasonFilter] = useState<SeasonKey>("s12");
     // Replay tab state moved to WatchReplayTab
     const [isHearted, setIsHearted] = useState(false);
@@ -39,6 +40,23 @@ export function GameDetail() {
 
     const currentPlayer = useBucket(btUser);
     const game: GameInfoFull = useLoading('game/' + (id ?? ""), btGame);
+
+    // Hide 'division' subtab if not logged in
+    const leaderboardSubtabs: LeaderboardSubtabOption[] = currentPlayer ? [
+            { key: "division" as const, label: "Division" },
+            { key: "rank" as const, label: "Rank" },
+            { key: "stats" as const, label: "Stats" },
+          ] : [
+            { key: "rank" as const, label: "Rank" },
+            { key: "stats" as const, label: "Stats" },
+          ];
+
+    // If current subtab is 'division' and user logs out, auto-switch to 'rank'
+    useEffect(() => {
+        if (!currentPlayer && activeLeaderboardSubtab === "division") {
+            setActiveLeaderboardSubtab("rank");
+        }
+    }, [currentPlayer, activeLeaderboardSubtab]);
 
     const heartReactions = 0;// Math.round(game.players * (7.5 + game.rating) + gameSeed * 230);
 
@@ -139,9 +157,13 @@ export function GameDetail() {
         if (activeTab === "leaderboards") {
             return (
                 <div className="space-y-4">
-                    <LeaderboardSubtabNav activeSubtab={activeLeaderboardSubtab} onChange={setActiveLeaderboardSubtab} />
+                    <LeaderboardSubtabNav
+                        activeSubtab={activeLeaderboardSubtab}
+                        onChange={setActiveLeaderboardSubtab}
+                        subtabs={leaderboardSubtabs}
+                    />
 
-                    {activeLeaderboardSubtab === "division" ? (
+                    {activeLeaderboardSubtab === "division" && currentPlayer ? (
                         <DivisionLeaderboardTab
                             divisionSeasonFilter={divisionSeasonFilter}
                             seasonOptions={seasonOptions}
@@ -182,12 +204,12 @@ export function GameDetail() {
             );
         }
 
-        if( liveMatch && activeTab == "live-match") {
-            
-            if( liveMatch ) {
+        if (liveMatch && activeTab == "live-match") {
+
+            if (liveMatch) {
                 return <LiveMatchSection gameName={game.name} gameImageUrl={imgUrl} liveMatch={liveMatch} liveMatchType={liveMatchType} mode="live" />;
             }
-            
+
         }
 
         return (
@@ -249,7 +271,7 @@ export function GameDetail() {
                             </h1>
                             <div className="mt-2 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
                                 <p className="inline-flex rounded-full bg-white/12 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-white ring-1 ring-white/15">
-                                    {game.displayname} • Level {currentPlayer?.level ?? "—"}
+                                    Created by <a className="text-blue-100 pl-1">{game.displayname}</a>
                                 </p>
                                 <button
                                     type="button"
@@ -313,27 +335,26 @@ export function GameDetail() {
 
             <div className="w-full  rounded-xl bg-white shadow-md">
                 <div className="flex w-max min-w-full items-center gap-1 p-3 sm:justify-center sm:p-4 sm:py-3  whitespace-nowrap">
-                        {tabs.map((tab) => {
-                            const Icon = tab.icon;
-                            const isActive = activeTab === tab.key;
-                            if( liveMatch == null && tab.key === "live-match") return <></>;
-                            return (
-                                <Tooltip key={tab.key} content={tab.label} className="flex-1 " contentClassName="text-md">
-                                    <button
-                                        type="button"
-                                        onClick={() => setActiveTab(tab.key)}
-                                        className={`flex h-8 w-full items-center justify-center rounded-lg px-4 transition-colors ${
-                                            isActive
-                                                ? "bg-slate-900 text-white shadow-sm"
-                                                : "text-slate-500 hover:bg-slate-100 hover:text-slate-800"
+                    {tabs.map((tab) => {
+                        const Icon = tab.icon;
+                        const isActive = activeTab === tab.key;
+                        if (liveMatch == null && tab.key === "live-match") return <div key="live-match"></div>;
+                        return (
+                            <Tooltip key={tab.key} content={tab.label} className="flex-1 " contentClassName="text-md">
+                                <button
+                                    type="button"
+                                    onClick={() => setActiveTab(tab.key)}
+                                    className={`flex h-8 w-full items-center justify-center rounded-lg px-4 transition-colors ${isActive
+                                            ? "bg-slate-900 text-white shadow-sm"
+                                            : "text-slate-500 hover:bg-slate-100 hover:text-slate-800"
                                         }`}
-                                        aria-label={tab.label}
-                                    >
-                                        <Icon className="h-4 w-4 sm:h-6 sm:w-6 shrink-0" />
-                                    </button>
-                                </Tooltip>
-                            );
-                        })}
+                                    aria-label={tab.label}
+                                >
+                                    <Icon className="h-4 w-4 sm:h-6 sm:w-6 shrink-0" />
+                                </button>
+                            </Tooltip>
+                        );
+                    })}
                 </div>
             </div>
 

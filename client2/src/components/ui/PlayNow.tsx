@@ -1,4 +1,8 @@
+import { useEffect } from "react";
 import { joinGame } from "@/actions/game";
+import { useBucket } from "@/actions/bucket";
+import { btUser, btModalShow, btLastJoin, btWebsocketConnected } from "@/actions/buckets";
+import { openSignInModal } from "../SignInPane";
 // import { useMatchmakingQueue } from "@/context/MatchmakingQueueContext";
 
 import { PlayIcon } from "@heroicons/react/24/solid";
@@ -6,15 +10,42 @@ import { PlayIcon } from "@heroicons/react/24/solid";
 
 
 export function PlayNow({ game_slug, name: _name }: { game_slug: string; name: string }) {
-
+    const user = useBucket(btUser);
+    const connected = useBucket(btWebsocketConnected);
     // const navigate = useNavigate();
     // const { enqueue } = useMatchmakingQueue();
 
+
     const handlePlayNow = () => {
+        if (!user || !user.shortid) {
+            // Store the pending join action
+            btLastJoin.set(game_slug);
+            localStorage.setItem("pendingJoin", game_slug);
+            openSignInModal();
+            return;
+        }
         joinGame(game_slug, false);
-        // enqueue({ game_slug, name });
-        // navigate(`/game/${game_slug}/play`);
     };
+
+    // Effect: if user logs in and btLastJoin is set, auto-join.
+    // Must run in useEffect (not during render) so it fires reliably
+    // after the commit phase, even when GameDetail re-renders due to login.
+    useEffect(() => {
+        if (user && user.shortid && connected) {
+            const lastJoin = localStorage.getItem("pendingJoin");
+            if (lastJoin) {
+
+                // Clear first to prevent double-calls if joinGame triggers re-renders
+                btLastJoin.set(null);
+                localStorage.removeItem("pendingJoin");
+                joinGame(lastJoin, false);
+
+
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user?.shortid, connected]);
+
 
 
     return (<div className="group relative inline-flex">

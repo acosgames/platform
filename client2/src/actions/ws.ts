@@ -375,6 +375,7 @@ export function onPong(message: any) {
 
 export async function disconnect() {
     let ws = btWebsocket.get();
+    btWebsocketConnected.set(false);
     if (!ws) return;
 
     ws.close();

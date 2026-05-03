@@ -8,6 +8,7 @@ import { BlogPost } from "./pages/BlogPost";
 import { DevManager } from "./pages/Developer/DevManager";
 import { DevLogin } from "./pages/Developer/DevLogin";
 import { DevGamePage } from "./pages/Developer/DevGamePage/index";
+import { LoginSuccess } from "./pages/LoginSuccess";
 
 export const router = createBrowserRouter([
   {
@@ -45,6 +46,10 @@ export const router = createBrowserRouter([
       {
         path: "dev/game/:game_slug/*",
         Component: DevGamePage,
+      },
+      {
+        path: "login/success",
+        Component: LoginSuccess,
       },
     ],
   },

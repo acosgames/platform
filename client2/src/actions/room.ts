@@ -19,6 +19,7 @@ import {
     btShowLoadingBox,
     btUser,
 } from "./buckets";
+import { gs } from "@acosgames/framework";
 
 export function setCurrentRoom(room_slug: string | null) {
     btRoomSlug.set(room_slug);
@@ -358,8 +359,8 @@ export function addRooms(roomList: any[]) {
 
 export function addRoom(msg: any) {
 
-    let history = msg.payload;
-    let room = msg.room;
+    let history = msg.payload.gamestate;
+    let room = msg.payload.room;
 
     let gamepanel = findGamePanelByRoom(room?.room_slug);
 
@@ -380,7 +381,7 @@ export function addRoom(msg: any) {
         gamepanel.gamestate = history[1]?.payload;
         gamepanel.room.history = history;
     } else {
-        gamepanel.gamestate = history?.gamestate;
+        gamepanel.gamestate = history;
     }
 
     btShowLoadingBox.assign({ [gamepanel.id]: true });
@@ -391,7 +392,7 @@ export function addRoom(msg: any) {
         setPrimaryGamePanel(gamepanel);
     }
 
-    rooms[room?.room_slug] = { room: room, gamestate: history?.gamestate };
+    rooms[room?.room_slug] = { room: room, gamestate: history };
     btRooms.set(rooms);
     setWithExpiry("rooms", JSON.stringify(rooms), 120);
 
@@ -467,26 +468,27 @@ export function updateRoomStatus(room_slug: string | null) {
 }
 
 export function processsRoomStatus(gamepanel: any) {
-    let gamestate = gamepanel.gamestate;
+    let gamestate = gs(gamepanel.gamestate);
 
-    if (!gamestate || !gamestate.state || !gamestate.players) {
+    if (!gamepanel.gamestate || !gamepanel.gamestate.state || !gamepanel.gamestate.players) {
         return "NOTEXIST";
     }
 
-    if (gamestate?.room?.events?.gameover) {
+    let eventMap = gamestate.eventsMap();
+    if (eventMap.gameover) {
         return "GAMEOVER";
     }
-    if (gamestate?.room?.events?.gamecancelled) {
+    if (eventMap.gamecancelled) {
         return "GAMECANCELLED";
     }
-    if (gamestate?.room?.events?.gameerror) {
+    if (eventMap.gameerror) {
         return "GAMEERROR";
     }
-    if (gamestate?.room?.events?.error) {
+    if (eventMap.error) {
         return "ERROR";
     }
 
-    if (gamestate?.room?.events?.noshow) {
+    if (eventMap.noshow) {
         return "NOSHOW";
     }
 

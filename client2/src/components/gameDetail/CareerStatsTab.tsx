@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { openSignInModal } from "../SignInPane";
 import { btGame, btPlayerStats, btUser } from "@/actions/buckets";
 import { useBucket } from "@/actions/bucket";
 import { getPlayerGlobalStats, getPlayerStatHistory } from "@/actions/playerStats";
@@ -26,6 +27,23 @@ export function CareerStatsTab({ gameSlug }: { gameSlug: string }) {
     const game = useBucket(btGame) as GameInfoFull | null;
     const currentPlayer = useBucket(btUser);
     const cp = currentPlayer as any;
+
+    // If not logged in, show a login prompt panel
+    if (!cp?.shortid) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[320px] rounded-xl bg-white p-8 shadow-md border border-slate-100 text-center">
+                <h2 className="text-lg font-bold text-slate-800 mb-2">Sign in to Track Your Stats</h2>
+                <p className="text-sm text-slate-500 mb-4">Log in or create an account to view your career stats, progress, and history for this game.</p>
+                <button
+                    type="button"
+                    className="px-5 py-2 rounded-md bg-blue-600 text-white font-semibold text-sm shadow hover:bg-blue-700 transition-colors"
+                    onClick={openSignInModal}
+                >
+                    Sign In / Create Account
+                </button>
+            </div>
+        );
+    }
     const playerStats = useBucket(btPlayerStats) as Record<string, any>;
     const playerStat = playerStats?.[gameSlug];
     const rating = Number(playerStat?.rating ?? 0);
@@ -62,20 +80,83 @@ export function CareerStatsTab({ gameSlug }: { gameSlug: string }) {
     const innerWidth = chartWidth - paddingLeft - paddingRight;
     const innerHeight = chartHeight - paddingTop - paddingBottom;
 
-    const minValue = 0;
-    const maxDataValue = statHistory.length > 0 ? Math.max(...statHistory.map((p) => p.value)) : 1;
-    // Add 50% headroom above the max so data floats in the centre of the chart
-    const maxValue = maxDataValue > 0 ? maxDataValue * 1.5 : 1;
+    const rawDataMin = statHistory.length > 0 ? Math.min(...statHistory.map((p) => p.value)) : 0;
+    const rawDataMax = statHistory.length > 0 ? Math.max(...statHistory.map((p) => p.value)) : 1;
+    const dataRange = rawDataMax - rawDataMin;
+    // Adaptive padding: 20% of data range, or 5% of max if range is zero/tiny
+    const yPad = dataRange > 0 ? dataRange * 0.25 : Math.max(rawDataMax * 0.1, 1);
+    const minValue = Math.max(0, rawDataMin - yPad);
+    const maxValue = rawDataMax + yPad;
     const valueRange = Math.max(1, maxValue - minValue);
 
-    const allStatDefs: { stat_slug: string; stat_name: string }[] = (game?.stats ?? []) as any;
+
+    const allStatDefs: any[] = (game?.stats ?? []) as any;
     const statDefMap = Object.fromEntries(allStatDefs.map((s) => [s.stat_slug, s]));
 
-    const fmtY = (v: number) => v >= 10000 ? `${(v / 1000).toFixed(1)}k` : String(Math.round(v));
-    const fmtStatVal = (row: GlobalStatRow) =>
-        row.valueINT != null ? fmtY(row.valueINT) : row.valueFLOAT != null ? fmtY(row.valueFLOAT) : "\u2014";
-    const fmtStatBest = (row: GlobalStatRow) =>
-        row.bestINT != null ? fmtY(row.bestINT) : row.bestFLOAT != null ? fmtY(row.bestFLOAT) : "\u2014";
+    // Formatters for display_format
+    function fmtNumber(v: number, decimals = 0) {
+        if (decimals > 0) return v >= 100000 ? `${(v / 1000).toFixed(1)}k` : v.toFixed(decimals);
+        return v >= 100000 ? `${(v / 1000).toFixed(1)}k` : String(Math.round(v).toLocaleString());
+    }
+    function fmtPercent(v: number, decimals = 2) {
+        return `${(v * 100).toFixed(decimals)}%`;
+    }
+    function fmtTime(v: number) {
+        // mm:ss
+        if (!isFinite(v)) return "—";
+        const m = Math.floor(v / 60);
+        const s = Math.floor(v % 60);
+        return `${m}:${s.toString().padStart(2, "0")}`;
+    }
+    function fmtDuration(v: number) {
+        // hh:mm:ss
+        if (!isFinite(v)) return "—";
+        const h = Math.floor(v / 3600);
+        const m = Math.floor((v % 3600) / 60);
+        const s = Math.floor(v % 60);
+        return `${h}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+    }
+    function fmtDateVal(v: number | string) {
+        // YYYY-MM-DD
+        const d = new Date(typeof v === "string" ? v : v * 1000);
+        return d.toISOString().slice(0, 10);
+    }
+
+    function fmtByDisplayFormat(v: number | string | null | undefined, def?: any): string {
+        if (v == null || v === "") return "—";
+        const fmt = def?.display_format ?? 0;
+        const isFloat = def?.valueTYPE === 1 || def?.valueTYPE === 2;
+        switch (fmt) {
+            case 1: return fmtPercent(Number(v), 2);
+            case 2: return fmtTime(Number(v));
+            case 3: return fmtDuration(Number(v));
+            case 4: return fmtDateVal(v);
+            default: return fmtNumber(Number(v), isFloat ? 3 : 0);
+        }
+    }
+
+    const fmtStatVal = (row: GlobalStatRow) => {
+        const def = statDefMap[row.stat_slug];
+        const vType = def?.valueTYPE ?? 0;
+        const algo = def?.algorithm ?? 0;
+        // int/time with avg algorithm: value accumulates in valueFLOAT (running avg), valueINT is count
+        // int/time with other algorithms: value is in valueINT
+        // float/avg types: value is always in valueFLOAT
+        let v: number | null;
+        if (vType === 0 || vType === 3) {
+            v = algo === 2 ? (row.valueFLOAT / row.valueINT) : row.valueINT;
+        } else {
+            v = algo === 2 ? (row.valueFLOAT / row.valueINT) : row.valueFLOAT;
+        }
+        return v != null ? fmtByDisplayFormat(v, def) : "—";
+    };
+    const fmtStatBest = (row: GlobalStatRow) => {
+        const def = statDefMap[row.stat_slug];
+        const vType = def?.valueTYPE ?? 0;
+        // best is always bestINT for int/time types, bestFLOAT for float/avg types
+        const v: number | null = (vType === 0 || vType === 3) ? row.bestINT : row.bestFLOAT;
+        return v != null ? fmtByDisplayFormat(v, def) : "—";
+    };
 
     // Compute "nice" Y ticks so values are never duplicated
     const rawStep = valueRange / 4;
@@ -137,8 +218,8 @@ export function CareerStatsTab({ gameSlug }: { gameSlug: string }) {
                     <div>
                         <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">Stat History</p>
                         <p className="text-sm font-semibold text-slate-800">Past 30 Days</p>
-                        {statsOptions.find((s) => s.stat_slug === selectedStat) && (
-                            <p className="mt-0.5 text-xs text-blue-600 font-semibold">{statsOptions.find((s) => s.stat_slug === selectedStat)!.stat_name}</p>
+                        {statDefMap[selectedStat] && (
+                            <p className="mt-0.5 text-xs text-blue-600 font-semibold">{statDefMap[selectedStat]!.stat_name}</p>
                         )}
                     </div>
                     <div className="text-right">
@@ -156,9 +237,9 @@ export function CareerStatsTab({ gameSlug }: { gameSlug: string }) {
                         <p className="text-xs text-slate-500 mt-1.5">
                             {selectedStat ? (
                                 <>
-                                    Current: <span className="font-bold text-slate-900">{latestValue}</span>{" "}
+                                    Current: <span className="font-bold text-slate-900">{fmtByDisplayFormat(latestValue, statDefMap[selectedStat])}</span>{" "}
                                     <span className={`text-[11px] font-semibold ${valueDelta >= 0 ? "text-emerald-600" : "text-rose-500"}`}>
-                                        {valueDelta >= 0 ? "+" : ""}{valueDelta} last
+                                        {valueDelta >= 0 ? "+" : ""}{fmtByDisplayFormat(valueDelta, statDefMap[selectedStat])} last
                                     </span>
                                 </>
                             ) : (
@@ -171,15 +252,15 @@ export function CareerStatsTab({ gameSlug }: { gameSlug: string }) {
                 {statHistory.length > 0 && (
                     <div className="mb-3 grid grid-cols-3 lg:grid-cols-6 divide-x divide-slate-100 rounded-lg border border-slate-100 bg-slate-50 text-center">
                         {[
-                            { label: "Current", value: latestValue, color: "text-blue-600" },
-                            { label: "Best", value: highestValue, color: "text-emerald-600" },
-                            { label: "Worst", value: lowestValue, color: "text-rose-500" },
+                            { label: "Worst", value: lowestValue, color: "text-slate-500" },
+                            { label: "Current", value: latestValue, color: "text-slate-600" },
+                            { label: "Best", value: highestValue, color: "text-slate-600" },
                             { label: "Up", value: biggestIncrease, color: "text-emerald-600", prefix: "+" },
-                            { label: "Down", value: biggestDrop, color: biggestDrop < 0 ? "text-rose-500" : "text-slate-400" },
                             { label: "Matches", value: statHistory.length, color: "text-slate-600" },
+                            { label: "Down", value: biggestDrop, color: biggestDrop < 0 ? "text-rose-500" : "text-slate-400" },
                         ].map(({ label, value, color, prefix }) => (
                             <div key={label} className="py-2 px-1">
-                                <p className={`mt-0.5 text-md font-black ${color}`}>{prefix ?? ""}{fmtY(value)}</p>
+                                <p className={`mt-0.5 text-md font-black ${color}`}>{prefix ?? ""}{label === "Matches" ? String(value) : fmtByDisplayFormat(value, statDefMap[selectedStat])}</p>
                                 <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-slate-600">{label}</p>
                             </div>
                         ))}
@@ -203,12 +284,23 @@ export function CareerStatsTab({ gameSlug }: { gameSlug: string }) {
                             {ySteps.map(({ value, y }) => (
                                 <g key={y}>
                                     <line x1={paddingLeft} x2={paddingLeft + innerWidth} y1={y} y2={y} stroke="#e2e8f0" strokeWidth="1" />
-                                    <text x={paddingLeft - 6} y={y} textAnchor="end" dominantBaseline="middle" fontSize="10" fill="#94a3b8">{fmtY(value)}</text>
+                                    <text x={paddingLeft - 6} y={y} textAnchor="end" dominantBaseline="middle" fontSize="10" fill="#94a3b8">{fmtByDisplayFormat(value, statDefMap[selectedStat])}</text>
                                 </g>
                             ))}
 
-                            {/* Y axis line */}
-                            <line x1={paddingLeft} x2={paddingLeft} y1={paddingTop} y2={paddingTop + innerHeight} stroke="#cbd5e1" strokeWidth="1.5" />
+                            {/* Y axis line — broken if not starting at 0 */}
+                            {minValue > 0 ? (
+                                <>
+                                    {/* Broken axis indicator at bottom of Y axis */}
+                                    <line x1={paddingLeft} x2={paddingLeft} y1={paddingTop} y2={paddingTop + innerHeight - 10} stroke="#cbd5e1" strokeWidth="1.5" />
+                                    <polyline
+                                        points={`${paddingLeft - 4},${paddingTop + innerHeight - 10} ${paddingLeft + 4},${paddingTop + innerHeight - 4} ${paddingLeft - 4},${paddingTop + innerHeight + 2} ${paddingLeft + 4},${paddingTop + innerHeight + 8}`}
+                                        fill="none" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
+                                    />
+                                </>
+                            ) : (
+                                <line x1={paddingLeft} x2={paddingLeft} y1={paddingTop} y2={paddingTop + innerHeight} stroke="#cbd5e1" strokeWidth="1.5" />
+                            )}
 
                             {/* Y axis title */}
                             <text
@@ -251,7 +343,7 @@ export function CareerStatsTab({ gameSlug }: { gameSlug: string }) {
                             {chartPathD && <path d={chartPathD} fill="none" stroke="rgb(37 99 235)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />}
 
                             {/* Data points */}
-                            {points.filter((_, idx) => idx % 4 === 0 || idx === points.length - 1).map((point, idx) => (
+                            {points.filter((_, idx, arr) => arr.length <= 20 || idx % Math.ceil(arr.length / 20) === 0 || idx === arr.length - 1).map((point, idx) => (
                                 <circle
                                     key={idx}
                                     cx={point.x} cy={point.y} r="5"
@@ -274,7 +366,7 @@ export function CareerStatsTab({ gameSlug }: { gameSlug: string }) {
                                     <g style={{ pointerEvents: "none" }}>
                                         <rect x={tipX} y={tipY} width={tipW} height={tipH} rx="6" fill="#1e293b" opacity="0.93" />
                                         <text x={tipX + tipW / 2} y={tipY + 13} textAnchor="middle" fontSize="10" fill="#94a3b8">{dateStr}</text>
-                                        <text x={tipX + tipW / 2} y={tipY + 28} textAnchor="middle" fontSize="12" fontWeight="bold" fill="#f1f5f9">{tooltip.value}</text>
+                                        <text x={tipX + tipW / 2} y={tipY + 28} textAnchor="middle" fontSize="12" fontWeight="bold" fill="#f1f5f9">{fmtByDisplayFormat(tooltip.value, statDefMap[selectedStat])}</text>
                                     </g>
                                 );
                             })()}
@@ -319,14 +411,17 @@ export function CareerStatsTab({ gameSlug }: { gameSlug: string }) {
                                 return (
                                     <div key={season}>
                                         <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">Season {season}</p>
-                                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+                                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-2">
                                             {rows.map((row) => {
-                                                const name = statDefMap[row.stat_slug]?.stat_name ?? ACOS_DISPLAY_NAMES[row.stat_slug] ?? row.stat_slug;
+                                                const def = statDefMap[row.stat_slug];
+                                                const name = def?.stat_name ?? ACOS_DISPLAY_NAMES[row.stat_slug] ?? row.stat_slug;
+                                                const fmtLabels: Record<number, string> = { 1: "%", 2: "mm:ss", 3: "hh:mm:ss", 4: "date" };
+                                                const fmtLabel = fmtLabels[def?.display_format ?? 0] ?? (def?.algorithm === 2 ? "avg" : undefined);
                                                 const val = fmtStatVal(row);
                                                 const best = fmtStatBest(row);
                                                 return (
                                                     <div key={row.stat_slug} className="rounded-lg border border-slate-100 bg-slate-50 px-3 py-2.5">
-                                                        <p className="text-[10px] font-semibold text-slate-500 truncate">{name}</p>
+                                                        <p className="text-[10px] font-semibold text-slate-500 truncate">{name}{fmtLabel ? <span className="font-normal text-slate-400"> ({fmtLabel})</span> : null}</p>
                                                         <p className="mt-1 text-xl font-black text-slate-900">{val}</p>
                                                         {best !== "\u2014" && best !== val && (
                                                             <p className="text-[10px] text-emerald-600 font-semibold">Best: {best}</p>

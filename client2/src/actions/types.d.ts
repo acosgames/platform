@@ -46,7 +46,9 @@ type GameInfo = {
 
 type GameStat = {
     stat_slug: string;
-    algorithm_id: string | null;
+    algorithm: number | null;
+    global_algorithm: number | null;
+    display_format: number | null;
     game_slug: string;
     stat_name: string;
     stat_abbreviation: string;
