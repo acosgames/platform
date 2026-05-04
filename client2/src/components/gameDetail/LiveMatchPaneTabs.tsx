@@ -44,7 +44,7 @@ export function LiveMatchPaneTabs({
         {/* </div> */}
       </div>
 
-      {activeTab === "scoreboard" ? <ScoreboardPane matchType={liveMatchType} /> : <MatchLogPane />}
+      {activeTab === "scoreboard" ? <ScoreboardPane roomSlug={null} /> : <MatchLogPane />}
     </section>
   );
 }

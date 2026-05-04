@@ -57,7 +57,7 @@ export function PlayRightPanel() {
     if (activeTab === "scoreboard") {
       return (
         <div className="h-full w-full min-h-0">
-          <ScoreboardPane matchType={matchType} />
+          <ScoreboardPane roomSlug="" />
         </div>
       );
     }

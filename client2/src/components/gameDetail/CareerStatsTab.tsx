@@ -143,10 +143,14 @@ export function CareerStatsTab({ gameSlug }: { gameSlug: string }) {
         // int/time with other algorithms: value is in valueINT
         // float/avg types: value is always in valueFLOAT
         let v: number | null;
-        if (vType === 0 || vType === 3) {
-            v = algo === 2 ? (row.valueFLOAT / row.valueINT) : row.valueINT;
+        let vfloat = row.valueFLOAT ?? 0;
+        let vint = row.valueINT ?? 0;
+        if( vint == 0 ) 
+            v = 0;
+        else if (vType === 0 || vType === 3) {
+            v = algo === 2 ? (vfloat / vint) : vint;
         } else {
-            v = algo === 2 ? (row.valueFLOAT / row.valueINT) : row.valueFLOAT;
+            v = algo === 2 ? (vfloat / vint) : vfloat;
         }
         return v != null ? fmtByDisplayFormat(v, def) : "—";
     };

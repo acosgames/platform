@@ -1,14 +1,16 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import { ArrowsPointingOutIcon } from "@heroicons/react/24/solid";
+import { ArrowsPointingOutIcon, ExclamationTriangleIcon } from "@heroicons/react/24/solid";
 import { Clapperboard } from "lucide-react";
 import { PlayerScreen } from "../components/PlayerScreen";
 import type { IntroPlayer } from "../components/IntroPlayerCard";
 import GamePanel from "../components/gameScreen/GamePanel";
-import { btPrimaryGamePanel, btPrimaryRoom, btPrimaryState } from "@/actions/buckets";
+import { btDisplayMode, btGame, btMainScrollRef, btPrimaryGamePanel, btPrimaryRoom, btPrimaryState } from "@/actions/buckets";
 import { useBucket } from "@/actions/bucket";
 import config from "../config";
 import { GameStatus } from "@acosgames/framework";
+import { addJoinQueues } from "@/actions/queue";
+import { wsJoinQueues } from "@/actions/ws";
 
 type MatchType = "free-for-all" | "1v1" | "team-based";
 
@@ -22,14 +24,29 @@ export function PlayScreen() {
   const navigate = useNavigate();
   const playSurfaceRef = useRef<HTMLElement | null>(null);
 
+  const mainScrollRef = useBucket(btMainScrollRef);
+
+
   const primary = useBucket(btPrimaryGamePanel);
   const room = useBucket(btPrimaryRoom) as any;
   const gamestate = useBucket(btPrimaryState) as any;
+  const game = useBucket(btGame) as any;
+  const gameSlug = game?.game_slug ?? id;
 
-  const [showVsScreen, setShowVsScreen] = useState(() => gamestate?.room?.status !== GameStatus.gamestart);
+  // Loading timeout — after 6s with no primary panel, show error
+  const [loadingTimedOut, setLoadingTimedOut] = useState(false);
+  useEffect(() => {
+    if (typeof primary === "number") { setLoadingTimedOut(false); return; }
+    const t = window.setTimeout(() => setLoadingTimedOut(true), 4000);
+    return () => window.clearTimeout(t);
+  }, [primary]);
+
+  const defaultShowVsScreen = room && gamestate && gamestate?.room && gamestate?.room?.status !== GameStatus.gamestart;
+  const [showVsScreen, setShowVsScreen] = useState(defaultShowVsScreen);
   const [vsExiting, setVsExiting] = useState(false);
-  const [isTheaterMode, setIsTheaterMode] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(false);
+  const displayMode = useBucket(btDisplayMode);
+  const isTheaterMode = displayMode === "theatre";
+  const isFullscreen = displayMode === "fullscreen";
 
   // Hide VS screen when game actually starts
   const gameStatus = gamestate?.room?.status;
@@ -44,15 +61,8 @@ export function PlayScreen() {
   // Fallback countdown to hide VS screen
   useEffect(() => {
     if (!showVsScreen) return;
-
-    const startExitTimer = window.setTimeout(() => {
-      setVsExiting(true);
-    }, COUNTDOWN_DURATION_MS);
-
-    const hideTimer = window.setTimeout(() => {
-      setShowVsScreen(false);
-    }, COUNTDOWN_DURATION_MS + 680);
-
+    const startExitTimer = window.setTimeout(() => setVsExiting(true), COUNTDOWN_DURATION_MS);
+    const hideTimer = window.setTimeout(() => setShowVsScreen(false), COUNTDOWN_DURATION_MS + 680);
     return () => {
       window.clearTimeout(startExitTimer);
       window.clearTimeout(hideTimer);
@@ -67,7 +77,9 @@ export function PlayScreen() {
 
   useEffect(() => {
     const handleFullscreenChange = () => {
-      setIsFullscreen(Boolean(document.fullscreenElement));
+      if (!document.fullscreenElement) {
+        btDisplayMode.set("normal");
+      }
     };
     document.addEventListener("fullscreenchange", handleFullscreenChange);
     return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
@@ -94,16 +106,58 @@ export function PlayScreen() {
     }));
   }, [gamestate?.players]);
 
-  if (typeof primary !== "number") {
+  // — All hooks above this line —
+
+  const handleQueue = () => {
+    if (!gameSlug) return;
+    addJoinQueues(gameSlug, "public");
+    wsJoinQueues([{ game_slug: gameSlug, mode: "public" }], null);
+    navigate(`/game/${gameSlug}`);
+  };
+
+  // Loading overlay
+  if (!showVsScreen && typeof primary !== "number" && !loadingTimedOut) {
     return (
-      <div className="space-y-4">
-        <h2 className="text-xl font-semibold text-foreground">Game session not found</h2>
-        <button
-          onClick={() => navigate("/")}
-          className="px-4 py-2 rounded-md text-sm font-semibold text-background bg-linear-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400"
-        >
-          Back to Games
-        </button>
+      <div className="container mx-auto px-2 lg:px-8 xl:px-20  py-16">
+      <div className="flex flex-col items-center justify-center min-h-64 gap-4  ">
+        <div className="w-10 h-10 rounded-full border-4 border-slate-600 border-t-cyan-400 animate-spin" />
+        <p className="text-sm font-semibold text-slate-400">Connecting to game session&hellip;</p>
+      </div>
+      </div>
+    );
+  }
+
+  // No room found overlay
+  if (!showVsScreen && typeof primary !== "number") {
+    return (
+      <div className="container mx-auto px-2 lg:px-8 xl:px-20 py-8">
+      <div className="flex bg-white rounded-lg p-2 min-h-64">
+        <div className="flex bg-slate-200 w-full flex-col items-center justify-center  gap-5 py-16">
+          <div className="flex items-center justify-center w-14 h-14 rounded-full bg-rose-500/15 border border-rose-500/30">
+            <ExclamationTriangleIcon className="w-7 h-7 text-rose-400" />
+          </div>
+          <div className="text-center">
+            <p className="text-base font-bold text-slate-600">No game session found</p>
+            <p className="mt-1 text-sm text-slate-600">The room may have ended or the link is invalid.</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={handleQueue}
+              className="px-5 py-2 rounded-md text-sm font-semibold text-white bg-linear-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 transition-colors"
+            >
+              Join Queue
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate(gameSlug ? `/game/${gameSlug}` : "/")}
+              className="px-5 py-2 rounded-md text-sm font-semibold text-slate-700 border border-slate-600 hover:border-slate-400 hover:text-white transition-colors"
+            >
+              Back to Game Page
+            </button>
+          </div>
+        </div>
+      </div>
       </div>
     );
   }
@@ -127,22 +181,19 @@ export function PlayScreen() {
     if (!document.fullscreenEnabled) return;
     if (document.fullscreenElement) {
       await document.exitFullscreen();
+      btDisplayMode.set("normal");
       return;
     }
     await playSurfaceRef.current?.requestFullscreen();
+    btDisplayMode.set("fullscreen");
   };
 
   return (
     <div className="space-y-3">
-      <section ref={playSurfaceRef} className="relative overflow-hidden min-h-full">
-        
-          {/* Game iframe — rendered behind VS overlay */}
-          <GamePanel id={String(primary)} prioritizeWidth />
-        {/* </div> */}
-
+      <section ref={playSurfaceRef} className={`relative overflow-hidden min-h-full ${!isTheaterMode && !isFullscreen ? "pt-2" : "p-4"}`}>
+        <GamePanel id={String(primary)} prioritizeWidth hideInBackground={showVsScreen} />
         <PlayerScreen
-          gameName={gameName}
-          gameImageUrl={gameImageUrl}
+          room={room}
           matchType={matchType}
           displayedPlayers={displayedPlayers}
           cardMotionPhase={cardMotionPhase}
@@ -150,27 +201,30 @@ export function PlayScreen() {
           showVsScreen={showVsScreen}
           vsExiting={vsExiting}
         />
-      </section>
 
-      <div className="flex items-center justify-between gap-3 px-1 pb-8">
-        <div className="flex items-center gap-2">
+      <div className="container flex items-end justify-end gap-3 px-1 py-4">
+        {/* <div className="flex items-center gap-2">
           <span className="px-3 py-1.5 rounded-full border border-cyan-300/35 bg-cyan-500/10 text-cyan-100 text-[11px] font-semibold uppercase tracking-wide">
             {matchType}
           </span>
           <span className="px-3 py-1.5 rounded-full border border-white/20 bg-black/25 text-white/85 text-[11px] font-semibold">
             {playersReady} ready
           </span>
-        </div>
+        </div> */}
 
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => setIsTheaterMode((prev) => !prev)}
-            className={`h-9 w-9 rounded-md border flex items-center justify-center transition-colors ${
-              isTheaterMode
-                ? "border-cyan-300/45 bg-cyan-500/18 text-cyan-50"
-                : "border-white/20 bg-black/25 text-white/80 hover:bg-black/45"
-            }`}
+            onClick={() => {
+              if (mainScrollRef?.current) {
+                mainScrollRef.current?.scrollTo(0, 0);
+              }
+              btDisplayMode.set(isTheaterMode ? "normal" : "theatre")
+            }}
+            className={`h-9 w-9 rounded-md border flex items-center justify-center transition-colors ${isTheaterMode
+              ? "border-cyan-300/45 bg-slate-100 text-slate-700"
+              : "border-white/20 bg-slate-100 text-slate-700 hover:bg-slate-300"
+              }`}
             title={isTheaterMode ? "Standard View" : "Theatre Mode"}
             aria-label={isTheaterMode ? "Standard View" : "Theatre Mode"}
           >
@@ -178,12 +232,11 @@ export function PlayScreen() {
           </button>
           <button
             type="button"
-            onClick={() => void toggleFullscreen()}
-            className={`h-9 w-9 rounded-md border flex items-center justify-center transition-colors ${
-              isFullscreen
-                ? "border-emerald-300/45 bg-emerald-500/18 text-emerald-50"
-                : "border-white/20 bg-black/25 text-white/80 hover:bg-black/45"
-            }`}
+            onClick={() => { void toggleFullscreen(); }}
+            className={`h-9 w-9 rounded-md border flex items-center justify-center transition-colors ${isFullscreen
+              ? "border-emerald-300/45 bg-slate-100 text-slate-700"
+              : "border-white/20 bg-slate-100 text-slate-700 hover:bg-slate-300"
+              }`}
             title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
             aria-label={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
           >
@@ -191,6 +244,8 @@ export function PlayScreen() {
           </button>
         </div>
       </div>
+      
+      </section>
     </div>
   );
 }

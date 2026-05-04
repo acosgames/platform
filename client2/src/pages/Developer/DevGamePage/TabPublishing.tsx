@@ -90,7 +90,7 @@ function PublishingCard() {
 function CloneAndDeployCard() {
     const devgame = useBucket(
         btDevGame,
-        (a: any, b: any) => a.deployCommand !== b.deployCommand
+        (a: any, b: any) => a?.deployCommand !== b?.deployCommand
     ) as any;
     const cloneRef = useRef<HTMLInputElement>(null);
     const deployRef = useRef<HTMLInputElement>(null);

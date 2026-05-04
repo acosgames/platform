@@ -19,7 +19,8 @@ export function RoundedHexPortrait({
 
   return (
     <div className={className}>
-      <svg viewBox="0 0 100 100" className="h-full w-full" aria-hidden="true">
+        <img src={src} alt={alt} className="w-full h-full object-cover rounded-md" style={{ clipPath: `url(#${clipPathId})` }} />
+      {/* <svg viewBox="0 0 100 100" className="h-full w-full" aria-hidden="true">
         <defs>
           <clipPath id={clipPathId}>
             <path d={hexPath} />
@@ -38,8 +39,8 @@ export function RoundedHexPortrait({
           preserveAspectRatio="xMidYMid slice"
         //   clipPath={`url(#${innerClipPathId})`}
         />
-      </svg>
-      <span className="sr-only">{alt}</span>
+      </svg> */}
+      {/* <span className="sr-only">{alt}</span> */}
     </div>
   );
 }

@@ -18,12 +18,12 @@ import type { LeaderboardSubtab, LeaderboardSubtabOption, SeasonKey } from "../c
 
 import { PlayNow } from "@/components/ui/PlayNow";
 import { Tooltip } from "@/components/ui/Tooltip";
-import { btGame, btUser } from "@/actions/buckets";
+import { btGame, btLoading, btUser } from "@/actions/buckets";
 import { useLoading } from "@/actions/loading";
 import { findGame, findGamePerson } from "@/actions/game";
 import { WatchReplayTab } from "../components/gameDetail/WatchReplayTab";
 import config from "../config";
-import { useBucket } from "@/actions/bucket";
+import { useBucket, useBucketSelector } from "@/actions/bucket";
 
 type DetailTab = "watch-replay" | "leaderboards" | "career-stats" | "game-description" | "tournaments" | "live-match" | "achievements";
 
@@ -40,6 +40,7 @@ export function GameDetail() {
 
     const currentPlayer = useBucket(btUser);
     const game: GameInfoFull = useLoading('game/' + (id ?? ""), btGame);
+    const loadingState = useBucketSelector(btLoading, (s: any) => s['game/' + (id ?? '')]);
 
     // Hide 'division' subtab if not logged in
     const leaderboardSubtabs: LeaderboardSubtabOption[] = currentPlayer ? [
@@ -77,15 +78,23 @@ export function GameDetail() {
 
 
 
-    if (!game) {
+    if (loadingState !== 2) {
         return (
-            <div className="space-y-4">
-                <h2 className="text-xl font-semibold text-foreground">Game not found</h2>
+            <div className="flex min-h-[60vh] items-center justify-center">
+                <div className="h-10 w-10 animate-spin rounded-full border-4 border-slate-700 border-t-white" />
+            </div>
+        );
+    }
+
+    if (!game?.game_slug) {
+        return (
+            <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4">
+                <p className="text-lg font-black uppercase tracking-tight text-white">Game not found</p>
                 <Link
                     to="/"
-                    className="px-4 py-2 rounded-md text-sm font-semibold text-white bg-linear-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-500"
+                    className="inline-flex items-center gap-2 rounded-md bg-slate-900/85 px-3.5 py-2 text-[11px] font-bold uppercase tracking-[0.08em] text-white transition-colors hover:bg-slate-900"
                 >
-                    Back to Games
+                    ← Back to Games
                 </Link>
             </div>
         );
@@ -230,7 +239,7 @@ export function GameDetail() {
     };
 
     return (
-        <div className="space-y-4 pb-4">
+        <div className="space-y-4 py-4 container mx-auto px-2 lg:px-8 xl:px-20">
             <div className="mb-4 flex items-start justify-between gap-3">
                 <Link
                     to="/"

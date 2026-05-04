@@ -33,21 +33,19 @@ function FSGSelect(props: FSGSelectProps) {
                 inputRef?.current?.focus();
             }, props.focusDelay || 300);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [props.focus, props.focusDelay]);
 
     let errors = props.useErrors ? props.useErrors(props.name) : [];
     errors = errors || [];
 
-    let value = props.value !== undefined
+    let bucketValue = useBucketSelector(btFormFields, (form: any) =>
+              form?.[props.group ?? ""]?.[props.name]
+          );
+    let value = bucketValue ?? (props?.value !== undefined
         ? props.value
         : props.useValue
         ? props.useValue(props.name)
-        : useBucketSelector(btFormFields, (form: any) =>
-              form[props.group!] && form[props.group!][props.name]
-                  ? form[props.group!][props.name]
-                  : null
-          );
+        : bucketValue);
     value = value ?? "";
 
     return (

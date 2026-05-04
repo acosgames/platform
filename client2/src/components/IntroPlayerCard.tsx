@@ -53,7 +53,7 @@ export function IntroPlayerCard({
           ? team == "blue" ? " ring-2 ring-white/90 -ring-offset-2" : "border-2 border-white/80 -ring-offset-2"
           : ""
       } ${team === "blue" ? 
-        "bg-primary bg-linear-to-br from-primary to-black/30 to-80%" : 
+        "bg-blue-600 bg-linear-to-br from-blue-400 to-black/30 to-80%" : 
         "bg-rose-600 bg-linear-to-br from-rose-600 to-black/30 to-80%"}`
       }
       style={{ animationDelay: `${delayMs}ms` }}
@@ -62,7 +62,7 @@ export function IntroPlayerCard({
         <img
           src={player?.avatarUrl}
           alt={player?.name}
-          className={`rounded-md object-cover border border-white/25 shrink-0 ${portraitClass}`}
+          className={`rounded-md object-cover border shrink-0 ${portraitClass}`}
         />
 
         <div className={`flex flex-col gap-0.5 overflow-hidden min-w-0 p-0.5 lg:p-1 xl:p-1.5`}>

@@ -19,7 +19,7 @@ export function BlogPost() {
   const paragraphs = post.content.split("\n\n");
 
   return (
-    <article className="py-8 flex-1 max-w-2xl mx-auto w-full">
+    <article className="py-8 flex-1 max-w-2xl mx-auto w-full container px-2 lg:px-8 xl:px-20">
       {/* Back link */}
       <Link to="/blog" className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-cyan-400 transition-colors mb-6">
         ← Back to Blog

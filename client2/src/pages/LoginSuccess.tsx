@@ -15,7 +15,7 @@ export function LoginSuccess() {
   }, [navigate]);
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
+    <div className="flex items-center justify-center min-h-screen container mx-auto px-2 lg:px-8 xl:px-20">
       <div className="text-lg font-semibold text-slate-700">Redirecting...</div>
     </div>
   );

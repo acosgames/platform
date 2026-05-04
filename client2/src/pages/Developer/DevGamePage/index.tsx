@@ -71,7 +71,7 @@ export function DevGamePage() {
     };
 
     return (
-        <div className="space-y-4 pb-4">
+        <div className="space-y-4 pb-4 container mx-auto px-2 lg:px-8 xl:px-20">
             {toast && (
                 <div
                     className={[

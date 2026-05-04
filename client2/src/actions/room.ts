@@ -19,7 +19,9 @@ import {
     btShowLoadingBox,
     btUser,
 } from "./buckets";
-import { gs } from "@acosgames/framework";
+import { GameStateReader, GameStatus, gs } from "@acosgames/framework";
+import { useBucketSelector } from "./bucket";
+import type { GameStateLocal } from "./replay";
 
 export function setCurrentRoom(room_slug: string | null) {
     btRoomSlug.set(room_slug);
@@ -38,7 +40,7 @@ export function getLastJoinType() {
 }
 
 export function getGamePanel(id: string) {
-    return btGamePanels.get((bucket:any) => bucket[id]);
+    return btGamePanels.get((bucket: any) => bucket[id]);
 }
 
 export function getGamePanels() {
@@ -82,17 +84,28 @@ export function updateGamePanel(gamepanel: any) {
 
         if (
             !gamepanel.active ||
-            status == "gameover" ||
-            status == "gamecancelled" ||
-            status == "gameerror"
+            status == GameStatus.gameover ||
+            status == GameStatus.gamecancelled ||
+            status == GameStatus.gameerror
         ) {
             gamepanel.showGameover = true;
             gamepanel.showPregame = false;
-        } else if (status == "pregame" || status == "starting") {
+        } else if (status == GameStatus.pregame || status == GameStatus.starting) {
             gamepanel.showGameover = false;
             gamepanel.showPregame = true;
         } else {
             gamepanel.showPregame = false;
+        }
+    }
+
+    if (gamestate?.room?.events) {
+        for (const event of gamestate?.room?.events) {
+            if (event.type == 'join') {
+                let playerid = event.payload;
+                let player = gamestate.players?.[playerid];
+                player.id = playerid;
+                player.portrait = `https://assets.acos.games/images/portraits/assorted-${player.portraitid || 1}-medium.webp`;
+            }
         }
     }
 
@@ -102,9 +115,72 @@ export function updateGamePanel(gamepanel: any) {
         btPrimaryRoom.set(gamepanel.room);
     }
 
+    gamepanel.updated = Date.now();
     gamepanels[gamepanel.id] = gamepanel;
     btGamePanels.set(gamepanels);
 }
+
+export function useGamePanel(room_slug: string | null, selector?: (gamepanel: any) => any) {
+    return useBucketSelector(btGamePanels, (panels) => {
+        if (!room_slug) return null;
+        const panel = (panels || []).find((p: any) => p?.room?.room_slug === room_slug);
+        if (!panel) return null;
+        return selector ? selector(panel) : panel ?? null;
+    });
+}
+
+export function useGamePanelUpdated(room_slug: string | null) {
+    return useGamePanel(room_slug, (panel) => panel?.updated ?? 0);
+}
+
+export function useGame(room_slugOrGamePanelId: string | number | null, selector: (gamestate: GameStateLocal) => any) {
+    return useBucketSelector(btGamePanels, (panels) => {
+        if (room_slugOrGamePanelId == null) return null;
+        let panel: any;
+        if (typeof room_slugOrGamePanelId === "string") {
+            panel = (panels || []).find((p: any) => p?.room?.room_slug === room_slugOrGamePanelId);
+        } else {
+            panel = panels?.[room_slugOrGamePanelId as number];
+        }
+        if (!panel) return null;
+        return selector(panel?.gamestate);
+    });
+}
+
+export function useGamePlayer(room_slugOrGamePanelId: string | number | null, playerId: number, selector?: (player: any) => any) {
+    return useGame(room_slugOrGamePanelId, (gamestate) => {
+        const player = gamestate?.players?.[playerId];
+        return selector ? selector(player) : player;
+    });
+}
+
+export function useGameTeam(room_slugOrGamePanelId: string | number | null, teamId: number, selector?: (team: any) => any) {
+    return useGame(room_slugOrGamePanelId, (gamestate) => {
+        const team = gamestate?.teams?.[teamId];
+        return selector ? selector(team) : team;
+    });
+}
+
+export function validateNextUser(userid: number, game: GameStateReader): boolean {
+        
+        let next = game.nextPlayer;
+        if (Array.isArray(next) && next.includes(userid)) return true;
+        let player = game.player(userid);
+        if (!player) return false;
+        if (next === userid) return true;
+        if (validateNextTeam(game, player.teamid)) return true;
+        return false;
+    }
+
+   export function validateNextTeam(game: GameStateReader, teamid: number): boolean {
+        
+        let next = game.nextTeam;
+        if (Array.isArray(next) && next.includes(teamid)) return true;
+        let player = game.player(teamid);
+        if (!player) return false;
+        if (next === teamid) return true;
+        return false;
+    }
 
 export function getPrimaryGamePanel() {
     let id = btPrimaryGamePanel.get();
@@ -136,7 +212,7 @@ export function setPrimaryGamePanel(gamepanel: any) {
 
         let game_slug = gamepanel?.room?.game_slug;
         if (game_slug) {
-            let game = btGames.get((bucket:any) => bucket[game_slug]);
+            let game = btGames.get((bucket: any) => bucket[game_slug]);
             if (game) {
                 updateBrowserTitle(game.name);
             }
@@ -177,9 +253,9 @@ export function cleanupGamePanels() {
     for (let i = 0; i < gamepanels.length; i++) {
         let gp = gamepanels[i];
         if (
-            gp.gamestate?.room?.status == "gameover" ||
-            gp.gamestate?.room?.status == "gamecancelled" ||
-            gp.gamestate?.room?.status == "gameerror"
+            gp.gamestate?.room?.status == GameStatus.gameover ||
+            gp.gamestate?.room?.status == GameStatus.gamecancelled ||
+            gp.gamestate?.room?.status == GameStatus.gameerror
         ) {
             gp.available = true;
             updateGamePanel(gp);
@@ -328,8 +404,15 @@ export function addRooms(roomList: any[]) {
         }
 
         if (gamestate && gamestate.players) {
-            gamestate.local = gamestate.players[user.shortid];
-            if (gamestate.local) gamestate.local.shortid = user.shortid;
+
+            for (const player of gamestate.players) {
+                player.id = player.id;
+                player.portrait = `https://assets.acos.games/images/portraits/assorted-${player.portraitid || 1}-medium.webp`;
+            }
+
+            
+            gamestate.local = gamestate.players.find((player: any) => player.shortid === user.shortid);
+            // if (gamestate.local) gamestate.local.shortid = user.shortid;
 
             for (const shortid in gamestate.players) {
                 gamestate.players[shortid].shortid = shortid;
@@ -409,7 +492,7 @@ export async function minimizeGamePanel() {
     let primaryGamePanel = getPrimaryGamePanel();
     if (primaryGamePanel) {
         if (primaryGamePanel.status == "GAMEOVER") {
-            btDisplayMode.set("none");
+            btDisplayMode.set("normal");
             clearRoom(primaryGamePanel.room.room_slug);
             // clearPrimaryGamePanel();
         }
@@ -454,7 +537,7 @@ export function getRoomStatus(room_slug: string) {
 }
 
 export function updateRoomStatus(room_slug: string | null) {
-    if(!room_slug) return "NOTEXIST";
+    if (!room_slug) return "NOTEXIST";
     let gamepanel = findGamePanelByRoom(room_slug);
     let status = processsRoomStatus(gamepanel);
     gamepanel.status = status;

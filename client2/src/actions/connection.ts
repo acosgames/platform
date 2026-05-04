@@ -438,15 +438,7 @@ function updateRoomPublicMessage(gamepanel: any, gamestate: any, payload: any) {
     gamepanel.gamestate = structuredClone(mergedState);
     console.log("[FULL GAMESTATE]", mergedState);
 
-    if (gamepanel.gamestate.players) {
-        for (const id in gamepanel.gamestate.players) {
-            gamepanel.gamestate.players[id].id = id;
-            gamepanel.gamestate.players[
-                id
-            ].portrait = `https://assets.acos.games/images/portraits/assorted-${gamepanel?.gamestate?.players[id]?.portraitid || 1
-            }-medium.webp`;
-        }
-    }
+   
 
     updateGamePanel(gamepanel);
 

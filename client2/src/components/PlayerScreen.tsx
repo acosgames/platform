@@ -1,12 +1,16 @@
 import { useEffect, useState, useRef } from "react";
 import { IntroPlayerCard, type IntroPlayer } from "./IntroPlayerCard";
 import { MatchCountdown } from "./MatchCountdown";
+import { useGamePanel } from "@/actions/room";
+
+import config from "@/config";
 
 type MatchType = "free-for-all" | "1v1" | "team-based";
 
 interface PlayerScreenProps {
-  gameName: string;
-  gameImageUrl: string;
+  // gameName: string;
+  // gameImageUrl: string;
+  room: any;
   matchType: MatchType;
   displayedPlayers: IntroPlayer[];
   cardMotionPhase: "enter" | "exit";
@@ -16,8 +20,9 @@ interface PlayerScreenProps {
 }
 
 export function PlayerScreen({
-  gameName,
-  gameImageUrl,
+  // gameName,
+  // gameImageUrl,
+  room,
   matchType,
   displayedPlayers,
   cardMotionPhase,
@@ -32,6 +37,13 @@ export function PlayerScreen({
     if (window.matchMedia("(min-width: 640px)").matches) return "tablet";
     return "mobile";
   });
+
+
+  let gamepanel = useGamePanel(room?.room_slug ?? null);
+  let gameName = room?.name ?? "Unknown Game";
+  let gameImageUrl = room?.preview_images
+    ? `${config.https.cdn}g/${room.game_slug}/preview/${room.preview_images}`
+    : "";
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -364,16 +376,16 @@ export function PlayerScreen({
   return (
     <>
       {showVsScreen ? (
-        <div ref={viewportRef} className="absolute inset-0 z-10 flex items-center justify-center  ">
+        <div ref={viewportRef} className="absolute inset-0 z-10 flex items-center justify-center  overflow-hidden drop-shadow-lg">
 
           <div className={` relative ${vsExiting ? "vs-screen-exit" : "vs-screen-enter"} w-full h-full   bg-black p-3 sm:p-2 flex flex-col justify-start gap-2 lg:gap-5 overflow-hidden`}>
-            <div className="absolute -z-1 inset-0 bg-linear-to-b from-black/30 via-black/55 to-black/80" />
-            <div className="absolute -z-4 inset-0 bg-linear-to-r from-cyan-500/15 via-transparent to-rose-500/15" />
-            <div className="absolute -z-5 inset-0 bg-linear-to-r from-transparent from-45% via-purple-500/20  to-transparent to-55%" />
-            <div className="absolute -z-5 inset-0 bg-linear-to-r from-transparent from-48% via-purple-500/5  to-transparent to-52%" />
-            <div className="absolute -z-2 top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 w-[15vw] h-[15vw] rounded-full bg-radial from-cyan-500/25 via-purple-500/20 to-transparent blur-3xl" />
+            {/* <div className="absolute -z-1 inset-0 bg-linear-to-b from-black/30 via-black/55 to-black/80" />
+            <div className="absolute -z-4 inset-0 bg-linear-to-r from-cyan-500/15 via-transparent to-rose-500/15" /> */}
+            {/* <div className="absolute -z-5 inset-0 bg-linear-to-r from-transparent from-45% via-purple-500/20  to-transparent to-55%" /> */}
+            {/* <div className="absolute -z-5 inset-0 bg-linear-to-r from-transparent from-48% via-purple-500/5  to-transparent to-52%" /> */}
+            {/* <div className="absolute -z-2 top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 w-[15vw] h-[15vw] rounded-full bg-radial from-cyan-500/25 via-purple-500/20 to-transparent blur-3xl" /> */}
             <div className="absolute -z-3 bottom-[50%] right-[50%] transform translate-x-1/2 translate-y-1/2 w-[15vw] h-[15vw] rounded-full bg-radial from-pink-500/25 via-purple-500/20 to-transparent blur-3xl" />
-            <div className="absolute inset-0 w-full h-full bg-slate-950 overflow-hidden -z-10">
+            {/* <div className="absolute inset-0 w-full h-full bg-slate-950 overflow-hidden -z-10">
               <svg className="background-svg top" width="calc(100% + 160px)" height="100%">
                 <pattern id="pattern-aztec-top" x="0" y="0" width="160" height="78" patternUnits="userSpaceOnUse">
                   <path stroke="white" opacity="0.3"
@@ -388,7 +400,7 @@ export function PlayerScreen({
                 </pattern>
                 <rect x="0" y="0" width="100%" height="100%" fill="url(#pattern-aztec-bottom)"></rect>
               </svg>
-            </div>
+            </div> */}
             <div className="shrink-0 flex items-start gap-3">
               <div className="flex items-center gap-3 min-w-0">
                 <img src={gameImageUrl} alt={`${gameName} cover`} className="w-14 h-14 rounded-md object-cover border border-white/20" />

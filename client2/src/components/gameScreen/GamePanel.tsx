@@ -37,9 +37,10 @@ interface GamePanelProps {
     prioritizeWidth?: boolean;
     displayMode?: string;
     isFullScreen?: boolean;
+    hideInBackground?: boolean;
 }
 
-function GamePanel({ id, canvasRef, prioritizeWidth }: GamePanelProps) {
+function GamePanel({ id, canvasRef, prioritizeWidth, hideInBackground }: GamePanelProps) {
     let gamepanel = useBucketSelector(btGamePanels, (bucket) => (bucket as Record<string, any>)[id]);
     useBucketSelector(btShowLoadingBox, (bucket) => (bucket as Record<string, any>)[id]);
 
@@ -88,7 +89,7 @@ function GamePanel({ id, canvasRef, prioritizeWidth }: GamePanelProps) {
     return (
         // <Portal containerRef={gamepanel.draggableRef}>
         // <div className="relative w-full h-full">
-            <div className="play-surface min-h-full drop-shadow-md">
+            <div className={`play-surface min-h-full drop-shadow-md ${hideInBackground ? "opacity-0" : ""}`}>
             {/* <LoadingBox id={gamepanel.id} /> */}
             <GameIFrame
                 gamepanel={gamepanel}
@@ -388,7 +389,7 @@ function GameIFrame({ gamepanel, canvasRef, prioritizeWidth, displayMode, isFull
                         className="text-4xl bg-transparent border-none cursor-pointer"
                         onClick={() => {
                             if (displayMode == "theatre") {
-                                btDisplayMode.set("none");
+                                btDisplayMode.set("normal");
                             }
                             if (isFullScreen) document.exitFullscreen();
                             // openFullscreen(props.fullScreenElem)

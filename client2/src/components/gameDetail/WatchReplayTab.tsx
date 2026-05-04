@@ -218,7 +218,7 @@ export function WatchReplayTab({ gameSlug }: WatchReplayTabProps) {
 
 
                 {gamestate ? (
-                    <ScoreboardPane matchType={matchType} gamestate={gamestate} />
+                    <ScoreboardPane roomSlug={roomSlug} />
                 ) : (
                     <div className="text-center text-slate-400 text-xs">No game state loaded yet.</div>
                 )}

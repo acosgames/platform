@@ -1,3 +1,4 @@
+import type { RefObject } from "react";
 import { bucket } from "./bucket";
 import type { PlayerFull } from "shared/types/player";
 export const btLeaderboard = bucket({});
@@ -133,7 +134,8 @@ export const btPrimaryGamePanel = bucket(null);
 export const btChatMode = bucket("all");
 
 export const btIframes = bucket({});
-export const btDisplayMode = bucket("none");
+export type DisplayMode = "normal" | "theatre" | "fullscreen";
+export const btDisplayMode = bucket<DisplayMode>("normal");
 export const btGameStatus = bucket({});
 export const btPlayerCount = bucket(0);
 export const btGameTimeLeft = bucket(0);
@@ -208,7 +210,24 @@ export const btAchievementAward = bucket(false);
 export const btModalShow = bucket<Record<string, boolean>>({});
 
 export type PowerTabKey = "profile" | "queue" | "friends" | "chat" | "settings";
-export const btActivePowerTab = bucket<PowerTabKey | null>(null);
-export const btIsDockedWide = bucket(false);
-export const btIsLargeScreen = bucket(false);
+
+// Synchronously read cached user from localStorage so the panel starts in the
+// correct position on refresh without waiting for the async auth check.
+function _hasCachedUser(): boolean {
+    try {
+        const raw = localStorage.getItem("user");
+        if (!raw) return false;
+        const item = JSON.parse(raw);
+        return item.expiry > Date.now() && !!(item.value?.email || item.value?.displayname);
+    } catch {
+        return false;
+    }
+}
+const _cachedUser = _hasCachedUser();
+
+export const btActivePowerTab = bucket<PowerTabKey | null>(_cachedUser ? "chat" : null);
+export const btIsDockedWide = bucket(_cachedUser);
+export const btIsLargeScreen = bucket(typeof window !== "undefined" ? window.screen.width >= 1024 : false);
+
+export const btMainScrollRef = bucket<RefObject<HTMLDivElement | null> | null>(null);
 

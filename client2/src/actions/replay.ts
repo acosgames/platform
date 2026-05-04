@@ -287,11 +287,20 @@ export function pauseReplay(room_slug: string) {
         clearTimeout(gamepanel.room.replayTimerHandle);
         gamepanel.room.replayTimerHandle = null;
     }
+
+    let iframe = gamepanel.iframe;
+    if (iframe?.current?.contentWindow)
+        iframe.current.contentWindow.postMessage({type:"pause"}, "*");
 }
 
 export function resumeReplay(room_slug: string) {
     let gamepanel = findGamePanelByRoom(room_slug);
     if (!gamepanel?.room) return;
+
+    let iframe = gamepanel.iframe;
+    if (iframe?.current?.contentWindow)
+        iframe.current.contentWindow.postMessage({type:"resume"}, "*");
+
     let replayIndex = gamepanel.room.replayIndex ?? gamepanel.room.replayStartIndex ?? 0;
     let history = gamepanel.room.history;
     if (replayIndex >= history.length - 1) return;
@@ -328,6 +337,9 @@ export function replaySendGameStart(room_slug: string) {
     // gamepanel.room.timeend = (gamepanel.room.timesec || 0) * 1000;
     //gamepanel.gamestate = merged;
     //updateGamePanel(gamepanel);
+
+    if (iframe?.current?.contentWindow)
+        iframe.current.contentWindow.postMessage({type:"resume"}, "*");
 
     jumpToState(room_slug, replayStartIndex, false);
 }

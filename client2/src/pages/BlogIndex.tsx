@@ -3,7 +3,7 @@ import { blogPosts } from "../data/blogData";
 
 export function BlogIndex() {
   return (
-    <div className="space-y-8 py-8 flex-1">
+    <div className="space-y-8 py-8 flex-1 container mx-auto px-2 lg:px-8 xl:px-20">
       <div>
         <h1 className="text-2xl font-bold text-foreground">Blog</h1>
         <p className="text-muted-foreground text-sm mt-1">News, features, and deep dives from the ACOS team</p>

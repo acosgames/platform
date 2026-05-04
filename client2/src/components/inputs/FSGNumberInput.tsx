@@ -22,13 +22,15 @@ export default function FSGNumberInput(props: FSGNumberInputProps) {
     let errors = props.useErrors ? props.useErrors(props.name) : [];
     errors = errors || [];
 
-    let formValue = props.useValue
-        ? props.useValue(props.name)
-        : useBucketSelector(btFormFields, (form: any) =>
+    let bucketValue = useBucketSelector(btFormFields, (form: any) =>
               form[props.group!] && form[props.group!][props.name] !== undefined
                   ? form[props.group!][props.name]
                   : null
           );
+
+    let formValue = props.useValue
+        ? props.useValue(props.name)
+        : bucketValue;  
 
     if (typeof formValue === "undefined" || formValue == null) formValue = 0;
 

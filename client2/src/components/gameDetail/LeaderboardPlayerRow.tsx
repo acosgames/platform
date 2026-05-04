@@ -127,8 +127,8 @@ export function LeaderboardPlayerRow({
             <div
               className={`absolute -z-1 left-0 top-0 h-full`}
               style={{
-                width: 'calc(15rem + 2.5rem)', // covers rank (2.25rem), portrait (3.25rem), and name (3.5rem)
-                clipPath: 'polygon(-10px -10px, 100% -10px, 95% 100%, -10px 100%)',
+                width: '3.25rem', // covers rank (2.25rem), portrait (3.25rem), and name (3.5rem)
+                clipPath: 'polygon(-10px -10px, 100% -10px, 80% 100%, -10px 100%)',
               }}
             >
               <div className={`w-full h-full rounded-l-lg ${top3.row}`} />

@@ -15,9 +15,8 @@ export function Panel({ header, children, footer, className }: PanelProps) {
     return (
         <div className={`flex flex-col rounded-xl bg-white overflow-hidden shadow-[0_10px_20px_rgba(15,23,42,0.10)] ${className ?? ""}`}>
             {/* Header — blue background */}
-            <div className="bg-black px-4 pb-4 py-2.5">
+            
                 {header}
-            </div>
 
             {/* Content — white, overlays header with rounded top border, grows to fill */}
             <div className={contentClassName}>

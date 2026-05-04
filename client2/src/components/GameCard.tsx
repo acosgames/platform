@@ -15,14 +15,14 @@ function formatPlayerCount(count: number) {
 
 export function GameCard({ game_slug }: GameCardProps) {
 
-    let game:GameInfo = useBucketSelector(btGames,  (games) => games[game_slug]);
+    let game:GameInfo = useBucketSelector(btGames,  (games: Record<string, GameInfo>) => games[game_slug]);
     let imgUrl = `${config.https.cdn}g/${game.game_slug}/preview/${game.preview_images}`;
 
     let playerCount = 0; // TODO: get real player count
   return (
     <Link to={`/game/${game.game_slug}`} className="group block cursor-pointer">
       {/* Image */}
-      <div className="relative aspect-square overflow-hidden rounded-xl border-2 border-white/10 group-hover:border-secondary transition-colors duration-200">
+      <div className="relative aspect-square overflow-hidden rounded-xl border-2  border-white/10 transition-colors duration-200">
         <img
           src={imgUrl}
           alt={game.name}

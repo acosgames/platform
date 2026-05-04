@@ -34,13 +34,14 @@ export default function FSGSwitch(props: FSGSwitchProps) {
     let errors = props.useErrors ? props.useErrors(props.name) : [];
     errors = errors || [];
 
-    const value = props.useValue
-        ? props.useValue(props.name)
-        : useBucketSelector(btFormFields, (form: any) =>
+    let bucketValue =  useBucketSelector(btFormFields, (form: any) =>
               form[props.group!] && form[props.group!][props.name] !== undefined
                   ? form[props.group!][props.name]
                   : null
           );
+    const value = props.useValue
+        ? props.useValue(props.name)
+        : bucketValue;
     const checked = !!value;
 
     const wrapperClass = props.horizontal

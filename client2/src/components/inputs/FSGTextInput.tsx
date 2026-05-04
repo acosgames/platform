@@ -35,13 +35,14 @@ function FSGTextInput(props: FSGTextInputProps) {
     let errors = props.useErrors ? props.useErrors(props.name) : [];
     errors = errors || [];
 
-    const formValue = props.useValue
-        ? props.useValue(props.name)
-        : useBucketSelector(btFormFields, (form: any) =>
+    let bucketValue = useBucketSelector(btFormFields, (form: any) =>
               form[props.group!] && form[props.group!][props.name]
                   ? form[props.group!][props.name]
                   : null
           );
+    const formValue = props.useValue
+        ? props.useValue(props.name)
+        : bucketValue;
 
     useEffect(() => {
         if (props.focus) {
