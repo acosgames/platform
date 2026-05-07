@@ -488,7 +488,7 @@ async function postIncomingMessage(msg: ACOSMessage) {
                 let player_stat = btPlayerStats.get((bucket: any) => bucket[room.game_slug]);
                 // let player_stat = player_stats[room.game_slug] || {};
                 if (player_stat) {
-                    if (player.rating) player_stat.rating = player.rating;
+                    // if (player.rating) player_stat.rating = player.rating;
                     //if (player.ratingTxt)
                     //    player_stat.ratingTxt = player.ratingTxt;
                     // player_stats[room.game_slug] = player_stat;

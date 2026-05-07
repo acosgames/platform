@@ -42,7 +42,7 @@ export function MatchLogPane() {
       {isExpanded ? (
         <div className="h-full overflow-y-auto panel-scrollbar pr-1 space-y-1">
           {entries.map((entry, idx) => (
-            <div key={`${entry.text}-${idx}`} className="rounded-lg border border-slate-200 bg-white px-2.5 py-2 shadow-sm">
+            <div key={`${entry.text}-${idx}`} className="rounded-xl border border-slate-200 bg-white px-2.5 py-2 shadow-sm">
               <div className="flex items-start justify-between gap-2">
                 <p className="flex-1 text-[11px] text-slate-700">{entry.text}</p>
                 <span className="shrink-0 whitespace-nowrap text-[10px] text-slate-400">{formatTimeAgo(entry.timestamp)}</span>

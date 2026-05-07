@@ -12,7 +12,7 @@ export const handleReady: WSIncomingHandler = () => {
     return "return";
 };
 
-export const handleNotExist: WSIncomingHandler = (context:any) => {
+export const handleNotExist: WSIncomingHandler = (context: any) => {
     const currentPath = window.location.href;
     const currentParts = currentPath.split("/g/");
 
@@ -42,10 +42,13 @@ export const handleInRooms: WSIncomingHandler = (context) => {
                 wsLeaveGame(roomInfo.room.room_slug);
             });
 
-            
+
             context.msg.payload = multiplayerRoom.gamestate;
             context.msg.room_slug = multiplayerRoom.room?.room_slug;
-            router.navigate(`/game/${multiplayerRoom?.room?.game_slug}/play`);
+            let playPath = `/game/${multiplayerRoom?.room?.game_slug}/play`;
+            if (window.location.pathname !== playPath) {
+                router.navigate(playPath);
+            }
             clearGameQueues();
         } else {
             addRooms(payload);
@@ -64,7 +67,11 @@ export const handleJoined: WSIncomingHandler = (context) => {
 
     addRoom(context.msg);
 
-    router.navigate(`/game/${context.msg.payload?.room?.game_slug}/play`);
+    let playPath = `/game/${context.msg.payload?.room?.game_slug}/play`;
+    if (window.location.pathname !== playPath) {
+        router.navigate(playPath);
+    }
+
     const room = context.msg.payload?.room;
     if ((room?.maxplayers || 0) > 1) {
         clearGameQueues();

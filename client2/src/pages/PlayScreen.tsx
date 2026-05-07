@@ -10,7 +10,8 @@ import { useBucket } from "@/actions/bucket";
 import config from "../config";
 import { GameStatus } from "@acosgames/framework";
 import { addJoinQueues } from "@/actions/queue";
-import { wsJoinQueues } from "@/actions/ws";
+import { wsJoinGame, wsJoinQueues } from "@/actions/ws";
+import { Tooltip } from "@/components/ui/Tooltip";
 
 type MatchType = "free-for-all" | "1v1" | "team-based";
 
@@ -110,8 +111,9 @@ export function PlayScreen() {
 
   const handleQueue = () => {
     if (!gameSlug) return;
-    addJoinQueues(gameSlug, "public");
-    wsJoinQueues([{ game_slug: gameSlug, mode: "public" }], null);
+    wsJoinGame("rank", gameSlug);
+    // addJoinQueues(gameSlug, "public");
+    // wsJoinQueues([{ game_slug: gameSlug, mode: "public" }], null);
     navigate(`/game/${gameSlug}`);
   };
 
@@ -133,8 +135,8 @@ export function PlayScreen() {
       <div className="container mx-auto px-2 lg:px-8 xl:px-20 py-8">
       <div className="flex bg-white rounded-lg p-2 min-h-64">
         <div className="flex bg-slate-200 w-full flex-col items-center justify-center  gap-5 py-16">
-          <div className="flex items-center justify-center w-14 h-14 rounded-full bg-rose-500/15 border border-rose-500/30">
-            <ExclamationTriangleIcon className="w-7 h-7 text-rose-400" />
+          <div className="flex items-center justify-center w-14 h-14 rounded-full bg-slate-500 border border-red-500/30">
+            <ExclamationTriangleIcon className="w-7 h-7 text-red-600" />
           </div>
           <div className="text-center">
             <p className="text-base font-bold text-slate-600">No game session found</p>
@@ -189,9 +191,12 @@ export function PlayScreen() {
   };
 
   return (
-    <div className="space-y-3">
-      <section ref={playSurfaceRef} className={`relative overflow-hidden min-h-full ${!isTheaterMode && !isFullscreen ? "pt-2" : "p-4"}`}>
-        <GamePanel id={String(primary)} prioritizeWidth hideInBackground={showVsScreen} />
+    <div className="space-y-3 ">
+      <section ref={playSurfaceRef} className={`relative overflow-hidden min-h-full ${!isTheaterMode && !isFullscreen ? "p-2 md:p-4" : ""} `}>
+        <GamePanel wrapperClassName={`${isTheaterMode || isFullscreen ? "items-center justify-center":  "items-center justify-start"}`} id={String(primary)} prioritizeWidth hideInBackground={showVsScreen}>
+
+          
+        </GamePanel>
         <PlayerScreen
           room={room}
           matchType={matchType}
@@ -203,16 +208,9 @@ export function PlayScreen() {
         />
 
       <div className="container flex items-end justify-end gap-3 px-1 py-4">
-        {/* <div className="flex items-center gap-2">
-          <span className="px-3 py-1.5 rounded-full border border-cyan-300/35 bg-cyan-500/10 text-cyan-100 text-[11px] font-semibold uppercase tracking-wide">
-            {matchType}
-          </span>
-          <span className="px-3 py-1.5 rounded-full border border-white/20 bg-black/25 text-white/85 text-[11px] font-semibold">
-            {playersReady} ready
-          </span>
-        </div> */}
-
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-center gap-2 w-full ">
+          <Tooltip            content={isTheaterMode ? "Standard View" : "Theatre Mode"}>
+            
           <button
             type="button"
             onClick={() => {
@@ -230,6 +228,8 @@ export function PlayScreen() {
           >
             <Clapperboard className="h-5 w-5" />
           </button>
+          </Tooltip>
+          <Tooltip content={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}>
           <button
             type="button"
             onClick={() => { void toggleFullscreen(); }}
@@ -242,7 +242,18 @@ export function PlayScreen() {
           >
             <ArrowsPointingOutIcon className="h-5 w-5" />
           </button>
+          </Tooltip>
         </div>
+        {/* <div className="flex items-center gap-2">
+          <span className="px-3 py-1.5 rounded-full border border-cyan-300/35 bg-cyan-500/10 text-cyan-100 text-[11px] font-semibold uppercase tracking-wide">
+            {matchType}
+          </span>
+          <span className="px-3 py-1.5 rounded-full border border-white/20 bg-black/25 text-white/85 text-[11px] font-semibold">
+            {playersReady} ready
+          </span>
+        </div> */}
+
+        
       </div>
       
       </section>

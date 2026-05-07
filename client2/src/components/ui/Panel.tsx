@@ -9,11 +9,11 @@ interface PanelProps {
 
 export function Panel({ header, children, footer, className }: PanelProps) {
     const contentClassName = footer !== undefined
-        ? "relative z-10 -mt-2 -mb-2 rounded-xl bg-white flex-1"
-        : "relative z-10 -mt-2 rounded-xl bg-white flex-1";
+        ? "relative z-10 -mt-2 -mb-2 rounded-lg bg-white flex-1"
+        : "relative z-10 -mt-2 rounded-lg bg-white flex-1";
 
     return (
-        <div className={`flex flex-col rounded-xl bg-white overflow-hidden shadow-[0_10px_20px_rgba(15,23,42,0.10)] ${className ?? ""}`}>
+        <div className={`flex flex-col rounded-lg bg-white overflow-hidden shadow-md ${className ?? ""}`}>
             {/* Header — blue background */}
             
                 {header}

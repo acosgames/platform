@@ -2,12 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import type React from "react";
 import { Link, Outlet, useLocation } from "react-router";
 import { XMarkIcon } from "@heroicons/react/24/solid";
-import { ChatBubbleLeftRightIcon, Cog6ToothIcon, QueueListIcon, UsersIcon } from "@heroicons/react/24/solid";
+import { ChatBubbleLeftRightIcon, Cog6ToothIcon, QueueListIcon, UsersIcon, PlayIcon } from "@heroicons/react/24/solid";
 import { QueueList } from "./QueueList";
 import { FriendsList } from "./FriendsList";
 import { ChatPane } from "./ChatPane";
 import { CompressedGamerCard } from "./CompressedGamerCard";
 import { MatchmakingQueueIndicator } from "./MatchmakingQueueIndicator";
+import { HeaderQueueSearchIndicator } from "./HeaderQueueSearchIndicator";
 import { PowerBar } from "./PowerBar";
 import { SettingsPane } from "./SettingsPane";
 import { ScoreboardPane } from "./ScoreboardPane";
@@ -17,7 +18,7 @@ import { ScoreboardPane } from "./ScoreboardPane";
 import { hideToast } from "../actions/toast";
 import { SignInPane } from "./SignInPane";
 import { useBucket } from "@/actions/bucket";
-import { btActivePowerTab, btDisplayMode, btIsDockedWide, btIsLargeScreen, btLoggedIn, btMainScrollRef, btModalShow, btPrimaryGamePanel } from "@/actions/buckets";
+import { btActivePowerTab, btDisplayMode, btIsDockedWide, btIsLargeScreen, btIsMobile, btLoggedIn, btMainScrollRef, btModalShow, btPrimaryGamePanel, btScreenBreakpoint } from "@/actions/buckets";
 // import { Gamepad2, Sparkles } from "lucide-react";
 
 
@@ -31,6 +32,7 @@ const screensPx: { [key: string]: number } = {
     '2xl': 1536,
 };
 
+const mediaQuery = window.matchMedia('(pointer: coarse)');
 
 export function Layout() {
 
@@ -42,13 +44,14 @@ export function Layout() {
     const activePowerTab = useBucket(btActivePowerTab);
     const isDockedWide = useBucket(btIsDockedWide);
     const isLargeScreen = useBucket(btIsLargeScreen);
+    const isMobile = useBucket(btIsMobile);
     const loggedIn = useBucket(btLoggedIn);
     const isLoggedIn = !!loggedIn && loggedIn !== "LURKER" && loggedIn !== "CHECKING";
 
     const displayMode = useBucket(btDisplayMode);
     const isTheaterMode = displayMode === "theatre";
     const isFullscreen = displayMode === "fullscreen";
-    
+
     useEffect(() => { setMounted(true); }, []);
 
     useEffect(() => {
@@ -81,14 +84,40 @@ export function Layout() {
         // Use a window resize listener or a React useEffect hook to update dynamically
         // Example using a window listener:
         const updateLargeScreen = () => {
-            btIsLargeScreen.set(window.screen.width >= screensPx['lg']);
+            btIsLargeScreen.set(window.innerWidth >= screensPx['md']);
+
+            if (window.innerWidth >= screensPx['xl']) {
+                btScreenBreakpoint.set('xl');
+            }
+            else if (window.innerWidth >= screensPx['lg']) {
+                btScreenBreakpoint.set('lg');
+            }
+            else if (window.innerWidth >= screensPx['md']) {
+                btScreenBreakpoint.set('md');
+            }
+            else if (window.innerWidth >= screensPx['sm']) {
+                btScreenBreakpoint.set('sm');
+            }
+            else {
+                btScreenBreakpoint.set('xs');
+            }
+
         };
+
+        const handleTabletChange = (e: MediaQueryListEvent | any) => {
+            btIsMobile.set(e.matches);
+        };
+
+        
+        mediaQuery.addEventListener('change', handleTabletChange);
+        handleTabletChange(mediaQuery);
 
         updateLargeScreen();
         window.addEventListener('resize', updateLargeScreen);
 
         return () => {
             window.removeEventListener('resize', updateLargeScreen);
+            mediaQuery.removeEventListener('change', handleTabletChange);
         };
     }, []);
 
@@ -153,36 +182,35 @@ export function Layout() {
                     </div>
                 ) : null}
 
-                <div
-                    ref={(element) => {
-                        mainScrollRef.current = element;
-                        btMainScrollRef.set(mainScrollRef);
-                    }}
-                    className={`relative flex flex-row w-full h-screen  panel-scrollbar  overflow-y-auto overflow-x-hidden ${mounted ? "transition-[padding-right] transition-duration-200" : ""}`}
-                    style={{
-                        paddingRight: isLargeScreen && isPowerPanelOpen ? "calc(20rem - 6px)" : undefined,
-                        // width: isPowerPanelOpen ? "calc(100% - 20rem)" : undefined 
-                    }}
-                >
+                <div className="relative flex flex-row w-full h-screen overflow-hidden ">
 
-                    <div className="play-layout-main-shell flex-1 min-w-0 flex flex-col h-full ">
+                    <div
+                        ref={(element) => {
+                            mainScrollRef.current = element;
+                            btMainScrollRef.set(mainScrollRef);
+                        }}
+                        className={`play-layout-main-shell flex-1 min-w-0 flex flex-col panel-scrollbar overflow-y-auto overflow-x-hidden ${mounted ? "transition-[margin-right] duration-200" : ""}`}
+                        style={{
+                            marginRight: isDockedOpenWide ? "20rem" : 0,
+                            marginTop: isTheaterMode || isFullscreen ? 0 : isDockedOpenWide ? "50px" : undefined,
+                        }}
+                    >
                         {/* Header */}
 
                         <header
                             className={`play-layout-header fixed top-0 left-0 z-50 ${mounted ? "transition-[padding-right] transition-duration-200" : ""}  w-full h-12.5 min-h-12.5 max-h-12.5 box-border  bg-slate-950`}
                             style={{
-                                paddingRight: isLargeScreen && isPowerPanelOpen ? "calc(20rem - 6px)" : undefined,
-                                left: isLargeScreen && isPowerPanelOpen ? '-4px' : undefined,
-                                // width: isPowerPanelOpen ? "calc(100% - 20rem)" : undefined
+                                paddingRight: isDockedOpenWide ? "20rem" : undefined,
                             }}
                         >
                             <div className="absolute w-full -z-50 inset-0  bg-linear-to-r transition-[padding-right] transition-duration-200 "
                                 style={{
-                                    paddingRight: isLargeScreen && isPowerPanelOpen ? "calc(20rem - 6px)" : undefined,
+                                    // paddingRight: isLargeScreen && isPowerPanelOpen ? "calc(20rem - 8px)" : undefined,
                                     // width: isPowerPanelOpen ? "calc(100% - 20rem)" : undefined
                                 }}
                             />
                             <div className="w-full h-full container mx-auto px-2 lg:px-8 xl:px-20 relative">
+                                <HeaderQueueSearchIndicator />
                                 <div className="w-full h-full flex items-center justify-between gap-3">
                                     <div className="flex items-center gap-3 min-w-0">
                                         <Link to="/" className="flex items-center gap-2.5">
@@ -213,15 +241,17 @@ export function Layout() {
 
                         </header>
 
-                        {/* Main content + footer — shift right when panel is docked */}
+                        {/* Main content + footer */}
                         <div
-                            className={`flex-1 flex flex-col min-h-0 ${isTheaterMode || isFullscreen ? "" : "mt-12.5"} min-w-0 transition-[padding-right] duration-200 relative`}
-                        // style={{ paddingRight: isDockedOpenWide ? "20rem" : undefined }}
+                            className={`flex-1 flex flex-col min-h-0  ${isTheaterMode || isFullscreen ? "mt-0" : isDockedOpenWide ? "" : "mt-[50px]"} ${isTheaterMode || isFullscreen ? "mt-0" : ""} min-w-0 relative`}
+                            style={{
+
+                            }}
                         >
                             {/* Persistent rounded-corner overlay at top right */}
 
                             {/* Main content */}
-                            <div className="flex-1 min-w-0 play-layout-content relative  ">
+                            <div className="flex-1 min-w-0 play-layout-content relative shadow-sm">
                                 <div className="flex flex-col gap-4 lg:gap-6">
                                     {/* Main content area */}
                                     <div className="flex-1 min-w-0">
@@ -259,7 +289,7 @@ export function Layout() {
                 ) : null}
 
                 <aside
-                    className={`power-panel fixed z-55 py-1 ${mounted ? "transition-[right] duration-200" : ""} ${isPowerPanelOpen ? "power-panel-open right-1" : "-right-100"} ${isDockedOpenWide ? "docked bg-slate-950 bg-pink-500/5" : ""}`}
+                    className={`power-panel fixed z-55 pt-1 pb-2 bg-slate-950 ${mounted ? "transition-[right] duration-200" : ""} ${isPowerPanelOpen ? "power-panel-open right-0" : "-right-100"} ${isDockedOpenWide ? "docked  " : ""}`}
                 // aria-hidden={!isPowerPanelOpen}
                 >
                     {!isTheaterMode && !isFullscreen && isDockedOpenWide ? (
@@ -273,18 +303,22 @@ export function Layout() {
                 {/* Rounded concave corner — fixed sibling so it escapes the aside's stacking context */}
                 {!(isTheaterMode || isFullscreen) ? (
                     <div
-                        className={`pointer-events-none fixed -z-10 bg-slate-950 ${mounted ? "transition-[right] duration-200" : ""}`}
+                        className={`pointer-events-none overflow-hidden border-0 fixed z-9 bg-slate-950 ${mounted ? "transition-[right] duration-200" : ""}`}
                         style={{
                             top: '50px',
-                            right: isLargeScreen && isPowerPanelOpen ? 'calc(20rem + 0.25rem)' : '-100rem',
-                        width: '2rem',
-                        height: '2rem',
-                    }}
-                >
-                    <div className="w-full h-full bg-slate-300 rounded-tr-lg" />
-                </div>
+                            right: isDockedOpenWide && isMobile ? 'calc(20rem + 0px)' : isDockedOpenWide ? 'calc(20rem + 10px)' : '-100rem',
+                            width: '0.5rem',
+                            height: '0.5rem',
+                            opacity: '0.99',
+                            // inset: '0',
+                            // mask:`url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" preserveAspectRatio="none"><circle cx="5" cy="5" r="2" stroke="black" stroke-width="0" fill="red" /></svg>') 0/100% 100%`,
+                            clipPath: ' polygon(100% 0, 100% 100%, 83% 40%, 59% 20%, 0 0)',
+                        }}
+                    >
+                        <div className="w-full h-full bg-slate-300 rounded-tr-lg" />
+                    </div>
                 ) : null}
-                <MatchmakingQueueIndicator />
+                {/* <MatchmakingQueueIndicator /> */}
             </div>
 
         </>
@@ -297,7 +331,7 @@ type PanelSubTab = "chat" | "queue" | "friends" | "settings" | "scoreboard";
 const BASE_PANEL_TABS: Array<{ key: PanelSubTab; label: string; Icon: React.ElementType }> = [
     { key: "chat", label: "Chat", Icon: ChatBubbleLeftRightIcon },
     { key: "queue", label: "Queue", Icon: QueueListIcon },
-    { key: "friends", label: "Friends", Icon: UsersIcon },
+    // { key: "friends", label: "Friends", Icon: UsersIcon },
     { key: "settings", label: "Settings", Icon: Cog6ToothIcon },
 ];
 
@@ -318,11 +352,16 @@ function PanelContent({ isPlayRoute }: { isPlayRoute: boolean }) {
         if (typeof primary == "number") setActiveSubTab("scoreboard");
     }, [primary]);
 
+    // If we leave the play route, switch away from scoreboard
+    useEffect(() => {
+        if (!inGame && activeSubTab === "scoreboard") setActiveSubTab("chat");
+    }, [inGame]);
+
 
     // Dynamically add scoreboard tab if in game
     const PANEL_TABS: Array<{ key: PanelSubTab; label: string; Icon: React.ElementType }> = inGame
         ? [
-            { key: "scoreboard", label: "Scoreboard", Icon: QueueListIcon },
+            { key: "scoreboard", label: "Scoreboard", Icon: PlayIcon },
             ...BASE_PANEL_TABS.filter(tab => tab.key !== "scoreboard")
         ]
         : BASE_PANEL_TABS;
@@ -336,7 +375,7 @@ function PanelContent({ isPlayRoute }: { isPlayRoute: boolean }) {
     }
 
     return (
-        <div className="flex flex-1 z-10 min-h-0 flex-col gap-2  relative pl-2 pr-1 py-0 sm:gap-3 ">
+        <div className="flex flex-1 z-10 min-h-0 flex-col gap-2  relative pl-1.5 sm:pl-1.5 pr-2 py-0 sm:gap-3 ">
             {/* Player card — shrink-0 ensures it never loses height */}
             <div className="shrink-0">
                 <CompressedGamerCard />
@@ -352,9 +391,9 @@ function PanelContent({ isPlayRoute }: { isPlayRoute: boolean }) {
                                 key={key}
                                 type="button"
                                 onClick={() => setActiveSubTab(key)}
-                                className={`flex h-8 flex-1 items-center justify-center rounded-lg transition-colors ${isActive
-                                        ? "bg-slate-900 text-white shadow-sm"
-                                        : "text-slate-500 hover:bg-slate-100 hover:text-slate-800"
+                                className={`flex h-8 flex-1 items-center justify-center rounded-xl transition-colors ${isActive
+                                    ? "bg-slate-900 text-white shadow-sm"
+                                    : "text-slate-500 hover:bg-slate-100 hover:text-slate-800"
                                     }`}
                                 aria-pressed={isActive}
                                 aria-label={label}
@@ -372,7 +411,7 @@ function PanelContent({ isPlayRoute }: { isPlayRoute: boolean }) {
                 {activeSubTab === "scoreboard" ? <ScoreboardPane roomSlug={null} /> : null}
                 {activeSubTab === "chat" ? <ChatPane /> : null}
                 {activeSubTab === "queue" ? <QueueList /> : null}
-                {activeSubTab === "friends" ? <FriendsList /> : null}
+                {/* {activeSubTab === "friends" ? <FriendsList /> : null} */}
                 {activeSubTab === "settings" ? <SettingsPane isPlayRoute={isPlayRoute} /> : null}
             </div>
         </div>

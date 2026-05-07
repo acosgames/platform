@@ -240,10 +240,10 @@ export function GameDetail() {
 
     return (
         <div className="space-y-4 py-4 container mx-auto px-2 lg:px-8 xl:px-20">
-            <div className="mb-4 flex items-start justify-between gap-3">
+            <div className="flex items-start justify-between gap-3">
                 <Link
                     to="/"
-                    className="inline-flex items-center gap-2 rounded-md bg-slate-900/85 px-3.5 py-2 text-[11px] font-bold uppercase tracking-[0.08em] text-white transition-colors hover:bg-slate-900"
+                    className="inline-flex items-center gap-2 rounded-md  px-3.5 py-1 text-[10px] font-bold uppercase tracking-[0.08em] text-slate-800 transition-colors hover:bg-slate-100"
                 >
                     ← Back to Games
                 </Link>
@@ -264,21 +264,21 @@ export function GameDetail() {
                 {/* <div className="absolute inset-0 opacity-30 bg-[radial-gradient(ellipse_at_65%_45%,rgba(255,255,255,0.96),transparent_65%)]" /> */}
 
                 <div className="relative px-3 py-3 sm:px-5 sm:py-4 lg:px-7 lg:py-5 bg-slate-950 text-white rounded-xl">
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-center sm:gap-5 lg:grid-cols-[auto_minmax(0,1fr)] lg:gap-6">
-                        <div className="relative mx-auto w-32 sm:mx-0 sm:w-48 ">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-[auto_minmax(0,1fr)] sm:items-center sm:gap-5 lg:grid-cols-[auto_minmax(0,1fr)] lg:gap-6">
+                        <div className="relative mx-auto w-32 md:mx-0 md:w-42 ">
                             <div className="absolute inset-x-8 bottom-0 h-5 rounded-full bg-slate-900/30 blur-xl" />
                             <img
                                 src={imgUrl}
                                 alt={game.name}
-                                className="relative h-32 w-full rounded-xl  object-cover object-center sm:h-48 "
+                                className="relative h-32 w-full rounded-xl  object-cover object-center md:h-42 "
                             />
                         </div>
 
-                        <div className="relative flex flex-col z-10 min-w-0 w-full h-full text-center sm:text-left md:pb-20">
-                            <h1 className="truncate text-[1.5rem] font-black uppercase tracking-tight text-white sm:text-[2.2rem] lg:text-[2rem]">
+                        <div className="relative flex flex-col z-10 min-w-0 w-full h-full text-center md:text-left lg:pb-10">
+                            <h1 className="truncate text-[1.5rem] font-black uppercase tracking-tight text-white md:text-[1.4rem] lg:text-[2rem]">
                                 {game.name}
                             </h1>
-                            <div className="mt-2 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
+                            <div className="mt-2 flex flex-wrap items-center justify-center gap-2 md:justify-start">
                                 <p className="inline-flex rounded-full bg-white/12 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-white ring-1 ring-white/15">
                                     Created by <a className="text-blue-100 pl-1">{game.displayname}</a>
                                 </p>
@@ -297,13 +297,13 @@ export function GameDetail() {
                                 </button>
                             </div>
                             {game.shortdesc ? (
-                                <p className="mt-3 inline rounded-lg  px-4 py-2 text-sm italic leading-relaxed text-slate-100 sm:mx-0">
+                                <p className="mt-3 inline rounded-lg  px-4 py-2 text-sm italic leading-relaxed text-slate-100 md:mx-0">
                                     {/* <span className="mr-1 align-top text-base font-semibold leading-none text-slate-400">"</span> */}
                                     {game.shortdesc}
                                     {/* <span className="ml-1 align-bottom text-base font-semibold leading-none text-slate-400">"</span> */}
                                 </p>
                             ) : null}
-                            <div className=" flex-1 flex justify-center mb-4 sm:mb-2 md:mb-0 sm:justify-end md:absolute md:inset-x-0 bottom-2 md:mt-0 md:justify-end">
+                            <div className=" flex-1 flex justify-center mb-4 md:mb-2 md:justify-end md:absolute md:inset-x-0 bottom-2 md:mt-0">
                                 <PlayNow game_slug={game.game_slug} name={game.name} />
                             </div>
 
@@ -353,7 +353,7 @@ export function GameDetail() {
                                 <button
                                     type="button"
                                     onClick={() => setActiveTab(tab.key)}
-                                    className={`flex h-8 w-full items-center justify-center rounded-lg px-4 transition-colors ${isActive
+                                    className={`flex h-8 w-full items-center justify-center rounded-xl px-4 transition-colors ${isActive
                                             ? "bg-slate-900 text-white shadow-sm"
                                             : "text-slate-500 hover:bg-slate-100 hover:text-slate-800"
                                         }`}

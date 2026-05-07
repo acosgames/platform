@@ -88,22 +88,13 @@ export function ChatPane() {
   }, [quickChatOpen]);
 
   return (
-    <section className="flex h-full min-h-0 flex-col-reverse relative overflow-hidden p-2 sm:p-2">
-      <div className="min-h-10 shrink-0 flex items-center gap-2  pt-2.5">
-        <input
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") sendMessage();
-          }}
-          placeholder="Message squad..."
-          className="h-8 flex-1 rounded-md border border-slate-300 bg-white px-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-cyan-400 focus:outline-none"
-        />
-        <div className="relative" ref={quickChatRef}>
+    <section className="flex h-full min-h-0 flex-col relative overflow-hidden p-2 sm:p-2">
+      <div className="min-h-10 shrink-0 flex items-center gap-2  pb-2.5">
+         <div className="relative" ref={quickChatRef}>
           <button
             type="button"
             onClick={() => setQuickChatOpen((v) => !v)}
-            className="h-8 w-8 rounded-md border border-slate-300 bg-slate-50 text-sm text-slate-700 transition-colors hover:border-cyan-300 hover:bg-cyan-50"
+            className="h-8 w-8 rounded-xl border border-slate-100 bg-white text-sm text-slate-700 transition-colors hover:border-cyan-300 hover:bg-cyan-50"
             aria-label="Open quick chat menu"
             aria-expanded={quickChatOpen}
           >
@@ -111,7 +102,7 @@ export function ChatPane() {
           </button>
 
           {quickChatOpen && (
-            <div className="absolute bottom-9 right-0 z-30 w-36 overflow-hidden rounded-md border border-slate-200 bg-white py-1.5 shadow-lg">
+            <div className="absolute top-9 left-0 max-h-80 z-30 w-36 max-h-[calc(100vh-205px)] overflow-y-auto overflow-x-hidden rounded-xl panel-scrollbar2 border border-slate-200 bg-white py-1.5 shadow-md">
               {QUICK_CHATS.map((msg) => (
                 <button
                   key={msg}
@@ -126,16 +117,26 @@ export function ChatPane() {
             </div>
           )}
         </div>
+        <input
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") sendMessage();
+          }}
+          placeholder="Message squad..."
+          className="h-8 flex-1 rounded-xl border border-slate-300 bg-white px-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-cyan-400 focus:outline-none"
+        />
+       
         <button
           type="button"
           onClick={sendMessage}
-          className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-linear-to-r from-cyan-500 to-blue-600 text-white transition-colors hover:from-cyan-400 hover:to-blue-500"
+          className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-linear-to-r from-cyan-500 to-blue-600 text-white transition-colors hover:from-cyan-400 hover:to-blue-500"
           aria-label="Send message"
         >
           <PaperAirplaneIcon className="h-4 w-4" />
         </button>
       </div>
-      <div className="flex-1 min-h-0 max-h-50 md:max-h-full overflow-y-auto pr-1 panel-scrollbar">
+      <div className="flex-1 min-h-0 max-h-50 md:max-h-full overflow-y-auto pr-1 panel-scrollbar2">
         {messages.map((msg) => {
           const isMe = msg.sender === currentPlayer.name || msg.sender === "You";
           const sender = senderProfiles.get(msg.sender) ?? {
@@ -148,10 +149,10 @@ export function ChatPane() {
           return (
             <div
               key={msg.id}
-              className="rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 mb-1.5 last:mb-0"
+              className="rounded-xl bg-white shadow-md px-2 py-1.5 mb-1.5 last:mb-0"
             >
               <div className="flex gap-1.5 min-w-0">
-                <img src={sender.avatarUrl} alt={msg.sender} className="h-6 w-6 shrink-0 rounded-md border border-slate-300 object-cover" />
+                <img src={sender.avatarUrl} alt={msg.sender} className="h-6 w-6 shrink-0 rounded-lg border border-slate-300 object-cover" />
                 <div className="inline leading-none">
                   <img
                     src={flagSrc}

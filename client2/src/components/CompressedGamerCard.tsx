@@ -29,11 +29,26 @@ export function CompressedGamerCard() {
     const levelInt = Math.trunc(level);
     const xpPercent = Math.max(0, Math.min(100, Math.round((level - levelInt) * 100)));
 
+
+    
     const countrycode = (player.countrycode || "US").toUpperCase();
     const flagSrc = `${config.https.cdn}images/country/${countrycode}.svg`;
     const avatarUrl = `${config.https.cdn}images/portraits/assorted-${player.portraitid || 1}-medium.webp`;
-    const latencyValue = Number(latency || 0);
-    const statusLabel = duplicatetabs ? "Duplicate" : isOnline ? "Online" : "Offline";
+    let latencyValue = Number(latency || 0);
+    const statusLabel = duplicatetabs ? "Duplicate" : isOnline ? `Online (${latencyValue}ms)` : "Offline";
+
+        let latencyColor = "bg-slate-400";
+        if (latencyValue > 400) {
+            latencyColor = "bg-orange-400";
+        } else if (latencyValue > 200) {
+            latencyColor = "bg-yellow-200";
+        } else {
+            latencyColor = "bg-green-400";
+        }
+    
+        if (!wsConnected || duplicatetabs) {
+            latencyColor = "bg-red-600";
+        }
 
     return (
         <section className="relative  rounded-xl  bg-slate-950  shadow-md">
@@ -41,15 +56,15 @@ export function CompressedGamerCard() {
             <div className="relative flex items-start gap-3 bg-slate-950 rounded-xl px-2 pt-1">
 
                 <div className="relative shrink-0">
-                    <div className="relative  rounded-lg bg-linear-to-br from-slate-500/60 via-slate-500/35 to-slate-700/65 p-1">
-                        <img src={avatarUrl} alt={player.displayname || "Player"} className="relative h-14 w-14 rounded-lg  bg-slate-900 object-cover" />
+                    <div className="relative  rounded-xl bg-linear-to-br from-slate-300 via-slate-500 to-slate-900/65 p-0.5">
+                        <img src={avatarUrl} alt={player.displayname || "Player"} className="relative h-13 w-13 rounded-xl  bg-slate-900 object-cover" />
                         <span
-                            className={`absolute -bottom-1 -right-1 h-3 w-3 rounded-full border-2 border-white ${isOnline ? "bg-emerald-400" : "bg-slate-400"}`}
+                            className={`absolute -bottom-1 -right-1 h-2.5 w-2.5 rounded-full border-0 border-white ${latencyColor}`}
                             title={statusLabel}
                         />
                     </div>
 
-                    <div className="shrink-0 rounded-lg pt-0.5 text-center flex items-center justify-center leading-none gap-1">
+                    <div className="shrink-0 rounded-xl pt-0.5 text-center flex items-center justify-end leading-none gap-1">
                         <div className="text-[9px] font-bold uppercase tracking-[0.2em] text-slate-400">Lvl</div>
                         <div className="mt-0.5 text-sm font-black text-slate-50">{levelInt}</div>
                     </div>
@@ -66,7 +81,7 @@ export function CompressedGamerCard() {
                                     {latencyValue}ms
                                 </span>
                             </div> */}
-                            <h3 className="mt-1.5 truncate text-xs font-black uppercase tracking-[0.08em] text-slate-100">
+                            <h3 className="mt-1.5 truncate text-sm font-black uppercase tracking-[0.08em] text-slate-100">
                                 {player.displayname || "Player"}
                             </h3>
                             <div className="mt-1 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-100">
@@ -90,7 +105,7 @@ export function CompressedGamerCard() {
                                 </svg>
                             </button>
                             {menuOpen && (
-                                <div className="absolute right-0 top-7 w-44 rounded-lg bg-white py-1 shadow-md">
+                                <div className="absolute right-0 top-7 w-44 rounded-xl bg-white py-1 shadow-md">
                                     <button
                                         onClick={() => { setMenuOpen(false); navigate("/profile"); }}
                                         className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-semibold text-slate-600 hover:bg-slate-200"
@@ -137,9 +152,10 @@ export function CompressedGamerCard() {
 
                     </div>
 
-                    <div className="mt-2.5">
+                    <div className="mt-0.25">
                         <div className="mb-1 flex items-center justify-between text-[10px] font-semibold uppercase tracking-wide text-slate-200">
-                            <span>Progress</span>
+                            {/* <span>Progress</span> */}
+                            <span></span>
                             <span>{xpPercent}%</span>
                         </div>
                         <div className="h-1.5 overflow-hidden rounded-full bg-slate-200">

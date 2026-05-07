@@ -1,9 +1,9 @@
 
-import { btGame, btGames, btJoinQueues, btQueueStats, btQueues } from './buckets';
+import { btGame, btGames, btJoinQueues, btParty, btQueueStats, btQueues } from './buckets';
 import type { PartyQueue } from 'shared/types/queue';
 
 export async function onQueueStats(msg:any) {
-    btQueueStats.set(msg);
+    btQueueStats.set(msg.payload);
 }
 
 export async function addGameQueue(payload:PartyQueue) {
@@ -23,6 +23,7 @@ export async function addGameQueue(payload:PartyQueue) {
         q.rating = rating;
     })
 
+    btParty.set(payload);
     btQueues.set(queues);
 
 }
@@ -77,6 +78,7 @@ export function findQueue(game_slug: string) {
 
 export async function clearGameQueues() {
     btQueues.set([]);
+    btParty.set(null);
     btJoinQueues.set([]);
     localStorage.setItem('queues', JSON.stringify([]));
     localStorage.removeItem('joinqueues');

@@ -1,6 +1,7 @@
 import type { RefObject } from "react";
 import { bucket } from "./bucket";
 import type { PlayerFull } from "shared/types/player";
+import type { PartyQueue } from "shared/types/queue";
 export const btLeaderboard = bucket({});
 
 export const btUser = bucket<PlayerFull | null>(null);
@@ -55,6 +56,8 @@ export type PlayerStatHistoryEntry = {
   tsupdate: string;
   value: number;
 };
+
+export const btParty = bucket<PartyQueue | null>(null);
 export const btQueues = bucket<QueueEntry[] | null>([]);
 export const btRooms = bucket<{ [key: string]: any }>({});
 
@@ -228,6 +231,7 @@ const _cachedUser = _hasCachedUser();
 export const btActivePowerTab = bucket<PowerTabKey | null>(_cachedUser ? "chat" : null);
 export const btIsDockedWide = bucket(_cachedUser);
 export const btIsLargeScreen = bucket(typeof window !== "undefined" ? window.screen.width >= 1024 : false);
-
+export const btScreenBreakpoint = bucket<"xs" | "sm" | "md" | "lg" | "xl">("lg");
 export const btMainScrollRef = bucket<RefObject<HTMLDivElement | null> | null>(null);
 
+export const btVolume = bucket<number>(localStorage.getItem("volume") ? Number(localStorage.getItem("volume")) : 1);

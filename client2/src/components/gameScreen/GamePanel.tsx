@@ -9,6 +9,7 @@ import config from "../../config";
 
 import {
     getRoomStatus,
+    RoomStatus,
     updateGamePanel,
 } from "../../actions/room";
 
@@ -33,19 +34,26 @@ import {
 
 interface GamePanelProps {
     id: string;
-    canvasRef?: React.RefObject<HTMLDivElement>;
+    canvasRef?: React.RefObject<HTMLElement | HTMLDivElement | null>;
     prioritizeWidth?: boolean;
     displayMode?: string;
     isFullScreen?: boolean;
     hideInBackground?: boolean;
+    children?: React.ReactNode;
+    wrapperClassName?: string;
 }
 
-function GamePanel({ id, canvasRef, prioritizeWidth, hideInBackground }: GamePanelProps) {
+function GamePanel({ id, canvasRef, prioritizeWidth, hideInBackground, children, wrapperClassName }: GamePanelProps) {
     let gamepanel = useBucketSelector(btGamePanels, (bucket) => (bucket as Record<string, any>)[id]);
     useBucketSelector(btShowLoadingBox, (bucket) => (bucket as Record<string, any>)[id]);
 
     const primaryId = useBucket(btPrimaryGamePanel);
     const primaryRoom = useBucket(btPrimaryRoom) as any;
+    const playSurfaceRef = useRef<HTMLDivElement>(null);
+
+    const displayMode = useBucket(btDisplayMode);
+    const isTheaterMode = displayMode === "theatre";
+    const isFullscreen = displayMode === "fullscreen";
 
     // When btGamePanels doesn't have this panel, synthesize one from btPrimaryRoom
     if (!gamepanel && String(primaryId) === id && primaryRoom) {
@@ -85,37 +93,50 @@ function GamePanel({ id, canvasRef, prioritizeWidth, hideInBackground }: GamePan
     // let game = getGame(room.game_slug);
     // if (!game)
     // return <LoadingBox />
+    let room = gamepanel.room;
+    let resow = room.resow;
+    let resoh = room.resoh;
+
+    let resoRatio = ((resoh / resow) * 100.0).toFixed(2);
 
     return (
         // <Portal containerRef={gamepanel.draggableRef}>
         // <div className="relative w-full h-full">
-            <div className={`play-surface min-h-full drop-shadow-md ${hideInBackground ? "opacity-0" : ""}`}>
+        <div ref={playSurfaceRef} className={`play-surface min-h-0 drop-shadow-md ${hideInBackground ? "opacity-0" : ""}`}
+            style={{
+                paddingTop: isTheaterMode || isFullscreen ? `min(${resoRatio}%, 100vh)` : `min(${resoRatio}%, -130px + 100vh)`
+            }}
+        >
             {/* <LoadingBox id={gamepanel.id} /> */}
             <GameIFrame
                 gamepanel={gamepanel}
-                canvasRef={canvasRef}
+                canvasRef={playSurfaceRef}
                 prioritizeWidth={prioritizeWidth}
-            />
-        {/* </div> */}
+                wrapperClassName={wrapperClassName}
+            >
+                {children}
+            </GameIFrame>
+            {/* </div> */}
 
-            </div>
+        </div>
         // </Portal>
     );
 }
 
 interface GameIFrameProps {
     gamepanel: any;
-    canvasRef?: React.RefObject<HTMLDivElement>;
+    canvasRef?: React.RefObject<HTMLElement | HTMLDivElement | null>;
     prioritizeWidth?: boolean;
-    displayMode?: string;
     isFullScreen?: boolean;
+    children?: React.ReactNode;
+    wrapperClassName?: string;
 }
 
-function GameIFrame({ gamepanel, canvasRef, prioritizeWidth, displayMode, isFullScreen }: GameIFrameProps) {
+function GameIFrame({ gamepanel, canvasRef, prioritizeWidth, isFullScreen, children, wrapperClassName }: GameIFrameProps) {
     useBucket(btScreenResized);
     // 'resize', 'isFullScreen', 'displayMode'
 
-    let room = gamepanel.room;  
+    let room = gamepanel.room;
 
     const [isOpen, setIsOpen] = useState(false);
     const [isLoaded] = useState(true);
@@ -123,6 +144,10 @@ function GameIFrame({ gamepanel, canvasRef, prioritizeWidth, displayMode, isFull
     const gamescreenRef = useRef<HTMLDivElement>(null);
     const gamewrapperRef = useRef<HTMLDivElement>(null);
     const gameResizer = useRef<HTMLDivElement>(null);
+
+    const displayMode = useBucket(btDisplayMode);
+    const isTheaterMode = displayMode === "theatre";
+    const isFullscreen = displayMode === "fullscreen";
 
     const room_slug = room.room_slug;
 
@@ -160,7 +185,7 @@ function GameIFrame({ gamepanel, canvasRef, prioritizeWidth, displayMode, isFull
 
     const checkFullScreen = () => {
         if (
-            document.fullscreenElement 
+            document.fullscreenElement
             // ||
             // document.webkitFullscreenElement ||
             // document.mozFullScreenElement
@@ -215,20 +240,21 @@ function GameIFrame({ gamepanel, canvasRef, prioritizeWidth, displayMode, isFull
             windowWidth = document.documentElement.clientWidth;
         }
 
-        let roomStatus = getRoomStatus(room_slug);
+        let roomStatus: RoomStatus = getRoomStatus(room_slug);
         let offsetRatio = 1; // !isLoaded ? 0.1 : 1;
 
         if (isLoaded) {
             if (
-                roomStatus == "GAME" ||
-                roomStatus == "LOADING" ||
-                roomStatus == "GAMEOVER" ||
-                roomStatus == "GAMECANCELLED" ||
-                roomStatus == "GAMEERROR"
+                roomStatus == RoomStatus.GAME ||
+
+                roomStatus == RoomStatus.LOADING ||
+                roomStatus == RoomStatus.GAMEOVER ||
+                roomStatus == RoomStatus.GAMECANCELLED ||
+                roomStatus == RoomStatus.GAMEERROR
             ) {
                 offsetRatio = 1;
             }
-            if (roomStatus == "NOSHOW" || roomStatus == "ERROR") {
+            if (roomStatus == RoomStatus.NOSHOW || roomStatus == RoomStatus.ERROR) {
                 // offsetRatio = 0.4;
             }
         }
@@ -275,7 +301,7 @@ function GameIFrame({ gamepanel, canvasRef, prioritizeWidth, displayMode, isFull
                     scale: scale,
                     translateZ: "0",
                 }) +
-                    `; transform-origin: left top; width:${screenwidth}px; height:${screenheight}px;`
+                `; transform-origin: left top; width:${screenwidth}px; height:${screenheight}px;`
             );
         }
 
@@ -332,11 +358,11 @@ function GameIFrame({ gamepanel, canvasRef, prioritizeWidth, displayMode, isFull
         <>
             <div
                 ref={gameResizer}
-                className="gameResizer flex flex-col h-full w-full relative z-10 top-0 left-0 justify-center items-center drop-shadow-md"
+                className={`gameResizer absolute flex flex-col w-full z-10 top-0 left-0 ${isTheaterMode || isFullscreen ? "justify-center items-center" : "justify-center items-center"}  drop-shadow-md`}
             >
                 {/* <LoadingBox isDoneLoading={gamepanel.loaded} /> */}
                 <div
-                    className="screen-wrapper flex flex-col h-full w-full relative justify-start items-center "
+                    className={`screen-wrapper flex flex-col  w-full relative ${wrapperClassName}`}
                     ref={gamewrapperRef}
                     style={{
                         transition: "filter 0.3s ease-in, opacity 0.5s ease-in",
@@ -345,7 +371,7 @@ function GameIFrame({ gamepanel, canvasRef, prioritizeWidth, displayMode, isFull
                 >
                     <div
                         ref={gamescreenRef}
-                        className="gamescreenRef relative self-center overflow-hidden rounded-lg "
+                        className={`gamescreenRef relative overflow-hidden  ${isTheaterMode || isFullscreen ? "" : "rounded-lg"}`}
                         key={"gamescreenRef-" + gamepanel.id}
                         style={{ filter: "drop-shadow(5px 5px 10px var(--chakra-colors-primary-1200))" }}
                     >
@@ -381,6 +407,7 @@ function GameIFrame({ gamepanel, canvasRef, prioritizeWidth, displayMode, isFull
                         {/* <GameMessageOverlay gamepanel={gamepanel} /> */}
                     </div>
                 </div>
+
                 {/* <div
                     className="absolute bottom-4 right-4"
                     style={{ display: isFullScreen || displayMode == "theatre" ? "block" : "none" }}
@@ -401,6 +428,8 @@ function GameIFrame({ gamepanel, canvasRef, prioritizeWidth, displayMode, isFull
                 </div> */}
                 {/* <div className="w-full h-12 bg-blue-500"></div> */}
             </div>
+
+            {children}
         </>
     );
 }

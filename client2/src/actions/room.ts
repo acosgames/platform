@@ -143,7 +143,18 @@ export function useGame(room_slugOrGamePanelId: string | number | null, selector
             panel = panels?.[room_slugOrGamePanelId as number];
         }
         if (!panel) return null;
-        return selector(panel?.gamestate);
+        return selector ? selector(panel?.gamestate) : panel?.gamestate ?? null;
+    });
+}
+
+export function useGameStatus(room_slug: string | null): GameStatus {
+    return useGame(room_slug, (gamestate) => gamestate?.room?.status ?? null);
+}
+
+export function useRoomStatus(room_slug: string | null):RoomStatus {
+    return useGamePanel(room_slug, (panel) => {
+        if (!panel) return RoomStatus.NOTEXIST;
+        return panel?.room?.status ?? RoomStatus.NOTEXIST;
     });
 }
 
@@ -529,15 +540,15 @@ export function clearRoom(room_slug: string) {
     clearChatMessages(room_slug);
 }
 
-export function getRoomStatus(room_slug: string) {
+export function getRoomStatus(room_slug: string): RoomStatus {
     let gamepanel = findGamePanelByRoom(room_slug);
-    if (!gamepanel) return "NOTEXIST";
+    if (!gamepanel) return RoomStatus.NOTEXIST;
 
-    return btGameStatus.get((bucket: any) => bucket[gamepanel.id] || "NOTEXIST");
+    return btGameStatus.get((bucket: any) => bucket[gamepanel.id] || RoomStatus.NOTEXIST);
 }
 
-export function updateRoomStatus(room_slug: string | null) {
-    if (!room_slug) return "NOTEXIST";
+export function updateRoomStatus(room_slug: string | null): RoomStatus {
+    if (!room_slug) return RoomStatus.NOTEXIST;
     let gamepanel = findGamePanelByRoom(room_slug);
     let status = processsRoomStatus(gamepanel);
     gamepanel.status = status;
@@ -550,39 +561,56 @@ export function updateRoomStatus(room_slug: string | null) {
     return status;
 }
 
-export function processsRoomStatus(gamepanel: any) {
+const RoomStatus = {
+    NOTEXIST: 1, 
+    LOADING: 2,
+    PREGAME: 3,
+    GAME: 4,
+    GAMEOVER: 5,
+    GAMECANCELLED: 6,
+    GAMEERROR: 7,
+    NOSHOW: 8,
+    FORFEIT: 9,
+    ERROR: 10
+} as const;
+
+type RoomStatus = typeof RoomStatus[keyof typeof RoomStatus];
+
+export { RoomStatus };
+
+export function processsRoomStatus(gamepanel: any): RoomStatus {
     let gamestate = gs(gamepanel.gamestate);
 
     if (!gamepanel.gamestate || !gamepanel.gamestate.state || !gamepanel.gamestate.players) {
-        return "NOTEXIST";
+        return RoomStatus.NOTEXIST;
     }
 
     let eventMap = gamestate.eventsMap();
     if (eventMap.gameover) {
-        return "GAMEOVER";
+        return RoomStatus.GAMEOVER;
     }
-    if (eventMap.gamecancelled) {
-        return "GAMECANCELLED";
+    if (gamestate.status == GameStatus.gamecancelled || eventMap.gamecancelled) {
+        return RoomStatus.GAMECANCELLED;
     }
-    if (eventMap.gameerror) {
-        return "GAMEERROR";
+    if (gamestate.status == GameStatus.gameerror || eventMap.gameerror) {
+        return RoomStatus.GAMEERROR;
     }
     if (eventMap.error) {
-        return "ERROR";
+        return RoomStatus.ERROR;
     }
 
     if (eventMap.noshow) {
-        return "NOSHOW";
+        return RoomStatus.NOSHOW;
     }
 
     if (gamepanel.forfeit) {
-        return "FORFEIT";
+        return RoomStatus.FORFEIT;
     }
 
     let gameLoaded = gamepanel.loaded;
-    if (!gameLoaded) return "LOADING";
+    if (!gameLoaded) return RoomStatus.LOADING;
 
-    return "GAME";
+    return RoomStatus.GAME;
 }
 
 export function isNextTeam(gamepanel: any, userid: string) {

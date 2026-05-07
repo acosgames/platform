@@ -415,12 +415,12 @@ export function CareerStatsTab({ gameSlug }: { gameSlug: string }) {
                                 return (
                                     <div key={season}>
                                         <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">Season {season}</p>
-                                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-2">
+                                        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                                             {rows.map((row) => {
                                                 const def = statDefMap[row.stat_slug];
                                                 const name = def?.stat_name ?? ACOS_DISPLAY_NAMES[row.stat_slug] ?? row.stat_slug;
                                                 const fmtLabels: Record<number, string> = { 1: "%", 2: "mm:ss", 3: "hh:mm:ss", 4: "date" };
-                                                const fmtLabel = fmtLabels[def?.display_format ?? 0] ?? (def?.algorithm === 2 ? "avg" : undefined);
+                                                const fmtLabel = fmtLabels[def?.display_format ?? 0] ?? (def?.algorithm === 2 ? "avg" : def?.algorithm === 1 ? "total" : undefined);
                                                 const val = fmtStatVal(row);
                                                 const best = fmtStatBest(row);
                                                 return (

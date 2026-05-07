@@ -1,7 +1,62 @@
 
 import { useEffect, useRef, useState } from "react";
+// --- ReplayControls component ---
+function ReplayControls({
+    playing,
+    onPrevState,
+    onPlayPause,
+    onNextState,
+    onReplay
+}: {
+    playing: boolean;
+    onPrevState: () => void;
+    onPlayPause: () => void;
+    onNextState: () => void;
+    onReplay: () => void;
+}) {
+    return (
+        <div className="flex items-center  justify-start mb-2">
+            <div className="relative flex  bg-white shadow-md p-2 rounded-xl items-center justify-center gap-3">
+                <button
+                    type="button"
+                    onClick={onPrevState}
+                    className="inline-flex h-8 w-12 items-center justify-center rounded-xl  border-slate-200 text-slate-600 hover:bg-slate-800 hover:text-slate-100"
+                    aria-label="Previous state"
+                >
+                    <BackwardIcon className="h-5 w-5" />
+                </button>
+                <button
+                    type="button"
+                    onClick={onPlayPause}
+                    className={`inline-flex h-8 w-8 items-center justify-center rounded-xl border-0 bg-white text-slate-700 hover:bg-slate-800 hover:text-slate-100 transition-colors `}
+                    aria-label={playing ? "Pause" : "Play"}
+                >
+                    {playing ? <PauseIcon className="h-5 w-5" /> : <PlayIcon className="h-5 w-5" />}
+                </button>
+                <button
+                    type="button"
+                    onClick={onNextState}
+                    className="inline-flex h-8 w-12 items-center justify-center rounded-xl  border-slate-200 text-slate-600 hover:bg-slate-800 hover:text-slate-100"
+                    aria-label="Next state"
+                >
+                    <ForwardIcon className="h-5 w-5" />
+                </button>
+                <div className="absolute -right-12 top-1/2 -translate-y-1/2">
+                    <button
+                        type="button"
+                        onClick={onReplay}
+                        className="ml-4 inline-flex h-8 w-8 items-center justify-center rounded-xl  border-slate-200 text-slate-600 bg-white hover:bg-slate-800 hover:text-slate-100"
+                        aria-label="Restart replay"
+                    >
+                        <ArrowPathIcon className="h-5 w-5" />
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
 import { useBucket, useBucketSelector } from "@/actions/bucket";
-import { btReplay, btReplays, btRooms } from "@/actions/buckets";
+import { btActivePowerTab, btReplay, btReplays, btRooms, btScreenBreakpoint } from "@/actions/buckets";
 import { downloadGameReplay, findGameReplays, pauseReplay, replayNextIndex, replayPrevIndex, replaySendGameStart, resumeReplay } from "@/actions/replay";
 import { findGamePanelByRoom } from "@/actions/room";
 import { ArrowPathIcon, BackwardIcon, ForwardIcon, PauseIcon, PlayIcon } from "@heroicons/react/24/solid";
@@ -20,8 +75,12 @@ export function WatchReplayTab({ gameSlug }: WatchReplayTabProps) {
     const timerRef = useRef<number | null>(null);
     const replays = useBucketSelector(btReplays, (replays) => replays[gameSlug]) || [];
 
+    const gameParentRef = useRef<HTMLDivElement>(null);
+
+    const breakpoint = useBucket(btScreenBreakpoint);
+    const sidebarOpen = useBucket(btActivePowerTab);
     const gamepanel = useBucketSelector(btReplay, (replays) => replays[gameSlug]);
-    
+
     // const replayId = useBucket(btReplay);
     // const gamepanel = findGamePanelByRoom(room_slug as string);
 
@@ -78,7 +137,7 @@ export function WatchReplayTab({ gameSlug }: WatchReplayTabProps) {
         return <div className="py-8 text-center text-slate-500">No replays found for this game.</div>;
     }
 
-    if(!gamepanel) {
+    if (!gamepanel) {
         return <div className="py-8 text-center text-slate-500">Loading replay...</div>;
     }
 
@@ -98,23 +157,23 @@ export function WatchReplayTab({ gameSlug }: WatchReplayTabProps) {
     const handlePrevState = () => {
         replayPrevIndex(roomSlug);
 
-        if( playing ) {
+        if (playing) {
             pauseReplay(roomSlug);
-            
+
             setPlaying(false)
         }
-        
+
     };
     const handleNextState = () => {
         replayNextIndex(roomSlug);
-        if( playing ) {
+        if (playing) {
             pauseReplay(roomSlug);
-            
+
             setPlaying(false)
         }
     }
     const handlePlayPause = () => {
-        if( playing ) {
+        if (playing) {
             pauseReplay(roomSlug);
         }
         else {
@@ -127,104 +186,86 @@ export function WatchReplayTab({ gameSlug }: WatchReplayTabProps) {
         if (gamepanel && gamestate) {
             // Find gamestart index and jump
             // This is a simplified version; you may want to use replaySendGameStart
-             setPlaying(true)
-                replaySendGameStart(roomSlug);
-            
+            setPlaying(true)
+            replaySendGameStart(roomSlug);
+
         }
     };
 
     return (
         <div className="space-y-4">
-                <div className="bg-white p-2 rounded-lg shadow-sm container">
-            <div className="flex flex-col sm:flex-row gap-2 items-center justify-between bg-slate-200 p-2 rounded-lg">
-                <div className="flex-1 min-w-0">
-                    <div className="truncate text-[11px] font-semibold text-slate-700">
-                        Room: <span className="text-slate-900">{activeReplay.room_slug}</span>
+            <div className="bg-white p-2 rounded-lg shadow-sm container">
+                <div className="flex flex-col sm:flex-row gap-2 items-center justify-between bg-slate-200 p-2 rounded-lg">
+                    <div className="flex-1 min-w-0">
+                        <div className="truncate text-[11px] font-semibold text-slate-700">
+                            Room: <span className="text-slate-900">{activeReplay.room_slug}</span>
+                        </div>
+                        <div className="text-[10px] text-slate-500">
+                            Version: {activeReplay.version} • Mode: {activeReplay.mode} • Rating: {activeReplay.rating}
+                        </div>
                     </div>
-                    <div className="text-[10px] text-slate-500">
-                        Version: {activeReplay.version} • Mode: {activeReplay.mode} • Rating: {activeReplay.rating}
+                    <div className="flex items-center gap-2">
+                        <button
+                            type="button"
+                            onClick={handlePrevReplay}
+                            className="inline-flex h-7 w-7 items-center justify-center rounded-full text-slate-600 transition-colors hover:bg-blue-50 hover:text-blue-700 border border-slate-200"
+                            aria-label="Previous replay"
+                            disabled={activeReplayIndex === 0}
+                        >
+                            <BackwardIcon className="h-4 w-4" />
+                        </button>
+                        <span className="text-xs text-slate-700">
+                            {activeReplayIndex + 1} / {replays.length}
+                        </span>
+                        <button
+                            type="button"
+                            onClick={handleNextReplay}
+                            className="inline-flex h-7 w-7 items-center justify-center rounded-full text-slate-600 transition-colors hover:bg-blue-50 hover:text-blue-700 border border-slate-200"
+                            aria-label="Next replay"
+                            disabled={activeReplayIndex === replays.length - 1}
+                        >
+                            <ForwardIcon className="h-4 w-4" />
+                        </button>
                     </div>
+
                 </div>
-                <div className="flex items-center gap-2">
-                    <button
-                        type="button"
-                        onClick={handlePrevReplay}
-                        className="inline-flex h-7 w-7 items-center justify-center rounded-full text-slate-600 transition-colors hover:bg-blue-50 hover:text-blue-700 border border-slate-200"
-                        aria-label="Previous replay"
-                        disabled={activeReplayIndex === 0}
-                    >
-                        <BackwardIcon className="h-4 w-4" />
-                    </button>
-                    <span className="text-xs text-slate-700">
-                        {activeReplayIndex + 1} / {replays.length}
-                    </span>
-                    <button
-                        type="button"
-                        onClick={handleNextReplay}
-                        className="inline-flex h-7 w-7 items-center justify-center rounded-full text-slate-600 transition-colors hover:bg-blue-50 hover:text-blue-700 border border-slate-200"
-                        aria-label="Next replay"
-                        disabled={activeReplayIndex === replays.length - 1}
-                    >
-                        <ForwardIcon className="h-4 w-4" />
-                    </button>
+            </div>
+            {/* <div className="grid grid-cols-12 gap-1 md:gap-4">
+                <div className="col-span-0 xl:col-span-1"></div>
+               <div className={`col-span-12 sm:col-span-6   ${breakpoint === 'md' && sidebarOpen != null ? 'md:col-span-12' : 'md:col-span-6'} lg:col-span-7 flex flex-col justify-center items-center`}>
+
+            <ReplayControls
+                playing={playing}
+                onPrevState={handlePrevState}
+                onPlayPause={handlePlayPause}
+                onNextState={handleNextState}
+                onReplay={handleReplay}
+            />
+    </div> */}
+            {/* </div> */}
+            <div className="grid grid-cols-12 gap-1 md:gap-4">
+                <div className="col-span-0 xl:col-span-1"></div>
+                <div ref={gameParentRef} className={`mt-15  col-span-12 sm:col-span-6 sm:mt-0  ${breakpoint === 'md' && sidebarOpen != null ? 'md:col-span-12 md:mt-15' : 'md:col-span-6'} lg:col-span-6 xl:col-span-6 flex flex-col justify-end items-end`}>
+                    
+                    <GamePanel wrapperClassName={`${breakpoint == "sm" || (breakpoint === 'md' && sidebarOpen != null) ? "justify-start items-center" : "justify-start items-end"}`} canvasRef={gameParentRef} id={String(gamepanel.id)} prioritizeWidth={false} />
                 </div>
-                
+                {/* Scoreboard rendered from live gamestate */}
+                <div className={`min-w-1/2 col-span-12 sm:col-span-6 ${breakpoint === 'md' && sidebarOpen != null ? 'md:col-span-12 px-8 py-2' : 'md:col-span-6'} lg:col-span-5 xl:col-span-4`}>
+                    <div className="w-auto pl-2 pr-4"><ReplayControls
+                playing={playing}
+                onPrevState={handlePrevState}
+                onPlayPause={handlePlayPause}
+                onNextState={handleNextState}
+                onReplay={handleReplay}
+            /></div>
+                    {gamestate ? (
+                        <ScoreboardPane roomSlug={roomSlug} />
+                    ) : (
+                        <div className="text-center text-slate-400 text-xs">No game state loaded yet.</div>
+                    )}
                 </div>
             </div>
 
-            <div className="grid grid-cols-12  gap-4">
-                <div className="col-span-7 flex justify-end items-end">
-                <GamePanel id={String(gamepanel.id)} prioritizeWidth={true} />
-
-                </div>
-                 {/* Scoreboard rendered from live gamestate */}
-            <div className=" min-w-1/2 col-span-5">
-
-            {/* State controls */}
-            <div className="flex items-center justify-center gap-3 mb-2">
-                <button
-                    type="button"
-                    onClick={handlePrevState}
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 text-slate-600 hover:bg-blue-50 hover:text-blue-700"
-                    aria-label="Previous state"
-                >
-                    <BackwardIcon className="h-5 w-5" />
-                </button>
-                <button
-                    type="button"
-                    onClick={handlePlayPause}
-                    className={`inline-flex h-10 w-10 items-center justify-center rounded-full border-2 border-blue-500 bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors ${playing ? "ring-2 ring-blue-400" : ""}`}
-                    aria-label={playing ? "Pause" : "Play"}
-                >
-                    {playing ? <PauseIcon className="h-6 w-6" /> : <PlayIcon className="h-6 w-6" />}
-                </button>
-                <button
-                    type="button"
-                    onClick={handleNextState}
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 text-slate-600 hover:bg-blue-50 hover:text-blue-700"
-                    aria-label="Next state"
-                >
-                    <ForwardIcon className="h-5 w-5" />
-                </button>
-                <button
-                    type="button"
-                    onClick={handleReplay}
-                    className="ml-4 inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 text-slate-600 hover:bg-blue-50 hover:text-blue-700"
-                    aria-label="Restart replay"
-                >
-                    <ArrowPathIcon className="h-5 w-5" />
-                </button>
-            </div>
-
-
-                {gamestate ? (
-                    <ScoreboardPane roomSlug={roomSlug} />
-                ) : (
-                    <div className="text-center text-slate-400 text-xs">No game state loaded yet.</div>
-                )}
-            </div>
-            </div>
-            
 
             <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm mt-2">
                 <div className="font-bold text-slate-900 mb-1">Replay Info</div>
@@ -238,7 +279,7 @@ export function WatchReplayTab({ gameSlug }: WatchReplayTabProps) {
                 </div>
             </div>
 
-           
+
         </div>
     );
 }
