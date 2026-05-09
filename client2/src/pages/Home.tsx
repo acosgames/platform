@@ -21,9 +21,9 @@ export function Home() {
   }, []);
 
   return (
-    <div className="space-y-4 py-4 flex-1 relative container mx-auto px-2 lg:px-8 xl:px-20">
+    <div className="space-y-4 flex-1 relative ">
       {/* Featured Games */}
-      <section className="overflow-hidden rounded-xl bg-white p-2 shadow-md">
+      <section className="overflow-hidden rounded-xl bg-white  shadow-md p-2">
         {/* Dark hero header — matches GameDetail hero */}
         <div className="bg-slate-950 px-5 py-6 rounded-lg ">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">

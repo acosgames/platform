@@ -28,9 +28,9 @@ export function HeaderQueueSearchIndicator() {
   const dots = ".".repeat(dotStep);
 
   return (
-    <div className="pointer-events-none absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2">
-      <div className="pointer-events-auto flex max-w-[min(56vw,30rem)] items-center gap-2 rounded-full  gap-3 py-1 backdrop-blur-sm">
-        <span className="relative h-4 w-4 shrink-0">
+    <div className="pointer-events-none absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 drop-shadow-sm">
+      <div className="pointer-events-auto flex  items-center rounded-full bg-slate-600 gap-3 p-1 ">
+        <span className="relative h-4 w-4 shrink-0 ml-2">
           <span className="absolute inset-0 rounded-full border border-white/50 animate-ping" />
           <span className="absolute inset-0 rounded-full border border-blue-300/90 border-t-transparent animate-spin" style={{ animationDuration: "1.2s" }} />
           <span className="absolute inset-0 flex items-center justify-center">
@@ -38,7 +38,7 @@ export function HeaderQueueSearchIndicator() {
           </span>
         </span>
 
-        <span className="truncate text-[11px] font-semibold tracking-wide text-white flex-1">
+        <span className="truncate text-[11px] font-semibold tracking-wide text-white flex-1 p-1">
           Searching for match
           <span className="inline-flex w-3">{dots}</span>
           {/* <span className="ml-1 text-blue-100/90">{queue.game_slug}</span>
@@ -51,7 +51,7 @@ export function HeaderQueueSearchIndicator() {
             wsLeaveQueue();
             clearGameQueues();
           }}
-          className="pointer inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full   text-white/85 transition-colors hover:border-white/45 hover:bg-white/15 hover:text-white"
+          className="mr-1 pointer-events-auto inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full   text-white/85 transition-colors hover:border-white/45 hover:bg-white/15 hover:text-white"
           aria-label="Leave matchmaking queue"
           title="Leave queue"
         >

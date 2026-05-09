@@ -371,7 +371,7 @@ function GameIFrame({ gamepanel, canvasRef, prioritizeWidth, isFullScreen, child
                 >
                     <div
                         ref={gamescreenRef}
-                        className={`gamescreenRef relative overflow-hidden  ${isTheaterMode || isFullscreen ? "" : "rounded-lg"}`}
+                        className={`gamescreenRef relative overflow-hidden  ${isTheaterMode || isFullscreen ? "" : "rounded-xl"}`}
                         key={"gamescreenRef-" + gamepanel.id}
                         style={{ filter: "drop-shadow(5px 5px 10px var(--chakra-colors-primary-1200))" }}
                     >

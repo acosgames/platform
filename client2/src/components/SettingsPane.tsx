@@ -46,15 +46,15 @@ export function SettingsPane({ isPlayRoute }: SettingsPaneProps) {
     }
 
     return (
-        <section className="flex h-full min-h-0 flex-col p-3 sm:p-3.5">
-            <div className="mb-2.5 flex items-center justify-between">
+        <section className="flex h-full min-h-0 flex-col p-2 sm:p-2 rounded-xl bg-white">
+            <div className="mb-2.5 flex items-center justify-between p-2">
                 <p className="text-sm font-semibold text-slate-900">Interface Settings</p>
                 <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-600 shadow-sm">
                     Profile
                 </span>
             </div>
 
-            <div className="flex-1 min-h-0 overflow-y-auto panel-scrollbar2 pr-1 space-y-2.5">
+            <div className="flex-1 min-h-0 overflow-y-auto  panel-scrollbar pl-2 pr-1 space-y-4">
                 {/* <div className="rounded-lg border border-slate-200 bg-slate-50 p-2.5">
                     <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Theme Mode</p>
                     <button
@@ -66,7 +66,7 @@ export function SettingsPane({ isPlayRoute }: SettingsPaneProps) {
                     </button>
                 </div> */}
 
-                <div className="rounded-xl border bg-white drop-shadow-md p-2.5">
+                <div className="rounded-xl border border-slate-100 bg-white shadow-md p-2.5">
                     <div className="flex items-center justify-between gap-2">
                         <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Master Volume</p>
                         <span className="text-[11px] font-semibold text-slate-700">{Math.round((volume ?? 1) * 100)}%</span>

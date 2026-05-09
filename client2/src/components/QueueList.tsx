@@ -47,15 +47,15 @@ export function QueueList() {
   }
 
   return (
-    <section className="flex w-full overflow-hidden h-full min-h-0 flex-col p-1 sm:p-1">
-      <div className="mb-2.5 flex items-center justify-between gap-2">
+    <section className="flex w-full overflow-hidden h-full min-h-0 flex-col p-2 sm:p-2 rounded-xl bg-white">
+      <div className="mb-2.5 flex items-center justify-between p-2">
         <h3 className="text-sm font-semibold text-slate-900">Queue Watch</h3>
         <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-600 shadow-sm">
           {totalPlayers} players
         </span>
       </div>
 
-      <div className="flex-1 min-h-0 overflow-y-auto panel-scrollbar2">
+      <div className="flex-1 min-h-0 overflow-y-auto panel-scrollbar p-2 pr-1">
         <ul className="flex flex-col gap-2">
           {queuedGames.map((queue) => (
             <li

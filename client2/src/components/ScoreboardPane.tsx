@@ -1,10 +1,10 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, use } from "react";
 import config from "../config";
 import { RoundedHexPortrait } from "./ui/RoundedHexPortrait";
 import { Panel } from "./ui/Panel";
-import { btGame, btUser } from "@/actions/buckets";
+import { btGame, btIsMobile, btPrimaryGamePanel, btUser } from "@/actions/buckets";
 import { useBucket } from "@/actions/bucket";
-import { findGamePanelByRoom as _findGamePanelByRoom, getPrimaryGamePanel, useGame, validateNextUser, clearRoom, clearPrimaryGamePanel, setRoomForfeited, useGameStatus, useGamePanel } from "@/actions/room";
+import { findGamePanelByRoom as _findGamePanelByRoom, getPrimaryGamePanel, useGame, validateNextUser, clearRoom, clearPrimaryGamePanel, setRoomForfeited, useGameStatus, useGamePanel, useGamePanelUpdated, getGamePanel } from "@/actions/room";
 import { wsJoinGame, wsLeaveGame, wsLeaveQueue } from "@/actions/ws";
 import { GameStatus, gs } from "@acosgames/framework";
 import { addJoinQueues } from "@/actions/queue";
@@ -22,6 +22,7 @@ type ScoreboardRow = {
   portraitid: number;
   portrait: string;
   teamid?: number;
+  moveTimeSec: number | null;
   stats: Record<string, number>;
 };
 
@@ -46,14 +47,15 @@ export function ScoreboardPane({ roomSlug }: { roomSlug: string | null }) {
     return () => document.removeEventListener("mousedown", handler);
   }, [confirmForfeit]);
 
+  const primaryId = useBucket(btPrimaryGamePanel) as any;
   let resolvedRoomSlug = roomSlug;
   if (resolvedRoomSlug == null) {
-    const primary = getPrimaryGamePanel();
+    const primary = getGamePanel(primaryId);
     resolvedRoomSlug = primary?.room?.room_slug ?? null;
   }
 
   // const updated = useGamePanelUpdated(resolvedRoomSlug); // Unused
-
+  const isMobile = useBucket(btIsMobile);
   const currentUser = useBucket(btUser) as any;
   const gameInfo = useBucket(btGame) as GameInfoFull | null;
   const scoreboardStats = (gameInfo?.stats ?? [])
@@ -63,7 +65,8 @@ export function ScoreboardPane({ roomSlug }: { roomSlug: string | null }) {
 
   const gamepanel = useGamePanel(resolvedRoomSlug);
   const gamestate = useGame(resolvedRoomSlug, (gs) => gs) as any;
-  const status:GameStatus = useGameStatus(resolvedRoomSlug);
+  const status: GameStatus = useGameStatus(resolvedRoomSlug); 
+  // const updated = useGamePanelUpdated(resolvedRoomSlug); // Used to trigger re-render when game panel updates, even if we don't use the value directly
 
   const players: any[] = gamestate?.players ?? [];
   const teams: any[] = gamestate?.teams ?? [];
@@ -79,7 +82,7 @@ export function ScoreboardPane({ roomSlug }: { roomSlug: string | null }) {
 
   let matchType: MatchType = getMatchType(gamestate?.room);
 
-  
+
 
   if (players.length === 2 && teams.length === 0) matchType = "1v1";
   if (teams.length > 1) matchType = "team-based";
@@ -97,6 +100,16 @@ export function ScoreboardPane({ roomSlug }: { roomSlug: string | null }) {
     portraitid: player.portraitid ?? 0,
     portrait: player.portrait ?? `https://assets.acos.games/images/portraits/assorted-${player.portraitid || 1}-medium.webp`,
     teamid: player.teamid,
+    moveTimeSec: Number(
+      player.move_time_left ??
+      player.movetimeleft ??
+      player.turn_time_left ??
+      player.turntimeleft ??
+      player.timeleft ??
+      player.time_remaining ??
+      player.timer ??
+      NaN
+    ),
     stats: Object.fromEntries(
       scoreboardStats.map((s) => [s.stat_slug, Number(player.stats?.[s.stat_abbreviation] ?? 0)])
     ),
@@ -113,88 +126,93 @@ export function ScoreboardPane({ roomSlug }: { roomSlug: string | null }) {
 
   let game = gs(gamestate);
 
-  const renderTableRow = (row: DecoratedScoreboardRow, idx: number) => {
+  const formatMoveTime = (seconds: number | null) => {
+    if (!Number.isFinite(seconds as number) || seconds == null || seconds < 0) return "--:--";
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${String(secs).padStart(2, "0")}`;
+  };
+
+  const renderPlayerCard = (row: DecoratedScoreboardRow, idx: number) => {
     const countrycode = (row.countrycode || "US").toUpperCase();
     const flagSrc = `${config.https.cdn}images/country/${countrycode}.svg`;
-    // const portraitSrc = `${config.https.cdn}images/portraits/assorted-${row.portraitid || 1}-medium.webp`; // Unused
     let rowClassName = row.isYou
-      ? "bg-blue-50"
+      ? "bg-slate-400 "
       : idx % 2 === 0
-        ? "bg-white"
-        : "bg-slate-50";
+        ? "bg-slate-400 "
+        : "bg-slate-400 ";
 
-    
+
     const isNext = validateNextUser(row.id, game);
 
-    if( isNext ) {
-      rowClassName = 'bg-cyan-100';
+    if (isNext) {
+      rowClassName = "bg-white";
     }
+
     return (
-      <tr
+      <div
         key={`${row.shortid}-${idx}`}
-        className={`${rowClassName} border-t border-slate-200 first:border-t-0 rounded-lg`}
+        className={`relative rounded-xl border shadow-md px-2 py-1.5 ${rowClassName} ${isNext ? "ring-1 ring-cyan-400" : ""}`}
       >
-        <td className="align-top py-1 pl-1">
-          <RoundedHexPortrait
-            src={row.portrait}
-            alt={row.displayname}
-            className={`h-10 w-10 md:h-10 md:w-10  rounded-xl border-2 overflow-hidden ${isNext ? "border-cyan-400" : "border-slate-200"} `}
-            imageInset={5}
-          />
-        </td>
-
-        <td className="align-top px-1  py-1 min-w-0">
-          <p className="w-full truncate text-xs font-semibold text-slate-800">{row.displayname}</p>
-
-          <div className="mt-1 min-w-0 flex items-center gap-1">
-            <div className=" min-w-0 flex items-center gap-0">
-              <span className="shrink-0 rounded  bg-slate-200 px-1.5 py-px text-[10px] font-bold text-slate-900">
-                {row.gameRank}
-              </span>
-              <div className="flex-1 min-w-0" />
+        <div className="flex items-start gap-3">
+          <div className="relative shrink-0">
+            <div className="rounded-xl bg-linear-to-br from-slate-300 via-slate-500 to-slate-900/65 p-0.5">
+              <RoundedHexPortrait
+                src={row.portrait}
+                alt={row.displayname}
+                className={`h-12 w-12 rounded-xl border-0 overflow-hidden `}
+                imageInset={5}
+              />
             </div>
-            <img
-              src={flagSrc}
-              alt={`${countrycode} flag`}
-              className="h-3 w-4.5 shrink-0 rounded-xs object-cover"
-              title={countrycode}
-            />
           </div>
-        </td>
 
-        {scoreboardStats.map((s) => (
-          <td key={s.stat_slug} className="align-top px-1 py-1 text-right text-[11px] leading-4 text-slate-700">{row.stats[s.stat_slug] ?? 0}</td>
-        ))}
-        <td className="align-top px-1 py-1 text-right text-xs leading-4 font-semibold text-blue-700 pr-2">
-          {row.score.toLocaleString()}
-        </td>
-      </tr>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0 pt-1">
+                <h3 className="truncate text-sm font-black uppercase tracking-[0.06em] text-slate-900">
+                  {row.displayname}
+                </h3>
+                <div className="mt-1 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-700">
+                  <span className="rounded bg-slate-200 px-1.5 py-px font-black text-slate-900">{row.gameRank}</span>
+                  <img src={flagSrc} alt={`${countrycode} flag`} className="h-3.5 w-5 rounded-[2px] border border-slate-300 object-cover" title={countrycode} />
+                  <span>{countrycode}</span>
+                </div>
+              </div>
+
+              <div className="shrink-0 rounded-xl bg-slate-800 px-2 py-1 text-[10px] font-black tracking-wide text-slate-100" title="Move time remaining">
+                {formatMoveTime(row.moveTimeSec)}
+              </div>
+            </div>
+
+            <div className="mt-2 flex items-end justify-between gap-2">
+              <div className="flex flex-wrap items-center gap-1">
+                {scoreboardStats.map((s) => (
+                  <span
+                    key={s.stat_slug}
+                    className="inline-flex items-center gap-1 rounded-md border border-slate-300 bg-slate-100 px-1.5 py-0.5 text-[10px] font-bold text-slate-800"
+                    title={s.stat_name}
+                  >
+                    <span className="text-slate-600">{s.stat_abbreviation}</span>
+                    <span className="text-slate-900">{row.stats[s.stat_slug] ?? 0}</span>
+                  </span>
+                ))}
+              </div>
+
+              <div className="shrink-0 text-right leading-none text-slate-900">
+                <div className="text-lg font-black tracking-wide">{row.score.toLocaleString()}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     );
   };
 
   const renderList = (rows: DecoratedScoreboardRow[], keyOffset = 0) => (
-    <div className="w-full min-w-0 overflow-x-auto  rounded-lg bg-white ">
-      <table className="w-full table-fixed border-collapse">
-        <colgroup>
-          <col className="w-6.5" />
-          <col className="w-26" />
-          {scoreboardStats.map((s) => <col key={s.stat_slug} className="w-7" />)}
-          <col className="w-10" />
-        </colgroup>
-        <thead>
-          <tr className="bg-slate-800">
-            <th aria-hidden="true" className="px-1.5 py-1 text-left" />
-            <th className="px-1 py-1 text-left text-[10px] font-semibold uppercase tracking-wide text-slate-400">Player</th>
-            {scoreboardStats.map((s) => (
-              <th key={s.stat_slug} className="px-1 py-1 text-right text-[10px] font-semibold uppercase tracking-wide text-slate-400" title={s.stat_name}>{s.stat_abbreviation}</th>
-            ))}
-            <th className="px-1 py-1 pr-2 text-right text-[10px] font-semibold uppercase tracking-wide text-slate-400">Score</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row, idx) => renderTableRow(row, keyOffset + idx))}
-        </tbody>
-      </table>
+    <div className="w-full min-w-0">
+      <div className="space-y-4">
+        {rows.map((row, idx) => renderPlayerCard(row, keyOffset + idx))}
+      </div>
     </div>
   );
 
@@ -231,13 +249,13 @@ export function ScoreboardPane({ roomSlug }: { roomSlug: string | null }) {
     gamestate.room.status > GameStatus.gamestart;
 
   return (
-    <section className="flex min-h-0 min-w-0 w-full flex-1 flex-col space-y-2.5  text-slate-800 drop-shadow-md h-full overflow-y-auto panel-scrollbar2">
+    <section className={`flex min-h-0 min-w-0 w-full flex-1 flex-col space-y-4 text-slate-800 h-full overflow-y-auto overflow-x-visible panel-scrollbar2 ${isMobile ? "pr-1" : ""}`}>
       {isExpanded ? (
-        <div className="flex-1 min-h-0  rounded-lg  space-y-2 pl-2 pr-1 pt-1">
+        <div className="flex-1 min-h-0 rounded-xl space-y-4">
           {matchType === "1v1" ? renderList(oneVOneRows) : null}
           {matchType === "free-for-all" ? renderList(freeForAllRows) : null}
           {matchType === "team-based" ? (
-            <div className="space-y-2">
+            <div className="space-y-4">
               {teams.map((team: any, tidx: number) => {
                 const teamRows = allDecorated.filter((r) => r.teamid === tidx);
                 if (teamRows.length === 0) return null;
@@ -249,21 +267,21 @@ export function ScoreboardPane({ roomSlug }: { roomSlug: string | null }) {
                   teamColor = `${teamColor.toUpperCase()}`;
                 }
                 return (
-                  <Panel
-                    key={team.team_slug}
-                    header={(
-                      <div className={`px-2 pb-3 py-1 bg-slate-950`} >
-                        <div className="flex items-center justify-between gap-1 pl-10">
-                          <p className="text-[10px] font-black text-slate-300">{team.name}</p>
-                          <span className="rounded-full  px-0 py-0 text-[10px] font-semibold text-slate-300">
-                            {team.score != null ? team.score.toLocaleString() : `${teamRows.length} player${teamRows.length > 1 ? "s" : ""}`}
-                          </span>
-                        </div>
+                  <div className="space-y-1">
+                    <div className="p-2 bg-slate-900 rounded-xl shadow-sm">
+                      <div className="flex items-center justify-between gap-1 ">
+                        <p className="text-xs font-black uppercase  text-slate-300/80">{team.name}</p>
+                        <span className="w-full flex-1 flex items-center justify-center text-slate-400">--:--</span>
+                        <span className="rounded-full px-2 py-0.5 text-[10px] font-bold text-slate-300/80 bg-slate-800 ">
+                          {team.score != null ? team.score.toLocaleString() : `${teamRows.length} player${teamRows.length > 1 ? "s" : ""}`}
+                        </span>
                       </div>
-                    )}
-                  >
-                    {renderList(teamRows, tidx * 100)}
-                  </Panel>
+                    </div>
+
+                    <div className="">
+                      {renderList(teamRows, tidx * 100)}
+                    </div>
+                  </div>
                 );
               })}
             </div>
@@ -280,14 +298,14 @@ export function ScoreboardPane({ roomSlug }: { roomSlug: string | null }) {
                 type="button"
                 onClick={handleForfeit}
                 className={`w-full h-8 rounded-lg border text-xs font-semibold transition-colors ${confirmForfeit
-                  ? "border-rose-400/60 bg-rose-500 text-white hover:bg-rose-400"
-                  : "border-rose-300/40 bg-rose-500/10 text-rose-600 hover:bg-rose-500/18"
+                  ? "border-rose-400/60 bg-slate-800 text-white hover:bg-slate-900"
+                  : "border-rose-300/40 bg-slate-800 text-rose-600 hover:bg-slate-900"
                   }`}
               >
                 {confirmForfeit ? "Confirm Forfeit" : "Forfeit Match"}
               </button>
               {confirmForfeit ? (
-                <p className="mt-1 text-[10px] text-center text-rose-500">This will concede the match.</p>
+                <p className="mt-1 text-[11px] text-center text-rose-800">This will concede the match.</p>
               ) : null}
             </>
           ) : (

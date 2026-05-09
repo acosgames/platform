@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { IntroPlayerCard, type IntroPlayer } from "./IntroPlayerCard";
 import { MatchCountdown } from "./MatchCountdown";
-import { useGamePanel } from "@/actions/room";
+import { btActivePowerTab } from "@/actions/buckets";
 
 import config from "@/config";
 
@@ -38,8 +38,6 @@ export function PlayerScreen({
     return "mobile";
   });
 
-
-  let gamepanel = useGamePanel(room?.room_slug ?? null);
   let gameName = room?.name ?? "Unknown Game";
   let gameImageUrl = room?.preview_images
     ? `${config.https.cdn}g/${room.game_slug}/preview/${room.preview_images}`
@@ -67,6 +65,16 @@ export function PlayerScreen({
 
     return () => window.removeEventListener("resize", updateScreenTier);
   }, []);
+
+  useEffect(() => {
+    if (!showVsScreen) return;
+    if (typeof window === "undefined") return;
+
+    const isMobileViewport = !window.matchMedia("(min-width: 640px)").matches;
+    if (isMobileViewport) {
+      btActivePowerTab.set(null);
+    }
+  }, [showVsScreen]);
 
   const getFfaOverflowPortraitSize = (count: number) => {
     const viewportWidth = viewportRef.current?.clientWidth ?? 1280;
@@ -139,7 +147,7 @@ export function PlayerScreen({
   const renderTimer = () => {
     return (
       <MatchCountdown
-        // durationMs={countdownDurationMs}
+        durationMs={countdownDurationMs}
         className="absolute top-1 right-4 shrink-0 flex items-end justify-end lg:pt-1 pt-2"
       />
     )
@@ -376,7 +384,7 @@ export function PlayerScreen({
   return (
     <>
       {showVsScreen ? (
-        <div ref={viewportRef} className="absolute inset-0 z-10 flex items-center justify-center  overflow-hidden drop-shadow-lg">
+        <div ref={viewportRef} className="fixed inset-0 z-1000 flex items-center justify-center overflow-hidden drop-shadow-lg">
 
           <div className={` relative ${vsExiting ? "vs-screen-exit" : "vs-screen-enter"} w-full h-full   bg-black p-3 sm:p-2 flex flex-col justify-start gap-2 lg:gap-5 overflow-hidden`}>
             {/* <div className="absolute -z-1 inset-0 bg-linear-to-b from-black/30 via-black/55 to-black/80" />

@@ -5,8 +5,8 @@ import { Clapperboard } from "lucide-react";
 import { PlayerScreen } from "../components/PlayerScreen";
 import type { IntroPlayer } from "../components/IntroPlayerCard";
 import GamePanel from "../components/gameScreen/GamePanel";
-import { btDisplayMode, btGame, btMainScrollRef, btPrimaryGamePanel, btPrimaryRoom, btPrimaryState } from "@/actions/buckets";
-import { useBucket } from "@/actions/bucket";
+import { btDisplayMode, btGame, btMainScrollRef, btPrimaryGamePanel, btPrimaryRoom, btPrimaryState, btTimeleft } from "@/actions/buckets";
+import { useBucket, useBucketSelector } from "@/actions/bucket";
 import config from "../config";
 import { GameStatus } from "@acosgames/framework";
 import { addJoinQueues } from "@/actions/queue";
@@ -32,6 +32,10 @@ export function PlayScreen() {
   const room = useBucket(btPrimaryRoom) as any;
   const gamestate = useBucket(btPrimaryState) as any;
   const game = useBucket(btGame) as any;
+  const timeleft = useBucketSelector(btTimeleft, (bucket) => {
+    if (primary == null) return undefined;
+    return (bucket as Record<string | number, number | undefined>)[primary];
+  }) as number | undefined;
   const gameSlug = game?.game_slug ?? id;
 
   // Loading timeout — after 6s with no primary panel, show error
@@ -51,6 +55,10 @@ export function PlayScreen() {
 
   // Hide VS screen when game actually starts
   const gameStatus = gamestate?.room?.status;
+  const secondsRemaining = Math.ceil((timeleft ?? 0) / 1000);
+  const revealBackgroundDuringCountdown =
+    vsExiting || (gameStatus === GameStatus.starting && secondsRemaining <= 2);
+
   useEffect(() => {
     if (gameStatus === GameStatus.gamestart && showVsScreen) {
       setVsExiting(true);
@@ -192,8 +200,8 @@ export function PlayScreen() {
 
   return (
     <div className="space-y-3 ">
-      <section ref={playSurfaceRef} className={`relative overflow-hidden min-h-full ${!isTheaterMode && !isFullscreen ? "p-2 md:p-4" : ""} `}>
-        <GamePanel wrapperClassName={`${isTheaterMode || isFullscreen ? "items-center justify-center":  "items-center justify-start"}`} id={String(primary)} prioritizeWidth hideInBackground={showVsScreen}>
+      <section ref={playSurfaceRef} className={`relative overflow-hidden min-h-full ${!isTheaterMode && !isFullscreen ? "p-2 md:p-0" : ""} `}>
+        <GamePanel wrapperClassName={`${isTheaterMode || isFullscreen ? "items-center justify-center":  "items-center justify-start"}`} id={String(primary)} prioritizeWidth hideInBackground={showVsScreen && !revealBackgroundDuringCountdown}>
 
           
         </GamePanel>

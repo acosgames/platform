@@ -2,12 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import type React from "react";
 import { Link, Outlet, useLocation } from "react-router";
 import { XMarkIcon } from "@heroicons/react/24/solid";
-import { ChatBubbleLeftRightIcon, Cog6ToothIcon, QueueListIcon, UsersIcon, PlayIcon } from "@heroicons/react/24/solid";
+import { ChatBubbleLeftRightIcon, Cog6ToothIcon, QueueListIcon, PlayIcon } from "@heroicons/react/24/solid";
 import { QueueList } from "./QueueList";
-import { FriendsList } from "./FriendsList";
 import { ChatPane } from "./ChatPane";
 import { CompressedGamerCard } from "./CompressedGamerCard";
-import { MatchmakingQueueIndicator } from "./MatchmakingQueueIndicator";
 import { HeaderQueueSearchIndicator } from "./HeaderQueueSearchIndicator";
 import { PowerBar } from "./PowerBar";
 import { SettingsPane } from "./SettingsPane";
@@ -42,15 +40,17 @@ export function Layout() {
     // const toast = useBucket(btToast);
     let toast = { open: false, title: "", description: "", status: "success", duration: 3000, isClosable: true, id: 1 };
     const activePowerTab = useBucket(btActivePowerTab);
-    const isDockedWide = useBucket(btIsDockedWide);
     const isLargeScreen = useBucket(btIsLargeScreen);
-    const isMobile = useBucket(btIsMobile);
     const loggedIn = useBucket(btLoggedIn);
     const isLoggedIn = !!loggedIn && loggedIn !== "LURKER" && loggedIn !== "CHECKING";
 
     const displayMode = useBucket(btDisplayMode);
     const isTheaterMode = displayMode === "theatre";
     const isFullscreen = displayMode === "fullscreen";
+    const isMobile = useBucket(btIsMobile);
+
+    const mainContentRef = useRef<HTMLDivElement>(null);
+    const headerContentRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => { setMounted(true); }, []);
 
@@ -59,13 +59,17 @@ export function Layout() {
             btActivePowerTab.set(null);
             btIsDockedWide.set(false);
         } else {
-            // Start panel docked open when user logs in
-            btIsDockedWide.set(true);
+            // Always dock wide on large screens
+            if (isLargeScreen) {
+                btIsDockedWide.set(true);
+            } else {
+                btIsDockedWide.set(false);
+            }
             if (btActivePowerTab.get() === null) {
                 btActivePowerTab.set("chat");
             }
         }
-    }, [isLoggedIn]);
+    }, [isLoggedIn, isLargeScreen]);
 
     useEffect(() => {
         if (!toast?.open) return;
@@ -84,7 +88,7 @@ export function Layout() {
         // Use a window resize listener or a React useEffect hook to update dynamically
         // Example using a window listener:
         const updateLargeScreen = () => {
-            btIsLargeScreen.set(window.innerWidth >= screensPx['md']);
+            btIsLargeScreen.set(window.innerWidth >= screensPx['sm']);
 
             if (window.innerWidth >= screensPx['xl']) {
                 btScreenBreakpoint.set('xl');
@@ -108,7 +112,7 @@ export function Layout() {
             btIsMobile.set(e.matches);
         };
 
-        
+
         mediaQuery.addEventListener('change', handleTabletChange);
         handleTabletChange(mediaQuery);
 
@@ -123,12 +127,20 @@ export function Layout() {
 
     const isPlayRoute = /^\/game\/[^/]+\/play$/.test(location.pathname);
     const isPowerPanelOpen = activePowerTab !== null;
-    const isDockedOpenWide = isLargeScreen && isDockedWide && isPowerPanelOpen;
+    // Always show side panel on large screens
+    const isDockedOpenWide = isLargeScreen;
     const openSignIn = () => btModalShow.assign("signIn", true);
 
     // let isLargeScreen = checkBreakpoint('lg');
 
     console.log("Layout Render Count:", ++layoutRenderCount);
+
+    let headerRect = null;
+    if (headerContentRef.current) {
+        headerRect = headerContentRef.current.getBoundingClientRect();
+        console.log("Header Content Rect:", headerRect);
+    }
+
     return (
         <>
             <SignInPane onSignIn={() => false} />
@@ -148,7 +160,7 @@ export function Layout() {
                     <rect x="0" y="0" width="100%" height="100%" fill="url(#pattern-aztec-bottom)"></rect>
                 </svg>
             </div> */}
-            <div className="w-full h-screen overflow-hidden flex flex-col play-layout-root">
+            <div className="w-full h-screen  flex flex-col play-layout-root">
                 {toast?.open ? (
                     <div className="fixed top-4 right-4 z-90 w-[min(92vw,22rem)] rounded-md border border-white/15 bg-background/95 backdrop-blur-xl p-3 shadow-[0_10px_35px_rgba(0,0,0,0.35)]">
                         <div className="flex items-start justify-between gap-3">
@@ -182,60 +194,63 @@ export function Layout() {
                     </div>
                 ) : null}
 
-                <div className="relative flex flex-row w-full h-screen overflow-hidden ">
+                <div className="relative flex flex-row w-full h-full justify-center px-2 lg:px-3 panel-scrollbar2 overflow-y-auto overflow-x-hidden">
 
                     <div
                         ref={(element) => {
                             mainScrollRef.current = element;
                             btMainScrollRef.set(mainScrollRef);
                         }}
-                        className={`play-layout-main-shell flex-1 min-w-0 flex flex-col panel-scrollbar overflow-y-auto overflow-x-hidden ${mounted ? "transition-[margin-right] duration-200" : ""}`}
+                        className={`play-layout-main-shell container h-full mx-auto flex-1 min-w-0 flex flex-col   ${mounted ? "transition-[margin-right] duration-200" : ""}`}
                         style={{
-                            marginRight: isDockedOpenWide ? "20rem" : 0,
-                            marginTop: isTheaterMode || isFullscreen ? 0 : isDockedOpenWide ? "50px" : undefined,
+                            // paddingRight: isDockedOpenWide ? "20rem" : 0,
+                            // paddingTop: isTheaterMode || isFullscreen ? 0 : isDockedOpenWide ? "50px" : undefined,
                         }}
                     >
                         {/* Header */}
 
                         <header
-                            className={`play-layout-header fixed top-0 left-0 z-50 ${mounted ? "transition-[padding-right] transition-duration-200" : ""}  w-full h-12.5 min-h-12.5 max-h-12.5 box-border  bg-slate-950`}
+                            ref={headerContentRef}
+                            className={`play-layout-header ${isMobile ?  'left-0 pl-2 pr-2 md:pr-2' : '-left-1.5 pl-4 pr-3 md:pr-3.5'}  fixed top-0  z-50 ${mounted ? "transition-[padding-right] transition-duration-200" : ""}  w-full h-12.5 min-h-12.5 max-h-12.5 box-border  `}
                             style={{
-                                paddingRight: isDockedOpenWide ? "20rem" : undefined,
+                                // paddingRight: isDockedOpenWide ? "calc(20rem + 12px)" : "8px",
                             }}
                         >
-                            <div className="absolute w-full -z-50 inset-0  bg-linear-to-r transition-[padding-right] transition-duration-200 "
+                            {/* <div className="absolute  w-full -z-50    transition-[padding-right] transition-duration-200 "
                                 style={{
                                     // paddingRight: isLargeScreen && isPowerPanelOpen ? "calc(20rem - 8px)" : undefined,
                                     // width: isPowerPanelOpen ? "calc(100% - 20rem)" : undefined
                                 }}
-                            />
-                            <div className="w-full h-full container mx-auto px-2 lg:px-8 xl:px-20 relative">
-                                <HeaderQueueSearchIndicator />
-                                <div className="w-full h-full flex items-center justify-between gap-3">
-                                    <div className="flex items-center gap-3 min-w-0">
-                                        <Link to="/" className="flex items-center gap-2.5">
-                                            <img
-                                                src="https://assets.acos.games/acos-logo-2025.webp"
-                                                alt="ACOS"
-                                                className="h-8 w-auto object-contain"
-                                            />
-                                            <span className="font-acos-logo text-2xl font-semibold text-white leading-none">ACOS</span>
-                                        </Link>
-                                    </div>
+                            /> */}
+                            <div className="container  ">
+                                <div className="w-full  bg-white rounded-b-xl shadow-md h-full  px-2 ">
+                                    <HeaderQueueSearchIndicator />
+                                    <div className="w-full h-full flex items-center justify-between gap-3">
+                                        <div className="flex items-center gap-3 min-w-0">
+                                            <Link to="/" className="flex items-center gap-2.5">
+                                                <img
+                                                    src="https://assets.acos.games/acos-logo-2025.webp"
+                                                    alt="ACOS"
+                                                    className="h-8 w-auto object-contain"
+                                                />
+                                                <span className="font-acos-logo text-xl font-semibold text-slate-700 leading-none">ACOS</span>
+                                            </Link>
+                                        </div>
 
-                                    {isLoggedIn ? (
-                                        <PowerBar />
-                                    ) : (
-                                        <button
-                                            type="button"
-                                            onClick={openSignIn}
-                                            className="button bg-blue-500 hover:bg-blue-700 cursor-pointer text-white px-3 py-1.5 rounded-md text-sm font-medium transition-colors"
-                                            aria-label="Sign in"
-                                            title="Sign in"
-                                        >
-                                            Create Account
-                                        </button>
-                                    )}
+                                        {isLoggedIn ? (
+                                            <PowerBar />
+                                        ) : (
+                                            <button
+                                                type="button"
+                                                onClick={openSignIn}
+                                                className="button bg-blue-500 hover:bg-blue-700 cursor-pointer text-white px-3 py-1.5 rounded-md text-sm font-medium transition-colors"
+                                                aria-label="Sign in"
+                                                title="Sign in"
+                                            >
+                                                Create Account
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 
@@ -243,7 +258,8 @@ export function Layout() {
 
                         {/* Main content + footer */}
                         <div
-                            className={`flex-1 flex flex-col min-h-0  ${isTheaterMode || isFullscreen ? "mt-0" : isDockedOpenWide ? "" : "mt-[50px]"} ${isTheaterMode || isFullscreen ? "mt-0" : ""} min-w-0 relative`}
+
+                            className={`relative left-0 flex-1  flex flex-col min-h-0 ${isTheaterMode || isFullscreen ? "mt-0" : isDockedOpenWide ? "pt-16" : " pt-16 sm:mt-12.5"} ${isTheaterMode || isFullscreen ? "mt-0" : ""} min-w-0 relative`}
                             style={{
 
                             }}
@@ -251,59 +267,90 @@ export function Layout() {
                             {/* Persistent rounded-corner overlay at top right */}
 
                             {/* Main content */}
-                            <div className="flex-1 min-w-0 play-layout-content relative shadow-sm">
-                                <div className="flex flex-col gap-4 lg:gap-6">
+                            <div
+                                ref={mainContentRef}
+                                className=" flex-1 w-full items-start min-w-0 play-layout-content relative grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_16rem] md:grid-cols-[minmax(0,1fr)_20rem] gap-4">
+                                <div className="w-full h-full flex flex-col ">
                                     {/* Main content area */}
                                     <div className="flex-1 min-w-0">
                                         <Outlet />
                                     </div>
+
+                                    <footer className="w-full h-full text-xs px-1 flex items-end justify-center">
+                                        <div className="w-full bg-white rounded-t-xl shadow-md px-2  lg:px-4 p-3.5  ">
+                                            <div className="flex flex-row sm:flex-row sm:items-center sm:justify-between gap-2">
+                                                <p className="text-slate-700">© {new Date().getFullYear()} ACOS Platform. All rights reserved.</p>
+                                                <div className="flex items-center gap-3 text-muted-foreground">
+                                                    <span className="text-green-400">Status: Online</span>
+                                                    {/* <span>Build: Beta</span> */}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </footer>
                                 </div>
+                                {/* Right rail: flush 20rem column; scrollbar gutter floats outside rail width */}
+                                {isLargeScreen && isPowerPanelOpen && isDockedOpenWide && (
+                                    <aside
+                                        className="sticky top-16 z-20 w-83 h-[calc(100vh-4.5rem)] flex flex-col"
+                                        style={{ alignSelf: 'start' }}
+                                    >
+                                        <div className="w-[20rem] sm:w-[16rem] md:w-[20rem] flex flex-col flex-1 min-h-0">
+                                            {!isTheaterMode && !isFullscreen && isDockedOpenWide ? (
+                                                <div className="power-panel-sidebar-bar">
+                                                    <PowerBar className="flex h-12.5 items-center justify-center gap-1.5 px-2" />
+                                                </div>
+                                            ) : null}
+                                            <PanelContent isPlayRoute={isPlayRoute} />
+                                        </div>
+                                    </aside>
+                                )}
 
 
                             </div>
 
-                            {/* Footer */}
-                            <footer className="border-t border-cyan-500/20 bg-slate-950">
-                                <div className="container mx-auto px-2  lg:px-20 py-3.5">
-                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs">
-                                        <p className="text-muted-foreground">© {new Date().getFullYear()} ACOS Platform. All rights reserved.</p>
-                                        <div className="flex items-center gap-3 text-muted-foreground">
-                                            <span className="text-cyan-400/80">Status: Online</span>
-                                            <span>Build: Beta</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </footer>
                         </div>{/* end padding wrapper */}
                     </div>
 
                 </div>
+                {/* Footer */}
 
-                {isPowerPanelOpen && !isDockedOpenWide ? (
+                {!isLargeScreen && isPowerPanelOpen && !isDockedOpenWide && (
+                    <>
+                    <aside
+                        className={`power-panel top-16 right-2 w-83  h-[calc(100vh-4.5rem)] max-h-[calc(100vh-20px)] fixed z-55 pt-0 pb-2 transition-[right] duration-200 ${mounted ? "" : ""} ${isPowerPanelOpen ? "power-panel-open right-2" : "-right-50"} ${isDockedOpenWide ? "docked  " : ""}`}
+                    // aria-hidden={!isPowerPanelOpen}
+
+                    >
+                        {/* {!isTheaterMode && !isFullscreen && isDockedOpenWide ? (
+                            <div className="power-panel-sidebar-bar">
+                                <PowerBar className="flex h-12.5 items-center justify-center gap-1.5 px-2" />
+                            </div>
+                        ) : null} */}
+                        <PanelContent isPlayRoute={isPlayRoute} />
+                    </aside>
                     <button
                         type="button"
                         className="fixed inset-0 z-50 bg-black/80"
                         onClick={() => btActivePowerTab.set(null)}
                         aria-label="Close power panel"
                     />
-                ) : null}
+                    </>
+                )}
 
-                <aside
-                    className={`power-panel fixed z-55 pt-1 pb-2 bg-slate-950 ${mounted ? "transition-[right] duration-200" : ""} ${isPowerPanelOpen ? "power-panel-open right-0" : "-right-100"} ${isDockedOpenWide ? "docked  " : ""}`}
-                // aria-hidden={!isPowerPanelOpen}
-                >
-                    {!isTheaterMode && !isFullscreen && isDockedOpenWide ? (
-                        <div className="power-panel-sidebar-bar">
-                            <PowerBar className="flex h-12.5 items-center justify-center gap-1.5 px-2" />
-                        </div>
-                    ) : null}
-                    <PanelContent isPlayRoute={isPlayRoute} />
-                </aside>
+
+                {isTheaterMode && (
+                    <div className="fixed top-4 right-4 z-100">
+                        <PowerBar minimal={true} />
+                    </div>
+                )}
+
+
 
                 {/* Rounded concave corner — fixed sibling so it escapes the aside's stacking context */}
-                {!(isTheaterMode || isFullscreen) ? (
+                {/* {!(isTheaterMode || isFullscreen) ? (
                     <div
-                        className={`pointer-events-none overflow-hidden border-0 fixed z-9 bg-slate-950 ${mounted ? "transition-[right] duration-200" : ""}`}
+                        className={`pointer-events-none overflow-hidden border-0 fixed z-9 bg-slate-300 ${mounted ? "transition-[right] duration-200" : ""}`}
                         style={{
                             top: '50px',
                             right: isDockedOpenWide && isMobile ? 'calc(20rem + 0px)' : isDockedOpenWide ? 'calc(20rem + 10px)' : '-100rem',
@@ -317,7 +364,7 @@ export function Layout() {
                     >
                         <div className="w-full h-full bg-slate-300 rounded-tr-lg" />
                     </div>
-                ) : null}
+                ) : null} */}
                 {/* <MatchmakingQueueIndicator /> */}
             </div>
 
@@ -337,7 +384,7 @@ const BASE_PANEL_TABS: Array<{ key: PanelSubTab; label: string; Icon: React.Elem
 
 function PanelContent({ isPlayRoute }: { isPlayRoute: boolean }) {
     const loggedIn = useBucket(btLoggedIn);
-    const [activeSubTab, setActiveSubTab] = useState<PanelSubTab>("chat");
+    const [activeSubTab, setActiveSubTab] = useState<PanelSubTab>(isPlayRoute ? "scoreboard" : "chat");
 
     const isLoggedIn = !!loggedIn && loggedIn !== "LURKER" && loggedIn !== "CHECKING";
 
@@ -368,21 +415,24 @@ function PanelContent({ isPlayRoute }: { isPlayRoute: boolean }) {
 
     if (!isLoggedIn) {
         return (
-            <div className="power-panel-content panel-scrollbar flex flex-col p-2 sm:p-3">
+            <div className="power-panel-content panel-scrollbar2 flex flex-col p-2 sm:p-3">
                 <SignInPane onSignIn={() => false} />
             </div>
         );
     }
 
     return (
-        <div className="flex flex-1 z-10 min-h-0 flex-col gap-2  relative pl-1.5 sm:pl-1.5 pr-2 py-0 sm:gap-3 ">
+        <div className="flex flex-1 z-10 min-h-0 h-full flex-col gap-4  relative  sm:gap-4">
             {/* Player card — shrink-0 ensures it never loses height */}
-            <div className="shrink-0">
-                <CompressedGamerCard />
-            </div>
+            {!isPlayRoute && (
+                <div className="shrink-0">
+                    <CompressedGamerCard />
+                </div>
+            )}
+            
 
             {/* Compact sub-tab nav */}
-            <div className="shrink-0 rounded-xl border border-slate-200/90 bg-slate-100 p-1 shadow-md">
+            <div className="shrink-0 rounded-xl bg-white p-1 shadow-md">
                 <div className="flex items-center gap-1">
                     {PANEL_TABS.map(({ key, label, Icon }: { key: PanelSubTab; label: string; Icon: React.ElementType }) => {
                         const isActive = activeSubTab === key;
@@ -406,8 +456,8 @@ function PanelContent({ isPlayRoute }: { isPlayRoute: boolean }) {
                 </div>
             </div>
 
-            {/* Sub-tab content — overflow-hidden: each tab owns its own internal scroll */}
-            <div className="flex-1 min-h-0 overflow-hidden rounded-xl p-1 pr-0 bg-slate-100 shadow-md">
+            {/* Sub-tab content — stretches to bottom with pb-4 */}
+            <div className="flex-1 min-h-0 overflow-y-auto pb-2">
                 {activeSubTab === "scoreboard" ? <ScoreboardPane roomSlug={null} /> : null}
                 {activeSubTab === "chat" ? <ChatPane /> : null}
                 {activeSubTab === "queue" ? <QueueList /> : null}
