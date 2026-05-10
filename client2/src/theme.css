@@ -127,6 +127,7 @@
 }
 
 @theme inline {
+  --breakpoint-xs: 480px;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -217,6 +218,16 @@
 
   }
 
+  @keyframes bgSideScroller {
+    0% {
+      background-position-x: 10px;
+    }
+
+    100% {
+      background-position-x: 0;
+    }
+  }
+
   @keyframes svgmoveTop {
     to {
       transform: translateX(0px);
@@ -278,17 +289,12 @@
   }
 }
 
+/* In your CSS entry point */
+
 
 @layer utilities {
 
-  .container {
-    width: 100%;
-    margin-inline: auto;
-
-    @variant lg {
-      max-width: 84rem;
-    }
-  }
+  
 
   @keyframes vs-card-enter {
     0% {
@@ -451,7 +457,7 @@
 
   .play-surface {
     /* padding-top: min(56.25% + 56px, -132px + 100vh);  */
-    height: auto; 
+    height: auto;
     /* calc(-132px + 100vh); */
     width: calc(100%);
   }
@@ -613,8 +619,9 @@
   }
 
   .container {
-    max-width:1152px;
+    max-width: 1152px;
   }
+
   /* ── Power panel: drops from header, right-aligned ── */
   .power-panel {
     position: fixed;

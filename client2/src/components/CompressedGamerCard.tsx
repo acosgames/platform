@@ -6,7 +6,7 @@ import { useBuckets } from "@/actions/bucket";
 import { logout } from "@/actions/person";
 import { openSaveProfileModal } from "./SignInPane";
 
-export function CompressedGamerCard() {
+export function CompressedGamerCard({isPlayRoute}: {isPlayRoute: boolean}) {
     let [loggedIn, player, latency, wsConnected, duplicatetabs] = useBuckets([btLoggedIn, btUser, btLatency, btWebsocketConnected, btDuplicateTabs]);
     const [menuOpen, setMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
@@ -51,8 +51,8 @@ export function CompressedGamerCard() {
         }
 
     return (
-        <section className="relative rounded-xl">
-            <div className="relative flex items-start gap-3 bg-white shadow-md rounded-xl px-2 pt-1">
+        <section className={`relative `}>
+            <div className={`relative flex items-start gap-3 bg-white shadow-md rounded-xl  rounded-t-none  px-2 pt-1`}>
                 <div className="relative shrink-0">
                     <div className="relative rounded-xl bg-linear-to-br from-slate-300 via-slate-500 to-slate-900/65 p-0.5">
                         <img src={avatarUrl} alt={player.displayname || "Player"} className="relative h-13 w-13 rounded-xl bg-slate-900 object-cover" />
@@ -61,12 +61,12 @@ export function CompressedGamerCard() {
                             title={statusLabel}
                         />
                     </div>
-                    <div className="shrink-0 rounded-xl pt-0.5 text-center flex items-center justify-end leading-none gap-1">
+                    <div className="shrink-0 rounded-xl relative top-0.25 text-center flex items-center justify-end leading-none gap-1">
                         <div className="text-[9px] font-bold uppercase tracking-[0.2em] text-slate-700">Lvl</div>
                         <div className="mt-0.5 text-sm font-black text-slate-900">{levelInt}</div>
                     </div>
                 </div>
-                <div className="min-w-0 flex-1">
+                <div className="min-w-0 flex-1 relative w-full h-full">
                     <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
                             <h3 className="mt-1.5 truncate text-sm font-black uppercase tracking-[0.08em] text-slate-900">
@@ -135,12 +135,12 @@ export function CompressedGamerCard() {
                             )}
                         </div>
                     </div>
-                    <div className="mt-0.25">
+                    <div className="mt-0.25 relative -top-1">
                         <div className="mb-1 flex items-center justify-between text-[10px] font-semibold uppercase tracking-wide text-slate-900">
                             <span></span>
                             <span>{xpPercent}%</span>
                         </div>
-                        <div className="h-1.5 overflow-hidden rounded-full bg-slate-200">
+                        <div className="h-3 overflow-hidden rounded-full bg-slate-200">
                             <div className="h-full rounded-full bg-linear-to-r from-cyan-500 via-sky-500 to-blue-600" style={{ width: `${xpPercent}%` }} />
                         </div>
                     </div>

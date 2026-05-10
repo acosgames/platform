@@ -7,6 +7,7 @@ import { QueueList } from "./QueueList";
 import { ChatPane } from "./ChatPane";
 import { CompressedGamerCard } from "./CompressedGamerCard";
 import { HeaderQueueSearchIndicator } from "./HeaderQueueSearchIndicator";
+import { HeaderMatchSnapshot } from "./HeaderMatchSnapshot";
 import { PowerBar } from "./PowerBar";
 import { SettingsPane } from "./SettingsPane";
 import { ScoreboardPane } from "./ScoreboardPane";
@@ -222,8 +223,8 @@ export function Layout() {
                                     // width: isPowerPanelOpen ? "calc(100% - 20rem)" : undefined
                                 }}
                             /> */}
-                            <div className="container  ">
-                                <div className="w-full  bg-white rounded-b-xl shadow-md h-full  px-2 ">
+                            <div className="container relative grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_16rem] md:grid-cols-[minmax(0,1fr)_20rem] gap-4">
+                                <div className="relative bg-white rounded-b-xl shadow-md h-full  px-2 ">
                                     <HeaderQueueSearchIndicator />
                                     <div className="w-full h-full flex items-center justify-between gap-3">
                                         <div className="flex items-center gap-3 min-w-0">
@@ -238,7 +239,7 @@ export function Layout() {
                                         </div>
 
                                         {isLoggedIn ? (
-                                            <PowerBar />
+                                            <HeaderMatchSnapshot />
                                         ) : (
                                             <button
                                                 type="button"
@@ -252,6 +253,23 @@ export function Layout() {
                                         )}
                                     </div>
                                 </div>
+                                {isLargeScreen && isPowerPanelOpen && isDockedOpenWide && (
+                                    <div className={`w-full h-1 relative ${isPlayRoute ? 'top-0' : 'top-0'} transition-all duration-200`}>
+                                    <aside
+                                        className="sticky right-0 z-20 w-83 h-[calc(100vh)] flex flex-col"
+                                        style={{ alignSelf: 'start' }}
+                                    >
+                                        <div className="w-[20rem] sm:w-[16rem] md:w-[20rem] flex flex-col flex-1 min-h-0">
+                                            {!isTheaterMode && !isFullscreen && isDockedOpenWide ? (
+                                                <div className="power-panel-sidebar-bar">
+                                                    <PowerBar className="flex h-12.5 items-center justify-center gap-1.5 px-2" />
+                                                </div>
+                                            ) : null}
+                                            <PanelContent isPlayRoute={isPlayRoute} />
+                                        </div>
+                                    </aside>
+                                    </div>
+                                )}
                             </div>
 
                         </header>
@@ -276,7 +294,7 @@ export function Layout() {
                                         <Outlet />
                                     </div>
 
-                                    <footer className="w-full h-full text-xs px-1 flex items-end justify-center">
+                                    <footer className="w-full h-full text-[11px] px-1 flex items-end justify-center">
                                         <div className="w-full bg-white rounded-t-xl shadow-md px-2  lg:px-4 p-3.5  ">
                                             <div className="flex flex-row sm:flex-row sm:items-center sm:justify-between gap-2">
                                                 <p className="text-slate-700">© {new Date().getFullYear()} ACOS Platform. All rights reserved.</p>
@@ -290,21 +308,7 @@ export function Layout() {
                                     </footer>
                                 </div>
                                 {/* Right rail: flush 20rem column; scrollbar gutter floats outside rail width */}
-                                {isLargeScreen && isPowerPanelOpen && isDockedOpenWide && (
-                                    <aside
-                                        className="sticky top-16 z-20 w-83 h-[calc(100vh-4.5rem)] flex flex-col"
-                                        style={{ alignSelf: 'start' }}
-                                    >
-                                        <div className="w-[20rem] sm:w-[16rem] md:w-[20rem] flex flex-col flex-1 min-h-0">
-                                            {!isTheaterMode && !isFullscreen && isDockedOpenWide ? (
-                                                <div className="power-panel-sidebar-bar">
-                                                    <PowerBar className="flex h-12.5 items-center justify-center gap-1.5 px-2" />
-                                                </div>
-                                            ) : null}
-                                            <PanelContent isPlayRoute={isPlayRoute} />
-                                        </div>
-                                    </aside>
-                                )}
+                                
 
 
                             </div>
@@ -331,7 +335,7 @@ export function Layout() {
                     </aside>
                     <button
                         type="button"
-                        className="fixed inset-0 z-50 bg-black/80"
+                        className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm"
                         onClick={() => btActivePowerTab.set(null)}
                         aria-label="Close power panel"
                     />
@@ -424,15 +428,26 @@ function PanelContent({ isPlayRoute }: { isPlayRoute: boolean }) {
     return (
         <div className="flex flex-1 z-10 min-h-0 h-full flex-col gap-4  relative  sm:gap-4">
             {/* Player card — shrink-0 ensures it never loses height */}
-            {!isPlayRoute && (
+            {/* {!isPlayRoute && ( */}
                 <div className="shrink-0">
-                    <CompressedGamerCard />
+                    <CompressedGamerCard isPlayRoute={isPlayRoute} />
                 </div>
-            )}
+            {/* )} */}
             
 
+            
+
+            {/* Sub-tab content — stretches to bottom with pb-4 */}
+            <div className="flex-1 min-h-0 ">
+                {activeSubTab === "scoreboard" ? <ScoreboardPane roomSlug={null} /> : null}
+                {activeSubTab === "chat" ? <ChatPane /> : null}
+                {activeSubTab === "queue" ? <QueueList /> : null}
+                {/* {activeSubTab === "friends" ? <FriendsList /> : null} */}
+                {activeSubTab === "settings" ? <SettingsPane isPlayRoute={isPlayRoute} /> : null}
+            </div>
+
             {/* Compact sub-tab nav */}
-            <div className="shrink-0 rounded-xl bg-white p-1 shadow-md">
+            <div className={`shrink-0 rounded-xl rounded-b-none bg-white p-1 shadow-md`}>
                 <div className="flex items-center gap-1">
                     {PANEL_TABS.map(({ key, label, Icon }: { key: PanelSubTab; label: string; Icon: React.ElementType }) => {
                         const isActive = activeSubTab === key;
@@ -454,15 +469,6 @@ function PanelContent({ isPlayRoute }: { isPlayRoute: boolean }) {
                         );
                     })}
                 </div>
-            </div>
-
-            {/* Sub-tab content — stretches to bottom with pb-4 */}
-            <div className="flex-1 min-h-0 overflow-y-auto pb-2">
-                {activeSubTab === "scoreboard" ? <ScoreboardPane roomSlug={null} /> : null}
-                {activeSubTab === "chat" ? <ChatPane /> : null}
-                {activeSubTab === "queue" ? <QueueList /> : null}
-                {/* {activeSubTab === "friends" ? <FriendsList /> : null} */}
-                {activeSubTab === "settings" ? <SettingsPane isPlayRoute={isPlayRoute} /> : null}
             </div>
         </div>
     );

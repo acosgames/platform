@@ -15,7 +15,7 @@ function ReplayControls({
     onReplay: () => void;
 }) {
     return (
-        <div className="flex items-center  justify-start mb-2">
+        <div className="flex items-center justify-center lg:justify-start mb-2">
             <div className="relative flex  bg-white shadow-md p-2 rounded-xl items-center justify-center gap-3">
                 <button
                     type="button"
@@ -244,14 +244,15 @@ export function WatchReplayTab({ gameSlug }: WatchReplayTabProps) {
     </div> */}
             {/* </div> */}
             <div className="grid grid-cols-12 gap-1 md:gap-4">
-                <div className="col-span-0 xl:col-span-1"></div>
-                <div ref={gameParentRef} className={`mt-15  col-span-12 sm:col-span-6 sm:mt-0  ${breakpoint === 'md' && sidebarOpen != null ? 'md:col-span-12 md:mt-15' : 'md:col-span-6'} lg:col-span-6 xl:col-span-6 flex flex-col justify-end items-end`}>
+                <div className="hidden md:block lg:hidden xl:hidden col-span-2 xl:col-span-1"></div>
+                <div ref={gameParentRef} className={`  col-span-12 md:col-span-6 md:mt-0  ${breakpoint === 'md' && sidebarOpen != null ? 'md:col-span-8 md:mt-0' : 'md:col-span-6'} lg:col-span-6 xl:col-span-6 flex flex-col justify-end items-end`}>
                     
-                    <GamePanel wrapperClassName={`${breakpoint == "sm" || (breakpoint === 'md' && sidebarOpen != null) ? "justify-start items-center" : "justify-start items-end"}`} canvasRef={gameParentRef} id={String(gamepanel.id)} prioritizeWidth={false} />
+                    <GamePanel wrapperClassName={`${ (breakpoint === 'md' && sidebarOpen != null) ? "justify-start items-center" : "justify-start items-end"}`} canvasRef={gameParentRef} id={String(gamepanel.id)} prioritizeWidth={false} />
                 </div>
+                <div className="hidden md:block lg:hidden xl:hidden col-span-2 xl:col-span-1"></div>
                 {/* Scoreboard rendered from live gamestate */}
-                <div className={`min-w-1/2 col-span-12 sm:col-span-6 ${breakpoint === 'md' && sidebarOpen != null ? 'md:col-span-12 px-8 py-2' : 'md:col-span-6'} lg:col-span-5 xl:col-span-4`}>
-                    <div className="w-auto pl-2 pr-4"><ReplayControls
+                <div className={`min-w-1/2 col-span-12 md:col-span-12 ${breakpoint === 'md' && sidebarOpen != null ? 'sm:col-span-12 sm:px-8 ' : 'md:col-span-6'} lg:col-span-6 xl:col-span-6`}>
+                    <div className="w-auto "><ReplayControls
                 playing={playing}
                 onPrevState={handlePrevState}
                 onPlayPause={handlePlayPause}

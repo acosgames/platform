@@ -2,9 +2,9 @@ import { useState, useRef, useEffect, use } from "react";
 import config from "../config";
 import { RoundedHexPortrait } from "./ui/RoundedHexPortrait";
 import { Panel } from "./ui/Panel";
-import { btGame, btIsMobile, btPrimaryGamePanel, btUser } from "@/actions/buckets";
-import { useBucket } from "@/actions/bucket";
-import { findGamePanelByRoom as _findGamePanelByRoom, getPrimaryGamePanel, useGame, validateNextUser, clearRoom, clearPrimaryGamePanel, setRoomForfeited, useGameStatus, useGamePanel, useGamePanelUpdated, getGamePanel } from "@/actions/room";
+import { btGame, btIsMobile, btPrimaryGamePanel, btUser, btTimeleft } from "@/actions/buckets";
+import { useBucket, useBucketSelector } from "@/actions/bucket";
+import { findGamePanelByRoom as _findGamePanelByRoom, getPrimaryGamePanel, useGame, validateNextUser, clearRoom, clearPrimaryGamePanel, setRoomForfeited, useGameStatus, useGamePanel, useGamePanelUpdated, getGamePanel, validateNextTeam } from "@/actions/room";
 import { wsJoinGame, wsLeaveGame, wsLeaveQueue } from "@/actions/ws";
 import { GameStatus, gs } from "@acosgames/framework";
 import { addJoinQueues } from "@/actions/queue";
@@ -29,6 +29,47 @@ type ScoreboardRow = {
 type DecoratedScoreboardRow = ScoreboardRow & {
   gameRank: string;
 };
+
+// Extracted component for move time
+function PlayerMoveTime({ gamepanelId, fallback }: { gamepanelId: string | number | undefined, fallback: number | null }) {
+
+  // Only subscribe to the specific player's timeleft
+  const moveTime = useBucketSelector(
+    btTimeleft,
+    (state:any): number | null => state?.[gamepanelId ?? 0] ?? 0
+  );
+
+  const seconds = Math.floor((moveTime ?? 0) / 1000);
+  const milli = (moveTime ?? 0) % 1000;
+
+  const formatMoveTime = (seconds: number | null) => {
+    if (!Number.isFinite(seconds as number) || seconds == null || seconds < 0) return "--:--";
+
+    const milli = seconds % 1000;
+    seconds = seconds / 1000;
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+
+    if( seconds < 10 ) {
+      return `${secs}.${String(Math.floor(milli)).padEnd(3,"0")}`;
+    }
+    if( seconds <= 60 ) {
+      return `${String(secs).padStart(2, "0")}`;
+    }
+
+    return `${mins}:${String(secs).padStart(2, "0")}`;
+  };
+
+  let blinkClassNameUnder10Seconds = "text-slate-700";
+  if (typeof moveTime === "number" && seconds <= 9 && (seconds % 2 == 1 || seconds <= 3)) {
+    blinkClassNameUnder10Seconds = "text-amber-600";
+  }
+  return (
+    <div className={`shrink-0 rounded-xl bg-slate-200 px-2 py-1 text-md font-black tracking-wide  ${blinkClassNameUnder10Seconds}`} title="Move time remaining">
+      {formatMoveTime(moveTime)}
+    </div>
+  );
+}
 
 export function ScoreboardPane({ roomSlug }: { roomSlug: string | null }) {
   const navigate = useNavigate();
@@ -64,6 +105,8 @@ export function ScoreboardPane({ roomSlug }: { roomSlug: string | null }) {
     .slice(0, 4);
 
   const gamepanel = useGamePanel(resolvedRoomSlug);
+  // Use btTimeleft keyed by gamepanel.id (room id)
+ 
   const gamestate = useGame(resolvedRoomSlug, (gs) => gs) as any;
   const status: GameStatus = useGameStatus(resolvedRoomSlug); 
   // const updated = useGamePanelUpdated(resolvedRoomSlug); // Used to trigger re-render when game panel updates, even if we don't use the value directly
@@ -137,23 +180,24 @@ export function ScoreboardPane({ roomSlug }: { roomSlug: string | null }) {
     const countrycode = (row.countrycode || "US").toUpperCase();
     const flagSrc = `${config.https.cdn}images/country/${countrycode}.svg`;
     let rowClassName = row.isYou
-      ? "bg-slate-400 "
+      ? "bg-white "
       : idx % 2 === 0
-        ? "bg-slate-400 "
-        : "bg-slate-400 ";
-
+        ? "bg-white "
+        : "bg-white ";
 
     const isNext = validateNextUser(row.id, game);
-
-    if (isNext) {
-      rowClassName = "bg-white";
-    }
-
+    const isNextTeam = validateNextTeam(game, row?.teamid ?? 0);
     return (
       <div
         key={`${row.shortid}-${idx}`}
-        className={`relative rounded-xl border shadow-md px-2 py-1.5 ${rowClassName} ${isNext ? "ring-1 ring-cyan-400" : ""}`}
+        className={`relative rounded-xl border shadow-md px-2 py-1.5 ${rowClassName} ${isNext ? "ring-2 ring-cyan-400" : ""}`}
       >
+        {isNext && <div 
+        className="absolute inset-0 z-0 bg-[url('https://assets.acos.games/dark-line.webp')] bg-repeat opacity-5 bg-size-[10px_10px]"
+        style={{
+          animation: 'bgSideScroller 1000ms linear infinite'
+        }}
+        ></div>}
         <div className="flex items-start gap-3">
           <div className="relative shrink-0">
             <div className="rounded-xl bg-linear-to-br from-slate-300 via-slate-500 to-slate-900/65 p-0.5">
@@ -179,9 +223,10 @@ export function ScoreboardPane({ roomSlug }: { roomSlug: string | null }) {
                 </div>
               </div>
 
-              <div className="shrink-0 rounded-xl bg-slate-800 px-2 py-1 text-[10px] font-black tracking-wide text-slate-100" title="Move time remaining">
-                {formatMoveTime(row.moveTimeSec)}
-              </div>
+              {/* Only show move time if isNext */}
+              {isNext ? (
+                <PlayerMoveTime gamepanelId={gamepanel?.id} fallback={row.moveTimeSec} />
+              ) : null}
             </div>
 
             <div className="mt-2 flex items-end justify-between gap-2">
@@ -249,7 +294,7 @@ export function ScoreboardPane({ roomSlug }: { roomSlug: string | null }) {
     gamestate.room.status > GameStatus.gamestart;
 
   return (
-    <section className={`flex min-h-0 min-w-0 w-full flex-1 flex-col space-y-4 text-slate-800 h-full overflow-y-auto overflow-x-visible panel-scrollbar2 ${isMobile ? "pr-1" : ""}`}>
+    <section className={`flex min-h-0 min-w-0 w-full flex-1 flex-col space-y-4 text-slate-800 h-full pl-2 overflow-y-auto overflow-x-visible panel-scrollbar2 ${isMobile ? "pr-1" : ""}`}>
       {isExpanded ? (
         <div className="flex-1 min-h-0 rounded-xl space-y-4">
           {matchType === "1v1" ? renderList(oneVOneRows) : null}
@@ -267,17 +312,30 @@ export function ScoreboardPane({ roomSlug }: { roomSlug: string | null }) {
                   teamColor = `${teamColor.toUpperCase()}`;
                 }
                 return (
-                  <div className="space-y-1">
-                    <div className="p-2 bg-slate-900 rounded-xl shadow-sm">
-                      <div className="flex items-center justify-between gap-1 ">
-                        <p className="text-xs font-black uppercase  text-slate-300/80">{team.name}</p>
-                        <span className="w-full flex-1 flex items-center justify-center text-slate-400">--:--</span>
-                        <span className="rounded-full px-2 py-0.5 text-[10px] font-bold text-slate-300/80 bg-slate-800 ">
-                          {team.score != null ? team.score.toLocaleString() : `${teamRows.length} player${teamRows.length > 1 ? "s" : ""}`}
-                        </span>
-                      </div>
+                  <div className="space-y-2" key={'team-' + tidx}>
+                    <div
+                      className="relative flex items-center gap-2 p-2 rounded-xl shadow-md border-l-8"
+                      style={{
+                        borderColor: teamColor,
+                        background: 'linear-gradient(90deg, rgba(30,41,59,0.98) 80%, rgba(30,41,59,0.7) 100%)',
+                      }}
+                    >
+                      {/* Team color dot */}
+                      <span
+                        className="inline-block w-3 h-3 rounded-full border-2 border-white shadow mr-2"
+                        style={{ background: teamColor }}
+                        title={team.name + ' color'}
+                      />
+                      <span className="text-base font-extrabold uppercase tracking-wide text-slate-100 drop-shadow-sm flex-1">
+                        {team.name}
+                      </span>
+                      <span className="w-full flex-1 flex items-center justify-center text-slate-300 text-xs font-mono opacity-80">
+                        <PlayerMoveTime gamepanelId={gamepanel?.id} fallback={null} />
+                      </span>
+                      <span className="rounded-full px-3 py-1 text-xs font-bold text-white bg-gradient-to-r from-cyan-600 to-blue-700 shadow border border-cyan-400/40">
+                        {team.score != null ? team.score.toLocaleString() : `${teamRows.length} player${teamRows.length > 1 ? "s" : ""}`}
+                      </span>
                     </div>
-
                     <div className="">
                       {renderList(teamRows, tidx * 100)}
                     </div>
@@ -298,11 +356,11 @@ export function ScoreboardPane({ roomSlug }: { roomSlug: string | null }) {
                 type="button"
                 onClick={handleForfeit}
                 className={`w-full h-8 rounded-lg border text-xs font-semibold transition-colors ${confirmForfeit
-                  ? "border-rose-400/60 bg-slate-800 text-white hover:bg-slate-900"
-                  : "border-rose-300/40 bg-slate-800 text-rose-600 hover:bg-slate-900"
+                  ? "border-rose-400/60 bg-white text-red-600 hover:bg-slate-50"
+                  : "border-rose-300/40 bg-white text-red-600 hover:bg-slate-50"
                   }`}
               >
-                {confirmForfeit ? "Confirm Forfeit" : "Forfeit Match"}
+                {confirmForfeit ? "Click again to Forfeit" : "Forfeit Match"}
               </button>
               {confirmForfeit ? (
                 <p className="mt-1 text-[11px] text-center text-rose-800">This will concede the match.</p>

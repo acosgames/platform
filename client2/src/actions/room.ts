@@ -22,6 +22,7 @@ import {
 import { GameStateReader, GameStatus, gs } from "@acosgames/framework";
 import { useBucketSelector } from "./bucket";
 import type { GameStateLocal } from "./replay";
+import { getUser } from "./person";
 
 export function setCurrentRoom(room_slug: string | null) {
     btRoomSlug.set(room_slug);
@@ -65,7 +66,7 @@ export function findGamePanelByIFrame(iframeRef: any) {
     return null;
 }
 
-export function updateGamePanel(gamepanel: any) {
+export async function updateGamePanel(gamepanel: any) {
     // console.log("Updating gamepanel/" + gamepanel.id);
     let gamepanels = btGamePanels.get();
 
@@ -107,6 +108,13 @@ export function updateGamePanel(gamepanel: any) {
                 player.portrait = `https://assets.acos.games/images/portraits/assorted-${player.portraitid || 1}-medium.webp`;
             }
         }
+    }
+
+    let user = await getUser();
+    if (gamestate?.players) {
+        gamestate.local = gamestate.players.find((p: any) => p.shortid == user.shortid);
+    } else {
+        gamestate.local = { displayname: user.displayname, shortid: user.shortid };
     }
 
     // let prefix = "gamepanel/" + gamepanel.id;
@@ -151,7 +159,7 @@ export function useGameStatus(room_slug: string | null): GameStatus {
     return useGame(room_slug, (gamestate) => gamestate?.room?.status ?? null);
 }
 
-export function useRoomStatus(room_slug: string | null):RoomStatus {
+export function useRoomStatus(room_slug: string | null): RoomStatus {
     return useGamePanel(room_slug, (panel) => {
         if (!panel) return RoomStatus.NOTEXIST;
         return panel?.room?.status ?? RoomStatus.NOTEXIST;
@@ -173,25 +181,25 @@ export function useGameTeam(room_slugOrGamePanelId: string | number | null, team
 }
 
 export function validateNextUser(userid: number, game: GameStateReader): boolean {
-        
-        let next = game.nextPlayer;
-        if (Array.isArray(next) && next.includes(userid)) return true;
-        let player = game.player(userid);
-        if (!player) return false;
-        if (next === userid) return true;
-        if (validateNextTeam(game, player.teamid)) return true;
-        return false;
-    }
 
-   export function validateNextTeam(game: GameStateReader, teamid: number): boolean {
-        
-        let next = game.nextTeam;
-        if (Array.isArray(next) && next.includes(teamid)) return true;
-        let player = game.player(teamid);
-        if (!player) return false;
-        if (next === teamid) return true;
-        return false;
-    }
+    let next = game.nextPlayer;
+    if (Array.isArray(next) && next.includes(userid)) return true;
+    let player = game.player(userid);
+    if (!player) return false;
+    if (next === userid) return true;
+    if (validateNextTeam(game, player.teamid)) return true;
+    return false;
+}
+
+export function validateNextTeam(game: GameStateReader, teamid: number): boolean {
+
+    let next = game.nextTeam;
+    if (Array.isArray(next) && next.includes(teamid)) return true;
+    let player = game.player(teamid);
+    if (!player) return false;
+    if (next === teamid) return true;
+    return false;
+}
 
 export function getPrimaryGamePanel() {
     let id = btPrimaryGamePanel.get();
@@ -421,13 +429,13 @@ export function addRooms(roomList: any[]) {
                 player.portrait = `https://assets.acos.games/images/portraits/assorted-${player.portraitid || 1}-medium.webp`;
             }
 
-            
+
             gamestate.local = gamestate.players.find((player: any) => player.shortid === user.shortid);
             // if (gamestate.local) gamestate.local.shortid = user.shortid;
 
-            for (const shortid in gamestate.players) {
-                gamestate.players[shortid].shortid = shortid;
-            }
+            // for (const shortid in gamestate.players) {
+            //     gamestate.players[shortid].shortid = shortid;
+            // }
         } else {
             gamestate.local = {
                 displayname: user.displayname,
@@ -490,6 +498,7 @@ export function addRoom(msg: any) {
     btRooms.set(rooms);
     setWithExpiry("rooms", JSON.stringify(rooms), 120);
 
+    timerLoop();
     return gamepanel;
 }
 
@@ -562,7 +571,7 @@ export function updateRoomStatus(room_slug: string | null): RoomStatus {
 }
 
 const RoomStatus = {
-    NOTEXIST: 1, 
+    NOTEXIST: 1,
     LOADING: 2,
     PREGAME: 3,
     GAME: 4,

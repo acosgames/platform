@@ -78,7 +78,7 @@ export function timerLoop(cb?: () => void) {
             continue;
 
         let gamestate = gs(gamepanel.gamestate);
-        if(!gamestate) continue;
+        if (!gamestate) continue;
 
         // let timer = gamestate.timer;
         // if (!timer) {
@@ -165,6 +165,8 @@ export function sendFrameMessage(msg: any) {
         return;
     } else {
         try {
+
+         
             iframe.current.contentWindow.postMessage(msg, "*");
         } catch (e) {
             console.log("Error iframe not working: ", e, gamepanel);
@@ -214,15 +216,13 @@ export async function refreshGameState(room_slug: string) {
     let gamestate = gamepanel.gamestate;
     let user = await getUser();
     // if (iframe) {
-    let local: any = {};
     if (gamestate?.players) {
-        local = gamestate.players[user.shortid];
-        if (local) local.shortid = user.shortid;
+        gamestate.local = gamestate.players.find((p: any) => p.shortid == user.shortid);
     } else {
-        local = { displayname: user.displayname, shortid: user.shortid };
+        gamestate.local = { displayname: user.displayname, shortid: user.shortid };
     }
 
-    let out = { local, ...gamestate };
+    let out = { ...gamestate };
 
     // console.timeEnd('ActionLoop');
     sendFrameMessage(out);
@@ -284,9 +284,9 @@ export async function recvFrameMessage(evt: MessageEvent<any>) {
         return;
     }
 
-    if( action.type == 'gamesettings' ) {
-            // let gamepanel = findGamePanelByRoom(room_slug);
-            return;
+    if (action.type == 'gamesettings') {
+        // let gamepanel = findGamePanelByRoom(room_slug);
+        return;
     }
 
     if (gamepanel.room.isReplay) return;
@@ -377,6 +377,13 @@ export async function wsIncomingMessage(message: WSMessage) {
         return;
     }
 
+
+    const payload = msg.payload as any;
+
+   
+    let out = { local: msg.local, ...(payload || {}) };
+
+
     if (msg.payload) {
         // const payload = msg.payload as any;
         // let { gamestate, room } = msg.payload;
@@ -394,17 +401,7 @@ export async function wsIncomingMessage(message: WSMessage) {
         }
     }
 
-    const payload = msg.payload as any;
-
-    if (payload?.players) {
-        payload.local = payload.players.find((p: any) => p.shortid == user.shortid);
-        // msg.local = payload.players[user.shortid];
-        // if (msg.local) msg.local.shortid = user.shortid;
-    } else {
-        payload.local = { displayname: user.displayname, shortid: user.shortid };
-    }
-
-    let out = { local: msg.local, ...(payload || {}) };
+   
 
     // console.timeEnd('ActionLoop');
     sendFrameMessage(out);
@@ -433,12 +430,20 @@ function updateRoomPublicMessage(gamepanel: any, gamestate: any, payload: any) {
     mergedState = merge(gamestate, mergedState);
     // msg.payload.delta = deltaState;
 
+    
     mergedState.delta = deltaState;
+
+    //  if (mergedState?.players) {
+    //     mergedState.local = mergedState.players.find((p: any) => p.shortid == user.shortid);
+    // } else {
+    //     mergedState.local = { displayname: user.displayname, shortid: user.shortid };
+    // }
+
 
     gamepanel.gamestate = structuredClone(mergedState);
     console.log("[FULL GAMESTATE]", mergedState);
 
-   
+
 
     updateGamePanel(gamepanel);
 
