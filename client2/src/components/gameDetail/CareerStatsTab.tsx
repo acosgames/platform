@@ -102,11 +102,18 @@ export function CareerStatsTab({ gameSlug }: { gameSlug: string }) {
         return `${(v * 100).toFixed(decimals)}%`;
     }
     function fmtTime(v: number) {
-        // mm:ss
+        // days:hours:minutes:seconds, omit days/hours if zero
         if (!isFinite(v)) return "—";
-        const m = Math.floor(v / 60);
+        const d = Math.floor(v / 86400);
+        const h = Math.floor((v % 86400) / 3600);
+        const m = Math.floor((v % 3600) / 60);
         const s = Math.floor(v % 60);
-        return `${m}:${s.toString().padStart(2, "0")}`;
+        let out = [];
+        if (d > 0) out.push(d);
+        if (h > 0 || d > 0) out.push((d > 0 ? h.toString().padStart(2, "0") : h.toString().padStart(2,"0")));
+        out.push((h > 0 || d > 0 ? m.toString().padStart(2, "0") : m));
+        out.push(s.toString().padStart(2, "0"));
+        return out.join(":");
     }
     function fmtDuration(v: number) {
         // hh:mm:ss

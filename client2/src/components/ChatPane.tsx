@@ -89,7 +89,7 @@ export function ChatPane() {
 
   return (
     <section className="flex h-full min-h-0 flex-col-reverse relative overflow-hidden rounded-xl p-2 sm:p-2 pr-0 sm:pr-0 bg-white">
-      <div className="min-h-10 shrink-0 flex items-center gap-2 pb-2.5 pr-2">
+      <div className="min-h-10 shrink-0 flex items-center gap-2 pr-2">
         <div className="relative" ref={quickChatRef}>
           <button
             type="button"

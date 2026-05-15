@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router";
 import { ArrowsPointingOutIcon, ExclamationTriangleIcon } from "@heroicons/react/24/solid";
 import { Clapperboard } from "lucide-react";
 import { PlayerScreen } from "../components/PlayerScreen";
+import { GameEndOverlay } from "../components/GameEndOverlay";
 import type { IntroPlayer } from "../components/IntroPlayerCard";
 import GamePanel from "../components/gameScreen/GamePanel";
 import { btDisplayMode, btGame, btMainScrollRef, btPrimaryGamePanel, btPrimaryRoom, btPrimaryState, btTimeleft } from "@/actions/buckets";
@@ -213,6 +214,11 @@ export function PlayScreen() {
           countdownDurationMs={COUNTDOWN_DURATION_MS}
           showVsScreen={showVsScreen}
           vsExiting={vsExiting}
+        />
+
+        <GameEndOverlay
+          gameSlug={gameSlug ?? ""}
+          roomSlug={room?.room_slug ?? null}
         />
 
       <div className="container flex items-end justify-end gap-3 px-1 py-4">

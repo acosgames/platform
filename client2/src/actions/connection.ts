@@ -222,10 +222,10 @@ export async function refreshGameState(room_slug: string) {
         gamestate.local = { displayname: user.displayname, shortid: user.shortid };
     }
 
-    let out = { ...gamestate };
+    // let out = { ...gamestate };
 
     // console.timeEnd('ActionLoop');
-    sendFrameMessage(out);
+    sendFrameMessage(gamestate);
     // }
 }
 
@@ -378,11 +378,8 @@ export async function wsIncomingMessage(message: WSMessage) {
     }
 
 
-    const payload = msg.payload as any;
 
    
-    let out = { local: msg.local, ...(payload || {}) };
-
 
     if (msg.payload) {
         // const payload = msg.payload as any;
@@ -402,6 +399,9 @@ export async function wsIncomingMessage(message: WSMessage) {
     }
 
    
+    const payload = msg.payload as any;
+    let out = { local: msg.local, ...(payload || {}) };
+
 
     // console.timeEnd('ActionLoop');
     sendFrameMessage(out);

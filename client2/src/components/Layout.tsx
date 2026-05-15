@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type React from "react";
 import { Link, Outlet, useLocation } from "react-router";
 import { XMarkIcon } from "@heroicons/react/24/solid";
-import { ChatBubbleLeftRightIcon, Cog6ToothIcon, QueueListIcon, PlayIcon } from "@heroicons/react/24/solid";
+import { ChatBubbleLeftRightIcon, Cog6ToothIcon, BoltIcon, PlayIcon } from "@heroicons/react/24/solid";
 import { QueueList } from "./QueueList";
 import { ChatPane } from "./ChatPane";
 import { CompressedGamerCard } from "./CompressedGamerCard";
@@ -223,7 +223,7 @@ export function Layout() {
                                     // width: isPowerPanelOpen ? "calc(100% - 20rem)" : undefined
                                 }}
                             /> */}
-                            <div className="container relative grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_16rem] md:grid-cols-[minmax(0,1fr)_20rem] gap-4">
+                            <div className="container h-12 relative grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_16rem] md:grid-cols-[minmax(0,1fr)_20rem] gap-4">
                                 <div className="relative bg-white rounded-b-xl shadow-md h-full  px-2 ">
                                     <HeaderQueueSearchIndicator />
                                     <div className="w-full h-full flex items-center justify-between gap-3">
@@ -239,7 +239,8 @@ export function Layout() {
                                         </div>
 
                                         {isLoggedIn ? (
-                                            <HeaderMatchSnapshot />
+                                            <></>
+                                            // <HeaderMatchSnapshot />
                                         ) : (
                                             <button
                                                 type="button"
@@ -381,7 +382,7 @@ type PanelSubTab = "chat" | "queue" | "friends" | "settings" | "scoreboard";
 
 const BASE_PANEL_TABS: Array<{ key: PanelSubTab; label: string; Icon: React.ElementType }> = [
     { key: "chat", label: "Chat", Icon: ChatBubbleLeftRightIcon },
-    { key: "queue", label: "Queue", Icon: QueueListIcon },
+    { key: "queue", label: "Queue", Icon: BoltIcon },
     // { key: "friends", label: "Friends", Icon: UsersIcon },
     { key: "settings", label: "Settings", Icon: Cog6ToothIcon },
 ];
@@ -426,10 +427,10 @@ function PanelContent({ isPlayRoute }: { isPlayRoute: boolean }) {
     }
 
     return (
-        <div className="flex flex-1 z-10 min-h-0 h-full flex-col gap-4  relative  sm:gap-4">
+        <div className="flex flex-1 z-10 min-h-0 h-full flex-col gap-4  relative  sm:gap-4 ">
             {/* Player card — shrink-0 ensures it never loses height */}
             {/* {!isPlayRoute && ( */}
-                <div className="shrink-0">
+                <div className={`shrink-0 ${isPlayRoute ? 'opacity-60' : ''}`}>
                     <CompressedGamerCard isPlayRoute={isPlayRoute} />
                 </div>
             {/* )} */}
@@ -437,18 +438,10 @@ function PanelContent({ isPlayRoute }: { isPlayRoute: boolean }) {
 
             
 
-            {/* Sub-tab content — stretches to bottom with pb-4 */}
-            <div className="flex-1 min-h-0 ">
-                {activeSubTab === "scoreboard" ? <ScoreboardPane roomSlug={null} /> : null}
-                {activeSubTab === "chat" ? <ChatPane /> : null}
-                {activeSubTab === "queue" ? <QueueList /> : null}
-                {/* {activeSubTab === "friends" ? <FriendsList /> : null} */}
-                {activeSubTab === "settings" ? <SettingsPane isPlayRoute={isPlayRoute} /> : null}
-            </div>
 
             {/* Compact sub-tab nav */}
-            <div className={`shrink-0 rounded-xl rounded-b-none bg-white p-1 shadow-md`}>
-                <div className="flex items-center gap-1">
+            <div className={`shrink-0 h-full space-y-4 `}>
+                <div className={`flex items-center gap-1  rounded-xl ${isPlayRoute ? 'opacity-80' : ''}  bg-white p-1 shadow-md`}>
                     {PANEL_TABS.map(({ key, label, Icon }: { key: PanelSubTab; label: string; Icon: React.ElementType }) => {
                         const isActive = activeSubTab === key;
                         return (
@@ -469,6 +462,17 @@ function PanelContent({ isPlayRoute }: { isPlayRoute: boolean }) {
                         );
                     })}
                 </div>
+
+
+            
+            {/* Sub-tab content — stretches to bottom with pb-4 */}
+            <div className="flex-1 min-h-0 h-[calc(100vh-10rem)]">
+                {activeSubTab === "scoreboard" ? <ScoreboardPane roomSlug={null} /> : null}
+                {activeSubTab === "chat" ? <ChatPane /> : null}
+                {activeSubTab === "queue" ? <QueueList /> : null}
+                {/* {activeSubTab === "friends" ? <FriendsList /> : null} */}
+                {activeSubTab === "settings" ? <SettingsPane isPlayRoute={isPlayRoute} /> : null}
+            </div>
             </div>
         </div>
     );

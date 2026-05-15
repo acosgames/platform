@@ -65,7 +65,7 @@ function PlayerMoveTime({ gamepanelId, fallback }: { gamepanelId: string | numbe
     blinkClassNameUnder10Seconds = "text-amber-600";
   }
   return (
-    <div className={`shrink-0 rounded-xl bg-slate-200 px-2 py-1 text-md font-black tracking-wide  ${blinkClassNameUnder10Seconds}`} title="Move time remaining">
+    <div className={`shrink-0 rounded-xl text-white bg-slate-950 px-2 py-1 text-sm font-black tracking-wide  ${blinkClassNameUnder10Seconds}`} title="Move time remaining">
       {formatMoveTime(moveTime)}
     </div>
   );
@@ -186,7 +186,6 @@ export function ScoreboardPane({ roomSlug }: { roomSlug: string | null }) {
         : "bg-white ";
 
     const isNext = validateNextUser(row.id, game);
-    const isNextTeam = validateNextTeam(game, row?.teamid ?? 0);
     return (
       <div
         key={`${row.shortid}-${idx}`}
@@ -311,10 +310,12 @@ export function ScoreboardPane({ roomSlug }: { roomSlug: string | null }) {
                 } else {
                   teamColor = `${teamColor.toUpperCase()}`;
                 }
+                
+                const isNextTeam = validateNextTeam(game, team.teamid);
                 return (
                   <div className="space-y-2" key={'team-' + tidx}>
                     <div
-                      className="relative flex items-center gap-2 p-2 rounded-xl shadow-md border-l-8"
+                      className="relative flex items-center gap-2 p-1 rounded-xl shadow-sm border-l-8"
                       style={{
                         borderColor: teamColor,
                         background: 'linear-gradient(90deg, rgba(30,41,59,0.98) 80%, rgba(30,41,59,0.7) 100%)',
@@ -326,11 +327,11 @@ export function ScoreboardPane({ roomSlug }: { roomSlug: string | null }) {
                         style={{ background: teamColor }}
                         title={team.name + ' color'}
                       />
-                      <span className="text-base font-extrabold uppercase tracking-wide text-slate-100 drop-shadow-sm flex-1">
+                      <span className="text-xs font-extrabold uppercase tracking-wide text-slate-100 drop-shadow-sm flex-1">
                         {team.name}
                       </span>
                       <span className="w-full flex-1 flex items-center justify-center text-slate-300 text-xs font-mono opacity-80">
-                        <PlayerMoveTime gamepanelId={gamepanel?.id} fallback={null} />
+                        {isNextTeam && (<PlayerMoveTime gamepanelId={gamepanel?.id} fallback={null} />)}
                       </span>
                       <span className="rounded-full px-3 py-1 text-xs font-bold text-white bg-gradient-to-r from-cyan-600 to-blue-700 shadow border border-cyan-400/40">
                         {team.score != null ? team.score.toLocaleString() : `${teamRows.length} player${teamRows.length > 1 ? "s" : ""}`}
